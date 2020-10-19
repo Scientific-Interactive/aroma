@@ -91,7 +91,7 @@ def check(armfile):
 
       geomfl_flag = os.path.exists(geomfl)
       if (not geomfl_flag):
-         print geomfl + " Could Not be Found.\nTherefore, Aborting the Run .."
+         print(geomfl + " Could Not be Found.\nTherefore, Aborting the Run ..")
          sys.exit(10)
 
       geomflext = geomfl[geomfl.rindex(".")+1:len(geomfl)+1]
@@ -99,9 +99,9 @@ def check(armfile):
       valid_ext_flag = 1
       for extension in EXTENSIONS_FOR_GAUSSIAN_FILES:
          if (EXTENSIONS_FOR_GAUSSIAN_FILES[extension].count(geomflext) > 0): valid_ext_flag = 1
-      if (not valid_ext_flag): print "Gaussian File with \"" + geomflext + "\" Extension Can Not be Read.\nTherefore, Aborting the Run .."; sys.exit(10)
+      if (not valid_ext_flag): print("Gaussian File with \"" + geomflext + "\" Extension Can Not be Read.\nTherefore, Aborting the Run .."); sys.exit(10)
 
-   if (xy_flag): print "\nWARNING: You Have Requested XY-Scan. Make Sure That the Centers Are Defined in Proper Order.\n"
+   if (xy_flag): print("\nWARNING: You Have Requested XY-Scan. Make Sure That the Centers Are Defined in Proper Order.\n")
 
    for i in range (0, len(armlines)):
       if (armlines[i].upper().find("OUTFILE") >= 0): outfilename = armlines[i].strip().split("=")[1]
@@ -120,7 +120,7 @@ def check(armfile):
          if (armlines[i].upper().find("POINT") >= 0):
             points[(r_count, r_count+1)] = map(string.atof, re.split("[:|=]", armlines[i].strip())[1].split(","))
             points[(r_count, r_count+1)].insert(0,-1)
-            if (len(points[r_count, r_count+1]) != 4): print "The keyword POINT should have X, Y, Z coordinates.\n Check and Submit Again. Aborting This Run ..\n"; sys.exit(10)
+            if (len(points[r_count, r_count+1]) != 4): print("The keyword POINT should have X, Y, Z coordinates.\n Check and Submit Again. Aborting This Run ..\n"); sys.exit(10)
 
    for i in range (0, len(armlines)):
       if (armlines[i].upper().find("BQSTEP") >= 0): BQ_Step = string.atof(armlines[i].split("=")[1]); break;
@@ -129,11 +129,11 @@ def check(armfile):
 
    BQ_No = int((BQ_Range[1] - BQ_Range[0])/BQ_Step)
    if ( ncs_flag and (BQ_No > 100) ):
-      print "The package NBO can not handle more than 100 Bqs. Aborting thr Run.\nPlease change the BQRANGE or BQSTEP and Resubmit."
+      print("The package NBO can not handle more than 100 Bqs. Aborting thr Run.\nPlease change the BQRANGE or BQSTEP and Resubmit.")
       sys.exit(10)
 
    if ((len(CenterOf) < 1) and (len(normals) < 1)):
-      print "Rings/Bonds Are Not Defined.\nTherefore, Aborting the Run .."
+      print("Rings/Bonds Are Not Defined.\nTherefore, Aborting the Run ..")
       sys.exit(10)
 
 
@@ -186,7 +186,7 @@ def check(armfile):
          all_aromatic_rings[rings_count] = map(string.atoi, armlines[j].strip().split(",")) 
 
       if (all_aromatic_rings == {}):
-         print "\nWARNING: Aromatic Rings Are Not Provided, Therefore, Sigma-Only Model Calculations Will Not Be Performed.\n"
+         print("\nWARNING: Aromatic Rings Are Not Provided, Therefore, Sigma-Only Model Calculations Will Not Be Performed.\n")
          sigma_flag = 0
 
       for i in range (0, len(armlines)):
@@ -231,19 +231,19 @@ def generate_Opt_Input(geom, hashLine, title, charge, mult):
     f_opt.write("\n")
     f_opt.close()
 
-    print "Input file for Opitmization named as " + optfl + " is generated."
+    print("Input file for Opitmization named as " + optfl + " is generated.")
     return optfl
 
 def run_Optimization(optfl):
   
     # Run Gaussian for optimization
     # Check status and print approprate msg before proceeding 
-    print "Status: Optimization Running .. "
+    print("Status: Optimization Running .. ")
     status = os.system(constructGaussCMD(optfl))
-    print "Status: Optimization Over."
+    print("Status: Optimization Over.")
     if (status) : 
-       print "\nWARNING: Abnormal Termination of Optimization Run."
-       print "Aroma Will Continue with the Last Geometry for NICS Calculation.\n" 
+       print("\nWARNING: Abnormal Termination of Optimization Run.")
+       print("Aroma Will Continue with the Last Geometry for NICS Calculation.\n")
     
 
 
@@ -292,7 +292,7 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
    
             ringf.close()
          elif (new_geom == []):
-            print "Ring no. " + repr(ring) + " is not Planar within the tolerence of " + repr(TORSION_ANGLE_TOLERANCE)  +" degrees. Therefore, ring could not be reoriented in XY plane and BQs could not be generated."
+            print("Ring no. " + repr(ring) + " is not Planar within the tolerence of " + repr(TORSION_ANGLE_TOLERANCE)  +" degrees. Therefore, ring could not be reoriented in XY plane and BQs could not be generated.")
 
       # For "Normal"s defined by user
       n_count = len(CenterOf)
@@ -323,7 +323,7 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
    
             ringf.close()
          elif (new_geom == []):
-            print "Ring no. " + repr(n_count) + " is not Planar within the tolerence of " + repr(TORSION_ANGLE_TOLERANCE)  +" degrees. Therefore, ring could not be reoriented in XY plane and BQs could not be generated."
+            print("Ring no. " + repr(n_count) + " is not Planar within the tolerence of " + repr(TORSION_ANGLE_TOLERANCE)  +" degrees. Therefore, ring could not be reoriented in XY plane and BQs could not be generated.")
 
    elif (xy_flag):
       BQs_string, new_geom = generateBQs_XY(geom, Conn)
@@ -399,7 +399,7 @@ def generateBQs(geom, Conn, ring_atoms, normal = []):
    else: cmx, cmy, cmz = 0.0, 0.0, 0.0
 
    if (sigma_model):
-     print "\nSigma-Only Model detected. \nTherefore, the BQs will be generated on the opposite side of the s-only H-atoms."
+     print("\nSigma-Only Model detected. \nTherefore, the BQs will be generated on the opposite side of the s-only H-atoms.")
 
    zinc = BQ_Step
    if (direction_bq == 'NEGATIVE'): zinc = -zinc
@@ -450,7 +450,7 @@ def generateBQs_XY(geom, Conn):
                           elif ( (new_geom[Conn[atm_idx][j]][3]) < -0.5):
                              H_count += 1
                              direction -= 1
-              if (H_count > 2): sigma_model = 1; print "\nSigma-Only Model detected. \nTherefore, the BQs will be generated on the opposite side of the s-only H-atoms."
+              if (H_count > 2): sigma_model = 1; print("\nSigma-Only Model detected. \nTherefore, the BQs will be generated on the opposite side of the s-only H-atoms.")
               if (direction > 0): direction_bq = 'NEGATIVE'
 
               cmx, cmy, cmz = getGMOfRing(new_geom, ring_atoms)
@@ -480,7 +480,7 @@ def generateBQs_XY(geom, Conn):
               break;
 
            elif (new_geom == []):
-              print "None of the rings is Planar within the tolerence of " + repr(TORSION_ANGLE_TOLERANCE) + " degrees. Therefore, aboring the run .. "
+              print("None of the rings is Planar within the tolerence of " + repr(TORSION_ANGLE_TOLERANCE) + " degrees. Therefore, aboring the run .. ")
               sys.exit(10)
 
    xy_ref_ring_info.append(direct[1])
@@ -603,12 +603,12 @@ def run_Nics():
    elif (xy_flag): dict_cen = n_xy_center
    for ring in dict_cen:
       flname = flprfx + "-center" + repr(ring)
-      print "Job " + GaussCmd + flname + " " + flname + " running .."
+      print("Job " + GaussCmd + flname + " " + flname + " running ..")
       status = os.system(constructGaussCMD(flname))
-      print "Job Over."
+      print("Job Over.")
       if (not status) : continue 
       else : 
-          print "It seems that the NICS SCAN run for ring/bond number " + repr(ring) + " did not terminated normally.\n"
+          print("It seems that the NICS SCAN run for ring/bond number " + repr(ring) + " did not terminated normally.\n")
 #          sys.exit(10)
 
 
@@ -782,7 +782,7 @@ def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
             if (for_sigma_charge.has_key(sigma_key)):
                aroma_sigma_charge += for_sigma_charge[sigma_key]
             else:
-               if (not flag_for_warning): print "\nWARNING: Aroma does not have enough data for counting charge correctly for Atom with atomic no. ", geom[j][0], "\nIt is advised to give correct charge on Sigma model externally\n"; flag_for_warning = 1
+               if (not flag_for_warning): print("\nWARNING: Aroma does not have enough data for counting charge correctly for Atom with atomic no. ", geom[j][0], "\nIt is advised to give correct charge on Sigma model externally\n"); flag_for_warning = 1
    
 
    for ring_atoms in fused_3:
@@ -798,7 +798,7 @@ def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
             if (for_sigma_charge.has_key(sigma_key)):
                aroma_sigma_charge += for_sigma_charge[sigma_key]
             else:
-               if (not flag_for_warning): print "\nWARNING: Aroma does not have enough data for counting charge correctly for Atom with atomic no. ", geom[j][0], "\nIt is advised to give correct charge on Sigma model externally\n"; flag_for_warning = 1
+               if (not flag_for_warning): print("\nWARNING: Aroma does not have enough data for counting charge correctly for Atom with atomic no. ", geom[j][0], "\nIt is advised to give correct charge on Sigma model externally\n"); flag_for_warning = 1
 
    for ring in all_aromatic_rings_local:
       if (ring_count < indicator_for_fused_3):
@@ -815,7 +815,7 @@ def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
             if (for_sigma_charge.has_key(sigma_key)):
                aroma_sigma_charge += for_sigma_charge[sigma_key]
             else:
-               if (not flag_for_warning): print "\nWARNING: Aroma does not have enough data for counting charge correctly for Atom with atomic no. ", geom[j][0], "\nIt is advised to give correct charge on Sigma model externally\n"; flag_for_warning = 1
+               if (not flag_for_warning): print("\nWARNING: Aroma does not have enough data for counting charge correctly for Atom with atomic no. ", geom[j][0], "\nIt is advised to give correct charge on Sigma model externally\n"); flag_for_warning = 1
 
    for r in mapec:
        zmat_str += "1  " +  repr(zmat_idx[mapec[r]]) + "  " + ATM_H_BL[geom[mapec[r]][0]] + "  " + repr(zmat_idx[ring_dummy_tuples[r][0]]) + "  " + FIXED_SIGMA_ANGLE + "  " + repr(zmat_idx[ring_dummy_tuples[r][1]]) + "  " + FIXED_SIGMA_DIHEDRAL_ANGLE + "\n"
@@ -842,7 +842,7 @@ def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
       if (user_sigma_charge == aroma_sigma_charge):
          sigma_charge = aroma_sigma_charge
       else: 
-         print "\nWARNING: User Specifed Charge on Sigma Model is ", user_sigma_charge, " while that determined by Aroma is ", aroma_sigma_charge, "\nHowever, Aroma will proceed with Charge Provided by the User.\n"
+         print("\nWARNING: User Specifed Charge on Sigma Model is " + repr(user_sigma_charge) + " while that determined by Aroma is " + repr(aroma_sigma_charge) + "\nHowever, Aroma will proceed with Charge Provided by the User.\n")
          sigma_charge = user_sigma_charge
    else: sigma_charge = aroma_sigma_charge
 
@@ -957,8 +957,8 @@ def grepData():
                else : idx += 1
 
             else:
-               print ring
-               print "Number of Atoms and BQ number not matching .. \nTherefore, Skipping the Step Of Filtering and Storing the Data .."
+               print(ring)
+               print("Number of Atoms and BQ number not matching .. \nTherefore, Skipping the Step Of Filtering and Storing the Data ..")
                f_out.close()
                return
             
@@ -992,7 +992,7 @@ def Execute(geom, title, charge, mult, Conn):
          optfl = generate_Opt_Input(geom, hashLine_opt, title, charge, mult)
       else:
          optfl = flprfx + "-opt"
-         print "\nCopying external optimization input file to " + inpdir + optfl + GaussInpExt
+         print("\nCopying external optimization input file to " + inpdir + optfl + GaussInpExt)
          os.system("cp " + optfl_external + " " + inpdir + optfl + GaussInpExt)
 
       run_Optimization(optfl)
@@ -1008,11 +1008,11 @@ def Execute(geom, title, charge, mult, Conn):
       genNicsInputs(geom, Conn, hashLine_ncs, title, charge, mult)
    else : genNicsInputs(geom, Conn, hashLine_nics, title, charge, mult)
 
-   print "\nStatus : NICS input for all the centers generated."
+   print("\nStatus : NICS input for all the centers generated.")
 
    run_Nics()
-   print "\nAll the jobs are over"
-   print "\nStatus : Filtering Appropriate Data .. "
+   print("\nAll the jobs are over")
+   print("\nStatus : Filtering Appropriate Data .. ")
 
    grepData()
 
@@ -1074,9 +1074,9 @@ def aroma(armfile):
    # global technical 
    global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, sigma_charge, analyse_dist, clear_flag
 
-   print "\n--------------------------------------------------------------------"
-   print   "                        ** Aroma Run Begins. **"
-   print   "--------------------------------------------------------------------\n"
+   print("\n--------------------------------------------------------------------")
+   print("                        ** Aroma Run Begins. **")
+   print("--------------------------------------------------------------------\n")
 
    init()
 
@@ -1095,7 +1095,7 @@ def aroma(armfile):
       geom = {}; title = ""; charge=""; mult=""; Conn= []
 
    if (xy_flag):
-      print "The final output will be stored in ", outfilename
+      print("The final output will be stored in " + outfilename)
       outfl = open(outfilename, "w")
       outfl.write("\n--------------------------------------------------------------------")
       outfl.write("\n                        ** Aroma Run **")
@@ -1107,7 +1107,7 @@ def aroma(armfile):
 
 
    if (clear_flag):
-      print "\nClearing up unnecessary files .. \n"
+      print("\nClearing up unnecessary files .. \n")
       os.system("rm " + inpdir + flprfx + "-center*")
       os.system("rm " + inpdir + flprfx + "-guessonly* " + outdir + flprfx + "-guessonly*")
       if (opt_flag):
@@ -1159,13 +1159,13 @@ def aroma(armfile):
       Execute(sigma_geom, title, charge, mult, Conn)
 
       if (clear_flag):
-         print "\nClearing up unnecessary files .. \n"
+         print("\nClearing up unnecessary files .. \n")
          os.system("rm " + inpdir + flprfx + "-center*")
          os.system("rm " + inpdir + flprfx + "-guessonly* " + outdir + flprfx + "-guessonly*")
 
    numpy_flag = checkNumPy()
    if (sigma_flag and analyse_flag and numpy_flag and not xy_flag):
-       print "The final output will be stored in ", outfilename
+       print("The final output will be stored in " + outfilename)
        outfl = open(outfilename, "w")
        outfl.write("\n--------------------------------------------------------------------")
        outfl.write("\n                        ** Aroma Run **")
@@ -1186,9 +1186,9 @@ def aroma(armfile):
       armlog.close()
        
 
-   print "\n--------------------------------------------------------------------"
-   print   "                        ** Aroma Run Over. **"
-   print   "--------------------------------------------------------------------\n"
+   print("\n--------------------------------------------------------------------")
+   print("                        ** Aroma Run Over. **")
+   print("--------------------------------------------------------------------\n")
 
 if __name__ == "__main__":
    aroma(sys.argv[1])

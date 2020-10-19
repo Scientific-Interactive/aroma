@@ -1,10 +1,13 @@
 #! /usr/bin/env python
 # Author : Anuja
 # Last Updated : 02.11.2014
+# Python 3 upgrade: V. Ganesh
+# Updated: 19.10.2020
+#
 
-import Tkinter as tk
-import tkFileDialog
-import ScrolledText
+import tkinter as tk
+import tkinter.filedialog as tkFileDialog
+import tkinter.scrolledtext as ScrolledText
 import PIL
 from PIL import Image, ImageTk
 import threading
