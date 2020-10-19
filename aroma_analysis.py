@@ -19,7 +19,7 @@ from aroma_constants import *
 def readAndCheck(fl):
    lines = readFile(outdir + fl)
    if (len(lines) == 1):
-      print "AROMA output " + fl + " is empty. Hence, aborting .."
+      print("AROMA output " + fl + " is empty. Hence, aborting ..")
       sys.exit(10)
    else:
       return lines
@@ -66,7 +66,7 @@ def analyse(mfile, sfile, dist_start = DEFAULT_DISTANCE_FOR_ANALYSIS, outfl = sy
   
    for i in range (0, len(del_inp)):
        if (del_inp[i] > 5.0):
-           print "Warning: For some points chosen for fitting the Doop and 3Diso data, the del-inp values exceeds 5.0"
+           print("Warning: For some points chosen for fitting the Doop and 3Diso data, the del-inp values exceeds 5.0")
            break;
 
    p_oup = numpy.poly1d(numpy.polyfit(dist, del_oup, 3))

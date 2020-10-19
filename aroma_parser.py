@@ -59,8 +59,8 @@ class InputFileParser(FileParser):
          f.close()
          status = os.system(aroma_constants.constructGaussCMD(self.newflprfx))
          if (status):
-            print "WARNING: An error occured while running a Guess=Only job for converting Z-matrix to cartesian coordinates.\nConsequently, Aroma may terminate abnormally."
-#            print "Aborting Aroma .."
+            print("WARNING: An error occured while running a Guess=Only job for converting Z-matrix to cartesian coordinates.\nConsequently, Aroma may terminate abnormally.")
+#            print("Aborting Aroma ..")
 #            sys.exit(10)
          
          theParser = OutputFileParser(aroma_constants.outdir + self.newflprfx + aroma_constants.GaussOutExt)

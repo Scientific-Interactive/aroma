@@ -409,7 +409,7 @@ def identifyAromaticRings():
    for r in super_rings:
       final_rings.remove(r)
 
-   print "The Final Rings:\n", final_rings
+   print("The Final Rings:\n" + repr(final_rings))
       
 
 # ******************************************** RINGS END **************************************************** #

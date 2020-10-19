@@ -52,4 +52,4 @@ if __name__ == "__main__":
       idx.append(string.atoi(sys.argv[i]))
 
    area = ring_area(geomfl, idx)
-   print "\n\n       Area of Ring is ", round(abs(area),3), " sq. unit\n\n"
+   print("\n\n       Area of Ring is " + repr(round(abs(area),3)) + " sq. unit\n\n")

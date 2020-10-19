@@ -40,7 +40,7 @@ def detectPlane(geom):
    elif all_same_within_threshold(Z, aroma_constants.COORDINATE_EQUALITY_TOLERENCE): plane = 'XY'
    else : 
       plane = ''
-      print "The Molecule is not Planar. Please check the input and submit again."
+      print("The Molecule is not Planar. Please check the input and submit again.")
 
    return plane
 
@@ -156,7 +156,7 @@ def checkNumPy():
        import numpy
        return True
    except:
-       print "\nWarning: Analysis of data can not be performed as Python library \"numpy\" is not available."
+       print("\nWarning: Analysis of data can not be performed as Python library \"numpy\" is not available.")
        return False
 
 # A function for getting area of polygon (here, ring)

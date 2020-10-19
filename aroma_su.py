@@ -47,14 +47,14 @@ def main(suarmfile):
 
    for r in run_list:
           key = r[0]
-          print flprfx + "-" + key
+          print(flprfx + "-" + key)
           aroma(flprfx + "-" + key)
 #      try:
-#          print flprfx + "-" + key
+#          print(flprfx + "-" + key)
 #          aroma(flprfx + "-" + key)
 #      except:
-#          print "Some Error Occured While Performing The Run Named " + key
-#          print "Moving to The Next Run .."
+#          print("Some Error Occured While Performing The Run Named " + key)
+#          print("Moving to The Next Run ..")
 #          time.sleep(10)
 
 if __name__ == "__main__":
