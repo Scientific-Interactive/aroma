@@ -239,7 +239,7 @@ def run_Optimization(optfl):
     # Run Gaussian for optimization
     # Check status and print approprate msg before proceeding 
     print("Status: Optimization Running .. ")
-    # status = execCmd(constructGaussCMD(optfl))
+    status = execCmd(constructGaussCMD(optfl))
     status = 0
     print("Status: Optimization Over.")
     if (status) : 
@@ -605,7 +605,7 @@ def run_Nics():
    for ring in dict_cen:
       flname = flprfx + "-center" + repr(ring)
       print("Job " + GaussCmd + flname + " " + flname + " running ..")
-      # status = execCmd(constructGaussCMD(flname))
+      status = execCmd(constructGaussCMD(flname))
       status = 0
       print("Job Over.")
       if (not status) : continue 
