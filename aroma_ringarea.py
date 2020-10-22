@@ -49,7 +49,7 @@ if __name__ == "__main__":
    geomfl = sys.argv[1]
    idx = []
    for i in range (2, len(sys.argv)):
-      idx.append(string.atoi(sys.argv[i]))
+      idx.append(int(sys.argv[i]))
 
    area = ring_area(geomfl, idx)
    print("\n\n       Area of Ring is " + repr(round(abs(area),3)) + " sq. unit\n\n")

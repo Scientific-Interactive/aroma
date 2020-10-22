@@ -112,20 +112,20 @@ def check(armfile):
    for i in range (0, len(armlines)):
       if (armlines[i].upper().find("CENTER") >= 0):
          r_count += 1
-         CenterOf[r_count] = map(string.atoi, re.split("[:|=]", armlines[i].strip())[1].split(","))
+         CenterOf[r_count] = list(map(int, re.split("[:|=]", armlines[i].strip())[1].split(",")))
       if (armlines[i].upper().find("NORMAL") >= 0):
          n_count += 1
-         normals[n_count] = map(string.atof, re.split("[:|=]", armlines[i].strip())[1].split(","))
+         normals[n_count] = list(map(float, re.split("[:|=]", armlines[i].strip())[1].split(",")))
       if (xy_flag):
          if (armlines[i].upper().find("POINT") >= 0):
-            points[(r_count, r_count+1)] = map(string.atof, re.split("[:|=]", armlines[i].strip())[1].split(","))
+            points[(r_count, r_count+1)] = list(map(float, re.split("[:|=]", armlines[i].strip())[1].split(",")))
             points[(r_count, r_count+1)].insert(0,-1)
             if (len(points[r_count, r_count+1]) != 4): print("The keyword POINT should have X, Y, Z coordinates.\n Check and Submit Again. Aborting This Run ..\n"); sys.exit(10)
 
    for i in range (0, len(armlines)):
-      if (armlines[i].upper().find("BQSTEP") >= 0): BQ_Step = string.atof(armlines[i].split("=")[1]); break;
+      if (armlines[i].upper().find("BQSTEP") >= 0): BQ_Step = float(armlines[i].split("=")[1]); break;
    for i in range (0, len(armlines)):
-      if (armlines[i].upper().find("BQRANGE") >= 0): BQ_Range = map(string.atof, armlines[i].split("=")[1].split(",")); break;
+      if (armlines[i].upper().find("BQRANGE") >= 0): BQ_Range = list(map(float, armlines[i].split("=")[1].split(","))); break;
 
    BQ_No = int((BQ_Range[1] - BQ_Range[0])/BQ_Step)
    if ( ncs_flag and (BQ_No > 100) ):
@@ -169,7 +169,7 @@ def check(armfile):
    for i in range (0, len(armlines)):
       if (armlines[i].upper().find("ANALYSE") >= 0): 
          if (armlines[i].upper().find("NO") >= 0): analyse_flag = 0; break;
-         elif (armlines[i].find("=") >= 0): analyse_dist = string.atof(armlines[i].split("=")[1])
+         elif (armlines[i].find("=") >= 0): analyse_dist = float(armlines[i].split("=")[1])
          elif (armlines[i].upper().find("AREA") >= 0): area_flag = 1
 
    for i in range (0, len(armlines)):
@@ -183,7 +183,7 @@ def check(armfile):
       for j in range (i+1, len(armlines)):
          if (armlines[j].upper().find("END") >= 0): break;
          rings_count += 1
-         all_aromatic_rings[rings_count] = map(string.atoi, armlines[j].strip().split(",")) 
+         all_aromatic_rings[rings_count] = list(map(int, armlines[j].strip().split(",")))
 
       if (all_aromatic_rings == {}):
          print("\nWARNING: Aromatic Rings Are Not Provided, Therefore, Sigma-Only Model Calculations Will Not Be Performed.\n")
@@ -195,8 +195,7 @@ def check(armfile):
       for j in range (i+1, len(armlines)):
          if (armlines[j].upper().find("END") >= 0): break;
          ec_count += 1
-         exocyclic[ec_count] = map(string.atoi, armlines[j].strip().split(","))
-
+         exocyclic[ec_count] = list(map(int, armlines[j].strip().split(",")))
 
       for i in range (0, len(armlines)):
          if (armlines[i].upper().find("DIRECTION") >= 0):
@@ -207,7 +206,7 @@ def check(armfile):
       for i in range (0, len(armlines)):
          if (armlines[i].upper().find("SONLY CHARGE") >= 0):
             s_charge_flag = 1
-            sigma_charge = string.atoi(armlines[i].split("=")[1])
+            sigma_charge = int(armlines[i].split("=")[1])
    
 
 def generate_Opt_Input(geom, hashLine, title, charge, mult):
@@ -781,7 +780,7 @@ def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
             flag_H[j] = 1
             no_electrons += 1 
             sigma_key = (geom[j][0], len(Conn[j]))
-            if (for_sigma_charge.has_key(sigma_key)):
+            if (sigma_key in for_sigma_charge):
                aroma_sigma_charge += for_sigma_charge[sigma_key]
             else:
                if (not flag_for_warning): print("\nWARNING: Aroma does not have enough data for counting charge correctly for Atom with atomic no. ", geom[j][0], "\nIt is advised to give correct charge on Sigma model externally\n"); flag_for_warning = 1
@@ -797,7 +796,7 @@ def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
             flag_H[j] = 1
             no_electrons += 1 
             sigma_key = (geom[j][0], len(Conn[j]))
-            if (for_sigma_charge.has_key(sigma_key)):
+            if (sigma_key in for_sigma_charge):
                aroma_sigma_charge += for_sigma_charge[sigma_key]
             else:
                if (not flag_for_warning): print("\nWARNING: Aroma does not have enough data for counting charge correctly for Atom with atomic no. ", geom[j][0], "\nIt is advised to give correct charge on Sigma model externally\n"); flag_for_warning = 1
@@ -814,7 +813,7 @@ def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
             flag_H[j] = 1
             no_electrons += 1 
             sigma_key = (geom[j][0], len(Conn[j]))
-            if (for_sigma_charge.has_key(sigma_key)):
+            if (sigma_key in for_sigma_charge):
                aroma_sigma_charge += for_sigma_charge[sigma_key]
             else:
                if (not flag_for_warning): print("\nWARNING: Aroma does not have enough data for counting charge correctly for Atom with atomic no. ", geom[j][0], "\nIt is advised to give correct charge on Sigma model externally\n"); flag_for_warning = 1
@@ -903,7 +902,7 @@ def grepData():
 
          for i in range (0, len(outlines)):
            if (outlines[i].find("NAT") >= 0 ): break;
-         nat = string.atoi(outlines[i].split()[2])
+         nat = int(outlines[i].split()[2])
 
          for i in range (0, len(outlines)):
            if (outlines[i].find("Magnetic shielding tensor") >= 0 ): break;
@@ -926,16 +925,16 @@ def grepData():
                # BQ_data_string += words[0] + "   "
 
                # The isotropic value is in the first line
-               iso = -string.atof(words[4])
+               iso = -float(words[4])
 
                # Then get the diagonal values for the tensor
-               xx = -string.atof(outlines[j+1].strip().split()[1])
-               yy = -string.atof(outlines[j+2].strip().split()[3])
-               zz = -string.atof(outlines[j+3].strip().split()[5])
+               xx = -float(outlines[j+1].strip().split()[1])
+               yy = -float(outlines[j+2].strip().split()[3])
+               zz = -float(outlines[j+3].strip().split()[5])
 
                # Then get the three eigenvalues
                # Out-of-Plane eigenvalue is the one closest to ZZ
-               e1, e2, e3 = map(string.atof, outlines[j+4].split(":")[1].split())
+               e1, e2, e3 = list(map(float, outlines[j+4].split(":")[1].split()))
                sorted_e = []
                sorted_e.append(e1)
                close = abs(e1 + zz)
@@ -1182,8 +1181,8 @@ def aroma(armfile):
           sarmdatlines = readFile(outdir + flprfx + "-allcenter" + ".armdat")
           lineno = min(len(armdatlines), len(sarmdatlines))
           for i in range (1, lineno):
-             awords = map(string.atof, armdatlines[i].split())
-             sawords = map(string.atof, sarmdatlines[i].split())
+             awords = list(map(float, armdatlines[i].split()))
+             sawords = list(map(float, sarmdatlines[i].split()))
              armlog.write(fpformat.fix(awords[0],2) + "   " + fpformat.fix(awords[8],4) + "   " + fpformat.fix(sawords[8],4) + "   " + fpformat.fix(awords[8]-sawords[8], 4) + "\n" )
       armlog.close()
        

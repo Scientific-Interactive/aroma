@@ -41,7 +41,7 @@ class InputFileParser(FileParser):
 
       self.hashLine = glines[i].strip()
       self.title = glines[i+2].strip()
-      self.charge, self.mult = map(string.atoi, glines[i+4].strip().split())
+      self.charge, self.mult = list(map(int, glines[i+4].strip().split()))
 
       # Check if its in z-matrix format or cartesian coordinates
       zmat_flag = 0
@@ -79,11 +79,11 @@ class InputFileParser(FileParser):
                if ( (words[0].upper() != "BQ") and (words[0] != 0) ):
                   nat += 1
                   self.geom[nat] = []
-                  if dig_flag : self.geom[nat].append(string.atoi(words[0]))
+                  if dig_flag : self.geom[nat].append(int(words[0]))
                   else: self.geom[nat].append(aroma_constants.AtmSym[words[0].upper()])
 
                   for k in range (1,4):
-                     self.geom[nat].append(round(string.atof(words[k]),6))
+                     self.geom[nat].append(round(float(words[k]),6))
 
                if (glines[j+1] == "\n"):  break;
          else:
@@ -93,11 +93,11 @@ class InputFileParser(FileParser):
                if ( (words[0].upper() != "BQ") and (words[0] != 0) ):
                   nat += 1
                   self.geom[nat] = []
-                  if dig_flag : self.geom[nat].append(string.atoi(words[0].strip()))
+                  if dig_flag : self.geom[nat].append(int(words[0].strip()))
                   else: self.geom[nat].append(aroma_constants.AtmSym[words[0].strip().upper()])
 
                   for k in range (1,4):
-                     self.geom[nat].append(round(string.atof(words[k].strip()),6))
+                     self.geom[nat].append(round(float(words[k].strip()),6))
 
                if (glines[j+1] == "\n"):  break;
 
@@ -123,8 +123,8 @@ class OutputFileParser(FileParser):
 
       self.title = glines[j-2].strip()
       words = glines[j].strip().split()
-      self.charge = string.atoi(words[2])
-      self.mult = string.atoi(words[5])
+      self.charge = int(words[2])
+      self.mult = int(words[5])
 
       # If its an output of an optimization run, then the last goemetry should be read
       # Therefore, here a reverse loop is necessary
@@ -138,10 +138,10 @@ class OutputFileParser(FileParser):
          words = glines[j].split()
          nat += 1
          self.geom[nat] = []
-         self.geom[nat].append(string.atoi(words[1]))
+         self.geom[nat].append(int(words[1]))
 
          for k in range (3,6):
-            self.geom[nat].append(round(string.atof(words[k]),6))
+            self.geom[nat].append(round(float(words[k]),6))
 
       return self.geom, self.hashLine, self.title, self.charge, self.mult
 
@@ -154,15 +154,15 @@ class ChkFileParser(FileParser):
       glines = readFile(self.geomfl + ".fchk")
 
       self.title = glines[0].strip()
-      type = glines[1][0:10].strip()
+      basistype = glines[1][0:10].strip()
       method = glines[1][10:40].strip()
       basis = glines[1][40:70].strip()
-      self.hashLine = "# " + method + "/" + basis + " " + type
+      self.hashLine = "# " + method + "/" + basis + " " + basistype
 
       for i in range (0, len(glines)):
-         if (glines[i].find("Charge") >= 0 ): self.charge = string.atoi(glines[i].split()[2])
+         if (glines[i].find("Charge") >= 0 ): self.charge = int(glines[i].split()[2])
          if (glines[i+1].find("Multiplicity") >= 0 ):
-            self.mult = string.atoi(glines[i].split()[2])
+            self.mult = int(glines[i].split()[2])
             break;
 
       for i in range (0, len(glines)):
@@ -171,7 +171,7 @@ class ChkFileParser(FileParser):
       nat = 0
       for j in range (i+1, len(glines)):
          if (glines[j].find("Current cartesian coordinates") >= 0): break;
-         words = map(string.atof, glines[j].split())
+         words = len(list(map(float, glines[j].split())))
          for k in range (0, len(words)):
             nat += 1
             self.geom[nat] = []
@@ -184,7 +184,7 @@ class ChkFileParser(FileParser):
          str += glines[j].strip() + "   "
 
       nat = 1
-      words = map(string.atof, str.split())
+      words = list(map(float, str.split()))
       for k in range (0, len(words)):
          if (len(self.geom[nat]) <= 4):
             nat += 1

@@ -23,12 +23,12 @@ def identifyPiMOs(outfl):
    olines = readFile(outfl)
 #  Find out No. of basis funations, No. of electrons and No. of orbitals
    for o in range(0, len(olines)):
-      if (olines[o].find("NActive") >= 0): nat = string.atoi(olines[o].split()[1])
+      if (olines[o].find("NActive") >= 0): nat = int(olines[o].split()[1])
       if ( (olines[o].find("NBasis") >= 0) and (olines[o].find("NBE") >= 0) ):
-         nbasis = string.atoi(olines[o].split()[1])
-         nocc = string.atoi(olines[o].split()[3])
+         nbasis = int(olines[o].split()[1])
+         nocc = int(olines[o].split()[3])
          nelec = nocc*2
-         norb = string.atoi(olines[o+1].split()[1])
+         norb = int(olines[o+1].split()[1])
          break;
 
 
@@ -60,8 +60,8 @@ def identifyPiMOs(outfl):
    for i in range (MODataBegin+1, len(olines), nbasis+3):
       if (olines[i].upper().find("DENSITY MATRIX") >= 0 ): break
 
-      words = map(string.atoi, olines[i].split())
-      ene_words = map(string.atof, olines[i+2].upper().split("EIGENVALUES --")[1].split())
+      words = list(map(int, olines[i].split()))
+      ene_words = list(map(float, olines[i+2].upper().split("EIGENVALUES --")[1].split()))
       for j in range (0, len(words)):
          orb[words[j]] = [] # Define the key (index) for the MO vector (value)
          orb_ene[words[j]] = ene_words[j]
@@ -70,11 +70,11 @@ def identifyPiMOs(outfl):
          line = olines[k][21:71].strip("\n")
 
 # Life was so simple, if Gaussian did not have formatted write!
-#         coeff_words = map(string.atof, line.split())
+#         coeff_words = list(map(float, line.split()))
          format = ""
          for t in range (0, len(line)/10): format += "10s"
 
-         coeff_words = map(string.atof, struct.unpack(format, line))
+         coeff_words = list(map(float, struct.unpack(format, line)))
 
          for j in range (0, len(words)):
             orb[words[j]].append(coeff_words[j])
@@ -85,7 +85,7 @@ def identifyPiMOs(outfl):
    for i in range (1, nocc+1):
       FLAG = 1
       for j in range (0, nbasis):
-         eligible_for_ring = Max_Conn.has_key(icnt_atmicno[j])
+         eligible_for_ring = icnt_atmicno[j] in Max_Conn
          if (eligible_for_ring):
             if (abs(orb[i][j]) > 5e-5):
                 if (any ((Idx_Bas[j].upper().find(S) >= 0) for S in ["1S","2S","3S","PX","PY"])):
@@ -127,9 +127,9 @@ def grepPiCMO(nat, piMOs, nocc, nghost, BQ_Range, BQ_Step, outfl, GaussOutExt):
          else:
             words = olines[j+5+k].split()
             for l in range (prvsmo, len(piMOs)):
-               if (int(string.atof(words[0])) == int(piMOs[l])):
+               if (int(float(words[0])) == int(piMOs[l])):
                   data_string += "  " + words[9]
-                  sumval += string.atof(words[9])
+                  sumval += float(words[9])
                   prvsmo = l+1
                   break
             continue

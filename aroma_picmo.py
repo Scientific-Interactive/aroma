@@ -27,18 +27,18 @@ def grepPiCMO(piMOs, outfl, GaussOutExt):
 #  Find out No. of atoms and Bqs
    for o in olines:
       if ( (o.find("NAT") >= 0) and (o.find("NAtoms") >= 0) ):
-         nat = string.atoi(o.split()[2])
-         natoms = string.atoi(o.split()[4])
+         nat = int(o.split()[2])
+         natoms = int(o.split()[4])
          nghost = natoms - nat
          break;
 
 # Find out No. of basis funations, No. of electrons and No. of orbitals
    for o in range(0, len(olines)):
       if ( (olines[o].find("NBasis") >= 0) and (olines[o].find("NBE") >= 0) ):
-         nbasis = string.atoi(olines[o].split()[1])
-         nocc = string.atoi(olines[o].split()[3])
+         nbasis = int(olines[o].split()[1])
+         nocc = int(olines[o].split()[3])
 #         nelec = nocc*2
-#         norb = string.atoi(olines[o+1].split()[1])
+#         norb = int(olines[o+1].split()[1])
          break;
 
 
@@ -64,9 +64,9 @@ def grepPiCMO(piMOs, outfl, GaussOutExt):
          else:
             words = olines[j+5+k].split()
             for l in range (prvsmo, len(piMOs)):
-               if (int(string.atof(words[0])) == int(piMOs[l])):
+               if (int(float(words[0])) == int(piMOs[l])):
                   data_string += "  " + words[9]
-                  sumval += string.atof(words[9])
+                  sumval += float(words[9])
                   prvsmo = l+1
                   break
             continue
@@ -83,7 +83,7 @@ def main(Prfx):
    piMOs = []
    if (len(sys.argv) > 2):
       for i in range (2, len(sys.argv)):
-         piMOs.append(string.atoi(sys.argv[i]))
+         piMOs.append(int(sys.argv[i]))
    else: print "Error: MOs are not specified .. Aborting .. "; sys.exit(10)
 
    outfl = sys.argv[1]

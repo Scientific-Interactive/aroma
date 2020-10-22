@@ -439,7 +439,7 @@ def generateZMatrix(geom, Conn):
    while (flag):
       flag_connections_over = 1
       for i in range (0, len(Conn[a])):
-         if (not zmat.has_key(Conn[a][i])): 
+         if (not (Conn[a][i] in zmat)): 
             flag_connections_over = 0
             b = Conn[a][i]
             idx += 1
@@ -470,19 +470,19 @@ def generateZMatrix(geom, Conn):
                  c = zmat[b][2]
                  for j in range (0, len(Conn[a])):
                     e = Conn[a][j]
-                    if ( (e != b) and (e != c) and (zmat_idx.has_key(e))): 
+                    if ( (e != b) and (e != c) and (e in zmat_idx)): 
                        d = e
                        break;
                  zmat[b].append(d)
                if (len(zmat[b]) == 2):
                  for j in range (0, len(Conn[a])):
                     e = Conn[a][j]
-                    if ((e != b) and (zmat_idx.has_key(e))): 
+                    if ((e != b) and (e in zmat_idx)): 
                        c = e 
                        break;
                  for j in range (0, len(Conn[c])):
                     e = Conn[c][j]
-                    if ( (e != a) and (e != b) and (zmat_idx.has_key(e))): 
+                    if ( (e != a) and (e != b) and (e in zmat_idx)): 
                        d = e 
                        break;
                  if (d == ''):
@@ -523,7 +523,7 @@ def generateZMatrix(geom, Conn):
 
       if (a == ""):
          for k in range (1, nat+1):
-            if (zmat_idx.has_key(k)):
+            if (k in zmat_idx):
                continue
             else:
                a = k

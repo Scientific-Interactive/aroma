@@ -28,7 +28,7 @@ def processData(lines):
 #  List of list of dist, oup, inp, iso, zz
    data_dict = []
    for i in range (1, len(lines)):
-       words = map(string.atof, lines[i].split())
+       words = list(map(float, lines[i].split()))
        data_dict.append([words[0], words[1], words[4], words[5], words[8]])
        
    return data_dict 
@@ -38,7 +38,7 @@ def analyse(mfile, sfile, dist_start = DEFAULT_DISTANCE_FOR_ANALYSIS, outfl = sy
    numpy_flag = checkNumPy()
    if (not numpy_flag): sys.exit(10)
 
-   if (len(sys.argv) > 3): dist_start = string.atof(sys.argv[3]) 
+   if (len(sys.argv) > 3): dist_start = float(sys.argv[3]) 
    
    mlines = readAndCheck(mfile)
    slines = readAndCheck(sfile)
@@ -47,7 +47,7 @@ def analyse(mfile, sfile, dist_start = DEFAULT_DISTANCE_FOR_ANALYSIS, outfl = sy
    s_dict = processData(slines) 
 
    for i in range (0, len(m_dict)):
-      if (string.atof(m_dict[i][0]) >= string.atof(dist_start)):
+      if (float(m_dict[i][0]) >= float(dist_start)):
           dist_start = i
           break;
 
