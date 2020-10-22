@@ -177,3 +177,7 @@ def areaOfPolygon(vertices, ignore='z'):
 
    return area
 
+# execute an external command
+def execCmd(cmd):
+    return os.system(cmd)
+

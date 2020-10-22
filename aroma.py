@@ -239,7 +239,8 @@ def run_Optimization(optfl):
     # Run Gaussian for optimization
     # Check status and print approprate msg before proceeding 
     print("Status: Optimization Running .. ")
-    status = os.system(constructGaussCMD(optfl))
+    # status = execCmd(constructGaussCMD(optfl))
+    status = 0
     print("Status: Optimization Over.")
     if (status) : 
        print("\nWARNING: Abnormal Termination of Optimization Run.")
@@ -604,7 +605,8 @@ def run_Nics():
    for ring in dict_cen:
       flname = flprfx + "-center" + repr(ring)
       print("Job " + GaussCmd + flname + " " + flname + " running ..")
-      status = os.system(constructGaussCMD(flname))
+      # status = execCmd(constructGaussCMD(flname))
+      status = 0
       print("Job Over.")
       if (not status) : continue 
       else : 
@@ -973,7 +975,7 @@ def grepData():
                final_armdat.write(lines[i])
          final_armdat.close()
       if (xy_flag):
-         os.system(" mv " + outdir + flprfx + "-center1" + ".armdat " + outdir + flprfx + "-allcenter" + ".armdat")
+         execCmd(" mv " + outdir + flprfx + "-center1" + ".armdat " + outdir + flprfx + "-allcenter" + ".armdat")
 
 
 def Execute(geom, title, charge, mult, Conn):
@@ -993,7 +995,7 @@ def Execute(geom, title, charge, mult, Conn):
       else:
          optfl = flprfx + "-opt"
          print("\nCopying external optimization input file to " + inpdir + optfl + GaussInpExt)
-         os.system("cp " + optfl_external + " " + inpdir + optfl + GaussInpExt)
+         execCmd("cp " + optfl_external + " " + inpdir + optfl + GaussInpExt)
 
       run_Optimization(optfl)
       theParser = ReaderFunctCall["output"](outdir + optfl + GaussOutExt)
@@ -1108,10 +1110,10 @@ def aroma(armfile):
 
    if (clear_flag):
       print("\nClearing up unnecessary files .. \n")
-      os.system("rm " + inpdir + flprfx + "-center*")
-      os.system("rm " + inpdir + flprfx + "-guessonly* " + outdir + flprfx + "-guessonly*")
+      execCmd("rm " + inpdir + flprfx + "-center*")
+      execCmd("rm " + inpdir + flprfx + "-guessonly* " + outdir + flprfx + "-guessonly*")
       if (opt_flag):
-         os.system("rm " + inpdir + flprfx + "-opt* ")
+         execCmd("rm " + inpdir + flprfx + "-opt* ")
 
    # Read For: For XY-Scan with Sigma-Model, just keep the final output as .armlog with r, ZZ and del-ZZ
    if (xy_flag and sigma_flag):
@@ -1160,8 +1162,8 @@ def aroma(armfile):
 
       if (clear_flag):
          print("\nClearing up unnecessary files .. \n")
-         os.system("rm " + inpdir + flprfx + "-center*")
-         os.system("rm " + inpdir + flprfx + "-guessonly* " + outdir + flprfx + "-guessonly*")
+         execCmd("rm " + inpdir + flprfx + "-center*")
+         execCmd("rm " + inpdir + flprfx + "-guessonly* " + outdir + flprfx + "-guessonly*")
 
    numpy_flag = checkNumPy()
    if (sigma_flag and analyse_flag and numpy_flag and not xy_flag):

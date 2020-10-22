@@ -7,6 +7,8 @@
 
 import aroma_parser
 
+import getpass
+
 ###########################################################################################################################################
 # Atom information
 AtmSym = {'A':-1,'X':0, 'H':1, 'HE':2, 'LI':3, 'BE':4, 'B':5, 'C':6, 'N':7, 'O':8, 'F':9, 'AL':13,'SI':14, 'P':15, 'S':16, 'CL':17, 'TI':22}
@@ -31,9 +33,11 @@ TORSION_ANGLE_TOLERANCE = 15 # in degrees, ideal value 5
 ###########################################################################################################################################
 # Constants, Paths for setting Gaussian Runs
 
-inpdir = "/home/anuja/input/"
-outdir = "/home/anuja/output/"
-chkdir = "/home/anuja/chk/"
+currentUser = getpass.getuser()
+
+inpdir = "/home/" + currentUser + "/input/"
+outdir = "/home/" + currentUser + "/output/"
+chkdir = "/home/" + currentUser + "/chk/"
 FormChkCmd = "/usr/local/g09/formchk "
 GaussCmd = "/usr/local/g09/g09 "
 GaussInpExt = ".in"

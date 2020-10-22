@@ -57,7 +57,7 @@ class InputFileParser(FileParser):
          for j in range (i+1, len(glines)):
             f.write(glines[j] )
          f.close()
-         status = os.system(aroma_constants.constructGaussCMD(self.newflprfx))
+         status = execCmd(aroma_constants.constructGaussCMD(self.newflprfx))
          if (status):
             print("WARNING: An error occured while running a Guess=Only job for converting Z-matrix to cartesian coordinates.\nConsequently, Aroma may terminate abnormally.")
 #            print("Aborting Aroma ..")
@@ -150,7 +150,7 @@ class ChkFileParser(FileParser):
       FileParser.__init__(self, geomfl)
 
    def getInpData(self):
-      os.system(FormChk_CMD + self.geomfl + " " + self.geomfl + ".fchk")
+      status = execCmd(FormChk_CMD + self.geomfl + " " + self.geomfl + ".fchk")
       glines = readFile(self.geomfl + ".fchk")
 
       self.title = glines[0].strip()
