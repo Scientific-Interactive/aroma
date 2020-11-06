@@ -84,7 +84,7 @@ def main(Prfx):
    if (len(sys.argv) > 2):
       for i in range (2, len(sys.argv)):
          piMOs.append(int(sys.argv[i]))
-   else: print "Error: MOs are not specified .. Aborting .. "; sys.exit(10)
+   else: print("Error: MOs are not specified .. Aborting .. "); sys.exit(10)
 
    outfl = sys.argv[1]
    grepPiCMO(piMOs, outfl, GaussOutExt)
