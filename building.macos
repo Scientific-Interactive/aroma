@@ -1,0 +1,13 @@
+(Draft) 
+
+Install pyenv: https://github.com/pyenv/pyenv
+Install python: pyenv install 3.7.6
+Install:
+pip3
+pyinstaller
+tkinter
+Pillow (for PIL)
+
+Creating Installer:
+pyenv local 3.7.6
+pyinstaller --windowed --osx-bundle-identifier=aroma.technion.edu --onefile --name Aroma aroma_gui.py
