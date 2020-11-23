@@ -210,6 +210,7 @@ def check(armfile):
    
 
 def generate_Opt_Input(geom, hashLine, title, charge, mult):
+    global flprfx, inpdir
 
     # The chk file name for optimization can be same as given by the user.
     # Remove the above lines after testing this.

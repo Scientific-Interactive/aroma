@@ -1,4 +1,4 @@
-geomfile=benz-opt.log
+geomfile=output/benz-opt.log
 run=nicsscan, sigma
 center:1,2,3,4,5,6
 aromatic ring
