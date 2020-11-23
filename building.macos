@@ -10,4 +10,5 @@ Pillow (for PIL)
 
 Creating Installer:
 pyenv local 3.7.6
+rm -fr dist build
 pyinstaller --windowed --osx-bundle-identifier=aroma.technion.edu --onefile --name Aroma aroma_gui.py
