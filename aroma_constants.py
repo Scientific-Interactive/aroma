@@ -71,7 +71,7 @@ DEFAULT_BQ_RANGE = [0, 4]
 # Default for distance from molecular plane in case of XY-Scan
 DEFAULT_XY_DISTANCE = 1.7
 # For fitting polynomials, the BQs from distance defined by following parameter onwards are considered
-DEFAULT_DISTANCE_FOR_ANALYSIS = 1.1
+DEFAULT_DISTANCE_FOR_ANALYSIS = 1.0
 ###########################################################################################################################################
 
 
