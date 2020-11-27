@@ -34,11 +34,11 @@ from aroma_ringarea import *
 
 def init():
    # global flags
-   global opt_flag, ncs_flag, sigma_flag, analyse_flag, area_flag, s_charge_flag, opt_external, optfl_external, xy_flag
+   global opt_flag, ncs_flag, sigma_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, pt_external, optfl_external, xy_flag
    # global molecule-related
    global CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, points, normals, exocyclic
    # global technical 
-   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, sigma_charge, analyse_dist, clear_flag, BQGuide, xy_BQ_dist
+   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, sigma_charge, sigma_mult, analyse_dist, clear_flag, BQGuide, xy_BQ_dist, xy_extend
 
    # Initializing some global variables
    opt_flag = 0; ncs_flag = 0; sigma_flag = 0; opt_external = 0; xy_flag = 0; analyse_flag = 1; area_flag = 0
@@ -49,17 +49,19 @@ def init():
    runtype = "NICSSCAN"; hashLine_opt = DEFAULT_OPTIMIZATION_KEYLINE; hashLine_nics = DEFAULT_NICS_KEYLINE; hashLine_ncs = DEFAULT_NCS_KEYLINE; hashLine_nbo = DEFAULT_NBO_KEYLINE
    BQ_Step = DEFAULT_BQ_STEP; BQ_Range = DEFAULT_BQ_RANGE
    sigma_charge = 0; s_charge_flag = 0
+   sigma_mult = 1; s_mult_flag = 0
    analyse_dist = DEFAULT_DISTANCE_FOR_ANALYSIS 
+   xy_extend = 0.0
    clear_flag = 0
 
 def check(armfile):
 
    # global flags
-   global opt_flag, ncs_flag, sigma_flag, xy_flag, analyse_flag, area_flag, s_charge_flag, opt_external, optfl_external
+   global opt_flag, ncs_flag, sigma_flag, xy_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
    # global molecule-related
    global CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, BQGuide, points, normals
    # global technical 
-   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, sigma_charge, analyse_dist, clear_flag
+   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
 
    armpath = armfile[0:armfile.rindex("/")+1] 
    flprfx = armfile[armfile.rindex("/")+1:len(armfile)]
@@ -101,7 +103,11 @@ def check(armfile):
          if (EXTENSIONS_FOR_GAUSSIAN_FILES[extension].count(geomflext) > 0): valid_ext_flag = 1
       if (not valid_ext_flag): print("Gaussian File with \"" + geomflext + "\" Extension Can Not be Read.\nTherefore, Aborting the Run .."); sys.exit(10)
 
-   if (xy_flag): print("\nWARNING: You Have Requested XY-Scan. Make Sure That the Centers Are Defined in Proper Order.\n")
+   if (xy_flag): 
+       print("\nWARNING: You Have Requested XY-Scan. Make Sure That the Centers Are Defined in Proper Order.\n")
+       for i in range (0, len(armlines)):
+          if (armlines[i].upper().find("XYEXTEND") >= 0): xy_extend = float(armlines[i].split("=")[1]); break;
+
 
    for i in range (0, len(armlines)):
       if (armlines[i].upper().find("OUTFILE") >= 0): outfilename = armlines[i].strip().split("=")[1]
@@ -208,6 +214,11 @@ def check(armfile):
             s_charge_flag = 1
             sigma_charge = int(armlines[i].split("=")[1])
    
+      for i in range (0, len(armlines)):
+         if (armlines[i].upper().find("SONLY MULT") >= 0):
+            s_mult_flag = 1
+            sigma_mult = int(armlines[i].split("=")[1])
+   
 
 def generate_Opt_Input(geom, hashLine, title, charge, mult):
     global flprfx, inpdir
@@ -251,11 +262,11 @@ def run_Optimization(optfl):
 def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
 
    # global flags
-   global opt_flag, ncs_flag, sigma_flag, xy_flag, analyse_flag, area_flag, s_charge_flag, opt_external, optfl_external
+   global opt_flag, ncs_flag, sigma_flag, xy_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
    # global molecule-related
    global CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, points, normals
    # global technical 
-   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, sigma_charge, analyse_dist, clear_flag
+   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
 
    hashLine_rev = ''
    flag_chk = 0
@@ -377,7 +388,7 @@ def generateBQs(geom, Conn, ring_atoms, normal = []):
                   H_count += 1
                   direction -= 1
 
-# For Normal, the detectin of Sigma-only Model is under Trial
+# For Normal, the detection of Sigma-only Model is under Trial
    if ((len(ring_atoms) < 1) and (normal != [])):
        for i in range (0, len(geom)):
           atm_idx = i+1
@@ -417,11 +428,11 @@ def generateBQs(geom, Conn, ring_atoms, normal = []):
 def generateBQs_XY(geom, Conn):
 
    # global flags
-   global opt_flag, ncs_flag, sigma_flag, xy_flag, analyse_flag, area_flag, s_charge_flag, opt_external, optfl_external
+   global opt_flag, ncs_flag, sigma_flag, xy_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
    # global molecule-related
    global CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points
    # global technical 
-   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, analyse_dist, clear_flag
+   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
 
    direct = ''
    sigma_model = 0
@@ -557,6 +568,28 @@ def generateBQs_XY(geom, Conn):
    bq_coord_prvs = BQGuide[seq_BQGuide[0]][1]
    for i in range (0, len(seq_BQGuide)-1):
       
+      # If the XY trajectory needs to be extended out, then xy_extend is non-zero and BQs need to be added outside of the molecule
+      if ((i == 0.0) and (xy_extend != 0.0)): 
+          a = BQGuide[seq_BQGuide[i]][1]
+          b = BQGuide[seq_BQGuide[i+1]][1]
+          vec_ba = getVector(b,a)
+          n_vec_ba = getUnitVector(vec_ba)
+          # c is the point outside the molecule from where the trajectory begins
+          c = [xy_extend*v for v in n_vec_ba]
+          vec_ca = getVector(c, a)
+          n_vec_ca = getUnitVector(vec_ca)
+          n_BQ = int(round((xy_extend/BQ_Step),0))
+          bq_coord_prvs = c
+
+         for j in range (0, n_BQ):
+            bq_coord = [BQ_Step*j*v for v in n_vec_ca]
+            bq_coord[:] = [c[v]+bq_coord[v] for v in range (0,3)]
+            xy_BQ_dist.append(round(getDistance(bq_coord, bq_coord_prvs),3))
+            BQs_string += 'bq     ' + coord_format.format(bq_coord[0]) + "     " + coord_format.format(bq_coord[1]) + "     " + coord_format.format(bq_coord[2]) + "\n"
+            bq_count += 1
+            bq_coord_prvs = bq_coord
+            if (bq_count%50 == 0): BQs_string += "break"
+
       a = BQGuide[seq_BQGuide[i]][1]
       b = BQGuide[seq_BQGuide[i+1]][1]
       vec_ab = getVector(a,b)
@@ -564,6 +597,7 @@ def generateBQs_XY(geom, Conn):
       n_vec_ab = getUnitVector(vec_ab)
       n_BQ = int(round((norm_vec_ab/BQ_Step),0))
      
+
       for j in range (0, n_BQ):
          bq_coord = [BQ_Step*j*v for v in n_vec_ab]
          bq_coord[:] = [a[v]+bq_coord[v] for v in range (0,3)]
@@ -580,6 +614,20 @@ def generateBQs_XY(geom, Conn):
       xy_BQ_dist.append(round(getDistance(bq_coord, bq_coord_prvs),3))
       BQs_string += 'bq     ' + coord_format.format(bq_coord[0]) + "     " + coord_format.format(bq_coord[1]) + "     " + coord_format.format(bq_coord[2]) + "\n"
       bq_count += 1
+      bq_coord_prvs = bq_coord
+
+   # If xy_extend is non-zero then more BQs need to be added at the end of the trajectory too
+   n_vec_ab = getUnitVector(vec_ab)
+   n_BQ = int(round((xy_extend/BQ_Step),0))
+
+   for j in range (0, n_BQ):
+      bq_coord = [BQ_Step*j*v for v in n_vec_ab]
+      bq_coord[:] = [a[v]+bq_coord[v] for v in range (0,3)]
+      xy_BQ_dist.append(round(getDistance(bq_coord, bq_coord_prvs),3))
+      BQs_string += 'bq     ' + coord_format.format(bq_coord[0]) + "     " + coord_format.format(bq_coord[1]) + "     " + coord_format.format(bq_coord[2]) + "\n"
+      bq_count += 1
+      bq_coord_prvs = bq_coord
+      if (bq_count%50 == 0): BQs_string += "break"
 
    BQ_No = bq_count
    return BQs_string, new_geom
@@ -588,11 +636,11 @@ def generateBQs_XY(geom, Conn):
 def run_Nics():
 
    # global flags
-   global opt_flag, ncs_flag, sigma_flag, xy_flag, analyse_flag, area_flag, s_charge_flag, opt_external, optfl_external
+   global opt_flag, ncs_flag, sigma_flag, xy_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
    # global molecule-related
    global CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, normals
    # global technical 
-   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, analyse_dist, clear_flag
+   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag
 
    if (not xy_flag): 
       dict_cen = CenterOf.copy()
@@ -615,7 +663,7 @@ def run_Nics():
 
 
 def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
-   global sigma_charge, xy_flag, xy_ref_ring_info, normals, points, exocyclic
+   global sigma_charge, sigma_mult, xy_flag, xy_ref_ring_info, normals, points, exocyclic
 
    count = len(geom)+1
    sigma_geom = {}
@@ -850,7 +898,7 @@ def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
 
    sigma_flprfx = inpdir + flprfx + "-sigma" +  GaussInpExt
    f = open (sigma_flprfx, "w")
-   f.write("# \n\n" + title + " sigma only model " + "\n\n" + repr(sigma_charge) + " " + repr(mult) + "\n")
+   f.write("# \n\n" + title + " sigma only model " + "\n\n" + repr(sigma_charge) + " " + repr(sigma_mult) + "\n")
    f.write(zmat_str + "\n") 
    f.close()
 
