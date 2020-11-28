@@ -1,0 +1,13 @@
+
+--------------------------------------------------------------------
+                        ** Aroma Run **
+--------------------------------------------------------------------
+
+For the Original Molecule:
+
+
+The Centers for Rings/Bonds from the .arm file corresponds to following BQs
+Ring  Distance    X       Y       Z
+  1     0.0   -0.763   0.936   1.700
+  2     1.2   0.000   0.000   1.700
+  3     2.4   0.763   -0.936   1.700

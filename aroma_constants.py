@@ -66,7 +66,7 @@ DEFAULT_NCS_KEYLINE = "%nproc=1\n%mem=1024MB\n# B3LYP/6-311+G* NMR=GIAO IOP(10/4
 DEFAULT_NBO_KEYLINE = "$NBO NCS=0.1 <I MO XYZ> $END\n"
 
 # Defaults for NICS
-DEFAULT_BQ_STEP = 0.1 # in angstrom
+DEFAULT_BQ_STEP = 0.3 # in angstrom
 DEFAULT_BQ_RANGE = [0, 4]
 # Default for distance from molecular plane in case of XY-Scan
 DEFAULT_XY_DISTANCE = 1.7

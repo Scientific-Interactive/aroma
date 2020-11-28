@@ -1,8 +1,11 @@
 geomfile=output/benz-opt.log
-run=nicsscan, sigma
+run=xy, nicsscan, sigma
+center: 1,6
 center:1,2,3,4,5,6
+center: 3,4
 aromatic ring
 1,2,3,4,5,6
 end
+xyextend = 2.0
 sonly charge = 0
 sonly mult = 3

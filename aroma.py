@@ -34,7 +34,7 @@ from aroma_ringarea import *
 
 def init():
    # global flags
-   global opt_flag, ncs_flag, sigma_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, pt_external, optfl_external, xy_flag
+   global opt_flag, ncs_flag, sigma_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, xy_flag
    # global molecule-related
    global CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, points, normals, exocyclic
    # global technical 
@@ -570,18 +570,19 @@ def generateBQs_XY(geom, Conn):
       
       # If the XY trajectory needs to be extended out, then xy_extend is non-zero and BQs need to be added outside of the molecule
       if ((i == 0.0) and (xy_extend != 0.0)): 
-          a = BQGuide[seq_BQGuide[i]][1]
-          b = BQGuide[seq_BQGuide[i+1]][1]
+          a = BQGuide[seq_BQGuide[0]][1]
+          b = BQGuide[seq_BQGuide[1]][1]
           vec_ba = getVector(b,a)
           n_vec_ba = getUnitVector(vec_ba)
           # c is the point outside the molecule from where the trajectory begins
           c = [xy_extend*v for v in n_vec_ba]
+          c[:] = [a[v]+c[v] for v in range (0,3)]
           vec_ca = getVector(c, a)
           n_vec_ca = getUnitVector(vec_ca)
           n_BQ = int(round((xy_extend/BQ_Step),0))
           bq_coord_prvs = c
 
-         for j in range (0, n_BQ):
+          for j in range (0, n_BQ):
             bq_coord = [BQ_Step*j*v for v in n_vec_ca]
             bq_coord[:] = [c[v]+bq_coord[v] for v in range (0,3)]
             xy_BQ_dist.append(round(getDistance(bq_coord, bq_coord_prvs),3))
@@ -622,7 +623,7 @@ def generateBQs_XY(geom, Conn):
 
    for j in range (0, n_BQ):
       bq_coord = [BQ_Step*j*v for v in n_vec_ab]
-      bq_coord[:] = [a[v]+bq_coord[v] for v in range (0,3)]
+      bq_coord[:] = [b[v]+bq_coord[v] for v in range (0,3)]
       xy_BQ_dist.append(round(getDistance(bq_coord, bq_coord_prvs),3))
       BQs_string += 'bq     ' + coord_format.format(bq_coord[0]) + "     " + coord_format.format(bq_coord[1]) + "     " + coord_format.format(bq_coord[2]) + "\n"
       bq_count += 1
@@ -1060,7 +1061,7 @@ def Execute(geom, title, charge, mult, Conn):
 
    print("\nStatus : NICS input for all the centers generated.")
 
-   run_Nics()
+#   run_Nics()
    print("\nAll the jobs are over")
    print("\nStatus : Filtering Appropriate Data .. ")
 
@@ -1118,11 +1119,11 @@ def callAnalyse(flprfx, geom, CenterOf, all_aromatic_rings, analyse_dist, outfl)
 def aroma(armfile):
 
    # global flags
-   global opt_flag, ncs_flag, sigma_flag, analyse_flag, area_flag, s_charge_flag, opt_external, optfl_external, xy_flag
+   global opt_flag, ncs_flag, sigma_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, xy_flag
    # global molecule-related
    global CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, normals
    # global technical 
-   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, sigma_charge, analyse_dist, clear_flag
+   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
 
    print("\n--------------------------------------------------------------------")
    print("                        ** Aroma Run Begins. **")
@@ -1177,7 +1178,7 @@ def aroma(armfile):
       opt_flag = 0; ncs_flag = 0
       exttype = "input" 
       
-      geomfl, zmat_idx = genSigmaModel(flprfx, geom, Conn, title, charge, mult)
+      geomfl, zmat_idx = genSigmaModel(flprfx, geom, Conn, title, charge, sigma_mult)
 
       # Read the geometry and other data
       theParser = ReaderFunctCall[exttype](geomfl)
@@ -1206,7 +1207,13 @@ def aroma(armfile):
          outfl.write("\nFor the Sigma Model:\n")
          outfl.close()
 
-      Execute(sigma_geom, title, charge, mult, Conn)
+      if (s_charge_flag): scharge = sigma_charge
+      else: scharge = charge
+
+      if (s_mult_flag): smult = sigma_mult
+      else: smult = mult
+
+      Execute(sigma_geom, title, scharge, smult, Conn)
 
       if (clear_flag):
          print("\nClearing up unnecessary files .. \n")
