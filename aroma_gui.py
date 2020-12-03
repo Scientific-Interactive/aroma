@@ -5,6 +5,9 @@
 # Updated: 19.10.2020
 #
 
+import aroma
+import aroma_su
+
 import tkinter as tk
 import tkinter.filedialog as tkFileDialog
 import tkinter.scrolledtext as ScrolledText
@@ -13,11 +16,6 @@ from PIL import Image, ImageTk
 import threading
 import sys
 import time
-
-import aroma
-import aroma_su
-
-
 
 class RedirectText(object):
     def __init__(self, text_ctrl):
