@@ -193,3 +193,7 @@ class ChkFileParser(FileParser):
 
 
       return self.geom, self.hashLine, self.title, self.charge, self.mult
+
+# Reader Function to Be Called for each Type of Format
+# (Ganesh: Moved this here to remove the cyclic dependency)
+ReaderFunctCall = {'input':InputFileParser, 'output':OutputFileParser, 'checkpoint':ChkFileParser}
