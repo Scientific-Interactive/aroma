@@ -3,15 +3,17 @@
                         ** Aroma Run **
 --------------------------------------------------------------------
 
+ --------- Input Dump ---------- 
 
-For Center 1
---------------------------------------------------------------------
-Polynomials for Doop and 3Diso are :
+geomfile=output/benz-opt.log
+run=nicsscan, sigma, ptonly
+aromatic ring
+1,2,3,4,5,6
+end
+point: 5.0, 5.0, 5.0
+point: 4.0, 4.0, 4.0
+point: -3.0, -3.0, -3.0
+sonly charge = 0
+sonly mult = 3
 
-         3         2
--0.3446 x + 3.839 x - 7.26 x - 34.3
-         3         2
--0.2788 x + 5.281 x - 19.16 x - 19.73
-
-The mean NICS value is -35.981 with error 2.086
---------------------------------------------------------------------
+ --------- Input End ---------- 

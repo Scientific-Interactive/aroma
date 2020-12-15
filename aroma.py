@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # Author : Anuja
 # 30.01.2013
-# Last Updated : 14.10.2014
+# Last Updated : 11.12.2020
 
 # Main Driver scipt for automation of NICS-Scan in Z and XY Directions, Sigma-Only Model and CMO-NICS 
 
@@ -40,14 +40,14 @@ from aroma_ringarea import *
 
 def init():
    # global flags
-   global opt_flag, ncs_flag, sigma_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, xy_flag
+   global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
    # global molecule-related
-   global CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, points, normals, exocyclic
+   global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide,points, normals, exocyclic
    # global technical 
-   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, sigma_charge, sigma_mult, analyse_dist, clear_flag, BQGuide, xy_BQ_dist, xy_extend
+   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
 
    # Initializing some global variables
-   opt_flag = 0; ncs_flag = 0; sigma_flag = 0; opt_external = 0; xy_flag = 0; analyse_flag = 1; area_flag = 0
+   opt_flag = 0; ncs_flag = 0; sigma_flag = 0; opt_external = 0; xy_flag = 0; pointonly_flag = 0; analyse_flag = 1; area_flag = 0
    CenterOf = {}; all_aromatic_rings = {}; exocyclic = {}; points = {}; normals = {}
    geomflext = ""; geomfl = ""; flprfx = ""; outfilename = ""
    sigma_direction = 'POSITIVE'
@@ -63,11 +63,11 @@ def init():
 def check(armfile):
 
    # global flags
-   global opt_flag, ncs_flag, sigma_flag, xy_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
+   global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
    # global molecule-related
-   global CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, BQGuide, points, normals
+   global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
    # global technical 
-   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
+   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
 
    armpath = armfile[0:armfile.rindex("/")+1] 
    flprfx = armfile[armfile.rindex("/")+1:len(armfile)]
@@ -83,6 +83,7 @@ def check(armfile):
          if (runseq.count("NCS") > 0): ncs_flag = 1
          if (runseq.count("SIGMA") > 0): sigma_flag = 1
          if (runseq.count("XY") > 0): xy_flag = 1
+         if (runseq.count("PTONLY") > 0): pointonly_flag = 1
 
    if (opt_flag):
       for i in range (0, len(armlines)):
@@ -121,6 +122,7 @@ def check(armfile):
    # Get The Ring/Bond Info
    r_count = 0
    n_count = 0
+   p_count = 0
    for i in range (0, len(armlines)):
       if (armlines[i].upper().find("CENTER") >= 0):
          r_count += 1
@@ -133,6 +135,11 @@ def check(armfile):
             points[(r_count, r_count+1)] = list(map(float, re.split("[:|=]", armlines[i].strip())[1].split(",")))
             points[(r_count, r_count+1)].insert(0,-1)
             if (len(points[r_count, r_count+1]) != 4): print("The keyword POINT should have X, Y, Z coordinates.\n Check and Submit Again. Aborting This Run ..\n"); sys.exit(10)
+      if (not xy_flag):
+         if (armlines[i].upper().find("POINT") >= 0):
+             # The 0 in tuple has no meaning. It is kept only to match the "Point" format which was defined in Aroma 1.0 version
+             points[(p_count, 0)] = list(map(float, re.split("[:|=]", armlines[i].strip())[1].split(",")))
+             p_count += 1
 
    for i in range (0, len(armlines)):
       if (armlines[i].upper().find("BQSTEP") >= 0): BQ_Step = float(armlines[i].split("=")[1]); break;
@@ -144,8 +151,12 @@ def check(armfile):
       print("The package NBO can not handle more than 100 Bqs. Aborting thr Run.\nPlease change the BQRANGE or BQSTEP and Resubmit.")
       sys.exit(10)
 
-   if ((len(CenterOf) < 1) and (len(normals) < 1)):
+   if (not pointonly_flag and (len(CenterOf) < 1) and (len(normals) < 1)):
       print("Rings/Bonds Are Not Defined.\nTherefore, Aborting the Run ..")
+      sys.exit(10)
+
+   if (pointonly_flag and (len(points) < 1)):
+      print("The Points (x,y,z) Are Not Defined for POINTONLY Run.\nTherefore, Aborting the Run ..")
       sys.exit(10)
 
 
@@ -268,11 +279,11 @@ def run_Optimization(optfl):
 def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
 
    # global flags
-   global opt_flag, ncs_flag, sigma_flag, xy_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
+   global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
    # global molecule-related
-   global CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, points, normals
+   global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide,points, normals
    # global technical 
-   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
+   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
 
    hashLine_rev = ''
    flag_chk = 0
@@ -281,6 +292,40 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
       if (hlines[i].find("CHK") >= 0 ):
          flag_chk = 1
       else: hashLine_rev += hlines[i] + "\n"
+
+
+# POINT Keyword can add standaline points for the NICS calculation.
+   if (not xy_flag and pointonly_flag):
+
+      coord_format = "{0:.5f}"
+      BQs_string = ""
+      p_count = 0
+      bq_count = 0
+      for p in points: 
+          BQs_string += "bq " + coord_format.format(points[p_count,0][0]) + "     " + coord_format.format(points[p_count,0][1]) + "     " + coord_format.format(points[p_count,0][2]) + "\n" 
+          p_count += 1
+          bq_count += 1
+          if (bq_count%50 == 0): BQs_string += "break"
+
+   # Mostly there will not be occasion where user gives more than 40-50 points, but such situation is covered.
+   BQs_strings = BQs_string.split("break")
+   for ring in range (0, len(BQs_strings)): 
+       ringf = open(inpdir + flprfx + "-center" + repr(ring+1) + GaussInpExt, "w") 
+       if (flag_chk): ringf.write("%chk=" + chkdir + flprfx + "-center" + repr(ring+1) + ".chk\n")
+       ringf.write(hashLine_rev + title + " # Center " + repr(ring+1) + "\n\n" + repr(charge) + " " + repr(mult) + "\n")
+       for i in range (1, len(geom)+1):
+#          # The dummy atoms are considered as BQs, therefore, remove them
+#          if (new_geom[i][0] != 0):
+          geomline = repr(geom[i][0]) + "   " + coord_format.format(geom[i][1]) + "   " + coord_format.format(geom[i][2]) + "   " + coord_format.format(geom[i][3]) + "\n"
+          ringf.write(geomline)
+       ringf.write(BQs_strings[ring] + "\n")
+
+       # If NCS run is requested, then add NBO keywords at the end of the Gaussian input
+       if (ncs_flag):
+          ringf.write(hashLine_nbo + "\n")
+
+       ringf.close()
+
 
    if (not xy_flag):
       for ring in CenterOf:
@@ -434,9 +479,9 @@ def generateBQs(geom, Conn, ring_atoms, normal = []):
 def generateBQs_XY(geom, Conn):
 
    # global flags
-   global opt_flag, ncs_flag, sigma_flag, xy_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
+   global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
    # global molecule-related
-   global CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points
+   global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
    # global technical 
    global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
 
@@ -643,11 +688,11 @@ def generateBQs_XY(geom, Conn):
 def run_Nics():
 
    # global flags
-   global opt_flag, ncs_flag, sigma_flag, xy_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
+   global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
    # global molecule-related
-   global CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, normals
+   global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide,points, normals
    # global technical 
-   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag
+   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
 
    if (not xy_flag): 
       dict_cen = CenterOf.copy()
@@ -926,11 +971,11 @@ def getNewRings(geom, sigma_geom, CenterOf, zmat_idx):
 def grepData():
 
       # global flags
-      global opt_flag, ncs_flag, sigma_flag, xy_flag, analyse_flag, area_flag, s_charge_flag, opt_external, optfl_external
+      global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
       # global molecule-related
-      global CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, BQGuide
+      global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
       # global technical 
-      global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, analyse_dist, clear_flag
+      global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult,analyse_dist, clear_flag, xy_extend
 
       nBQs = []
       if (not xy_flag): 
@@ -1036,11 +1081,11 @@ def grepData():
 def Execute(geom, title, charge, mult, Conn):
 
    # global flags
-   global opt_flag, ncs_flag, sigma_flag, xy_flag, analyse_flag, area_flag, s_charge_flag, opt_external, optfl_external
+   global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
    # global molecule-related
-   global CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, BQGuide
+   global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
    # global technical 
-   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, sigma_charge, analyse_dist, clear_flag
+   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
 
    # Run optimization, if required
    if (hashLine_opt == "DEFAULT\n"): hashLine_opt = DEFAULT_OPTIMIZATION_KEYLINE
@@ -1125,11 +1170,11 @@ def callAnalyse(flprfx, geom, CenterOf, all_aromatic_rings, analyse_dist, outfl)
 def aroma(armfile):
 
    # global flags
-   global opt_flag, ncs_flag, sigma_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, xy_flag
+   global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
    # global molecule-related
-   global CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, normals
+   global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
    # global technical 
-   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
+   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
 
    print("\n--------------------------------------------------------------------")
    print("                        ** Aroma Run Begins. **")
@@ -1151,12 +1196,19 @@ def aroma(armfile):
    else:
       geom = {}; title = ""; charge=""; mult=""; Conn= []
 
+   print("The final output will be stored in " + outfilename)
+   outfl = open(outfilename, "w")
+   outfl.write("\n--------------------------------------------------------------------")
+   outfl.write("\n                        ** Aroma Run **")
+   outfl.write("\n--------------------------------------------------------------------\n")
+   outfl.write("\n --------- Input Dump ---------- \n\n")
+   armlines = readFile(armpath + flprfx + ".arm") 
+   for aline in armlines: outfl.write(aline)
+   outfl.write("\n --------- Input End ---------- \n")
+   outfl.close()
+
    if (xy_flag):
-      print("The final output will be stored in " + outfilename)
-      outfl = open(outfilename, "w")
-      outfl.write("\n--------------------------------------------------------------------")
-      outfl.write("\n                        ** Aroma Run **")
-      outfl.write("\n--------------------------------------------------------------------\n")
+      outfl = open(outfilename, "a")
       outfl.write("\nFor the Original Molecule:\n")
       outfl.close()
 
@@ -1228,12 +1280,9 @@ def aroma(armfile):
 
    numpy_flag = checkNumPy()
    if (sigma_flag and analyse_flag and numpy_flag and not xy_flag):
-       print("The final output will be stored in " + outfilename)
-       outfl = open(outfilename, "w")
-       outfl.write("\n--------------------------------------------------------------------")
-       outfl.write("\n                        ** Aroma Run **")
-       outfl.write("\n--------------------------------------------------------------------\n")
+       outfl = open(outfilename, "a")
        callAnalyse(org_flprfx, geom, org_CenterOf, all_aromatic_rings, analyse_dist, outfl)
+       outfl.close()
 
    # For XY-Scan with Sigma-Model, just keep the final output as .armlog with r, ZZ and del-ZZ
    if (xy_flag and sigma_flag):

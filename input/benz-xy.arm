@@ -1,8 +1,10 @@
 geomfile=output/benz-opt.log
 run=xy, nicsscan, sigma
+point: 5.0, 5.0, 5.0
 center: 1,6
 center:1,2,3,4,5,6
 center: 3,4
+point: -5.0, -5.0, -5.0
 aromatic ring
 1,2,3,4,5,6
 end
