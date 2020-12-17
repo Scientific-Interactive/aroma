@@ -8,6 +8,7 @@ import time
 import fpformat
 
 import aroma
+import aroma_molecule
 
 class TestRun:
   def runAndGetTime(self):
@@ -40,6 +41,39 @@ class SimpleAromaRunZScan:
 
       self.result = open("output/benz.armlog").readlines()
       self.expectedResult = open("testout/benz.armlog").readlines()
+
+      end = time.time()
+
+      return (end-start)
+
+   def getExpectedResult(self):
+      return repr(self.expectedResult)
+
+   def getResult(self):
+      return repr(self.result)
+
+   def testPassed(self):
+      return self.result == self.expectedResult
+
+class ZMatToCartesian:
+   def __init__(self):
+      self.result = []
+      self.expectedResult = []
+
+   def getName(self):
+      return "ZMatToCartesian"
+
+   def runAndGetTime(self):
+      start = time.time()
+
+      inpfl = open("input/zmat.in")
+      zmatLines = list(map(lambda x: x.strip().split(), inpfl.readlines()[5:]))
+      inpfl.close()
+      
+      print(zmatLines)
+
+      aroma_molecule.generateCartesianFromZmat(zmatLines)
+   
 
       end = time.time()
 
@@ -86,6 +120,7 @@ if __name__=="__main__":
    harness = Harness()
 
    harness.run(SimpleAromaRunZScan())
+   harness.run(ZMatToCartesian())
 
    harness.summary()
   

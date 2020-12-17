@@ -13,6 +13,10 @@ import math
 import string
 import itertools
 
+from numpy import sin, cos, pi
+from numpy.linalg import norm
+import numpy as np
+
 import aroma_constants
 from aroma_constants import *
 
@@ -539,4 +543,86 @@ def generateZMatrix(geom, Conn):
       if (len(zmat) == nat): flag = 0
 
    return zmat, zmat_str, zmat_idx
+
+#
+# parts of the code inspired from: https://github.com/ben-albrecht/qcl/blob/master/qcl/ccdata_xyz.py
+def generateCartesianFromZmat(zmat):
+
+   coord = []
+
+   def toRadian(deg):
+     return deg * (pi / 180.0)
+
+   def placeLength(x): 
+     atmtyp, connIdx, dist = x[:3]
+     connIdx = int(connIdx)-1
+     connCord = coord[connIdx]
+     return [x[0], connCord[1]+float(dist), connCord[2], connCord[3]] 
+
+   def placeAngle(x):
+     atmtyp, connIdx, dist = x[:3]
+     dist = float(dist)
+     connIdx = int(connIdx)-1
+
+     angleAtm, angle = x[3:5] 
+     angleAtm = int(angleAtm)-1
+     ang = toRadian(float(angle))
+
+     if (len(x) > 5):
+       torAtm, tor = x[5:7]
+       torAtm = int(torAtm)-1
+       tor = toRadian(float(tor))
+     else:
+       torAtm = -1
+       tor = toRadian(90)
+     
+     avec = coord[connIdx]
+     bvec = coord[angleAtm]
+     
+     if (torAtm == -1):
+        cvec = ["X", 0.0, 1.0, 0.0]
+     else:
+        cvec = coord[torAtm]
+
+     v1 = [avec[1]-bvec[1], avec[2]-bvec[2], avec[3]-bvec[3]]
+     v2 = [avec[1]-cvec[1], avec[2]-cvec[2], avec[3]-cvec[3]]
+
+     n  = np.cross(v1, v2)
+     nn = np.cross(v1, n)
+
+     n  /= norm(n)
+     nn /= norm(nn)
+
+     n  *= -sin(tor)
+     nn *= cos(tor)
+
+     v3 = n + nn
+     v3 /= norm(v3)
+     v3 *= dist * sin(ang) 
+
+     v1 /= norm(v1)
+     v1 *= dist * cos(ang)
+
+     v2 = [avec[1], avec[2], avec[3]] + v3 - v1
+
+     return [x[0], v2[0], v2[1], v2[2]]
+
+   for zItm in zmat:
+     if (len(zItm) == 0): continue
+
+     print(zItm)
+
+     if (len(zItm) == 1): coord.append([zItm[0], 0, 0, 0])
+
+     if (len(zItm) == 3):
+        coord.append(placeLength(zItm))
+     
+     if (len(zItm) > 3):
+        coord.append(placeAngle(zItm))
+
+   for crd in coord:
+     print(' '.join(map(lambda x: repr(x) if type(x) != str else x, crd)))
+
+   return coord
+
 
