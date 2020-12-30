@@ -1,0 +1,10 @@
+(Draft) 
+
+Install:
+pip3
+pyinstaller
+tkinter
+Pillow (for PIL)
+
+Creating Installer:
+pyinstaller --windowed --onefile --name Aroma --hidden-import='PIL._tkinter_finder' aroma_gui.py
