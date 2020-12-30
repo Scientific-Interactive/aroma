@@ -6,7 +6,7 @@ Install:
 pip3
 pyinstaller
 tkinter
-Pillow (for PIL)
+pillow (for PIL)
 
 Creating Installer:
 pyenv local 3.7.6
