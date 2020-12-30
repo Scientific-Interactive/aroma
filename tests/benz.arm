@@ -1,0 +1,7 @@
+geomfile=c:/Users/user/Downloads/Aroma-1.01-Win-Bin/Aroma-1.0-Win-Bin/aroma/tests/benz-opt.log
+run=nicsscan, sigma
+center:1,2,3,4,5,6
+aromatic ring
+1,2,3,4,5,6
+end
+analyse area 

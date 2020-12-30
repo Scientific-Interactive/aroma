@@ -293,9 +293,8 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
          flag_chk = 1
       else: hashLine_rev += hlines[i] + "\n"
 
-
 # POINT Keyword can add standaline points for the NICS calculation.
-   if (not xy_flag and pointonly_flag):
+   if ((not xy_flag) and pointonly_flag):
 
       coord_format = "{0:.5f}"
       BQs_string = ""
@@ -305,26 +304,26 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
           BQs_string += "bq " + coord_format.format(points[p_count,0][0]) + "     " + coord_format.format(points[p_count,0][1]) + "     " + coord_format.format(points[p_count,0][2]) + "\n" 
           p_count += 1
           bq_count += 1
-          if (bq_count%50 == 0): BQs_string += "break"
+          if (bq_count%MAX_BQS_IN_INPFL == 0): BQs_string += "break"
 
-   # Mostly there will not be occasion where user gives more than 40-50 points, but such situation is covered.
-   BQs_strings = BQs_string.split("break")
-   for ring in range (0, len(BQs_strings)): 
-       ringf = open(inpdir + flprfx + "-center" + repr(ring+1) + GaussInpExt, "w") 
-       if (flag_chk): ringf.write("%chk=" + chkdir + flprfx + "-center" + repr(ring+1) + ".chk\n")
-       ringf.write(hashLine_rev + title + " # Center " + repr(ring+1) + "\n\n" + repr(charge) + " " + repr(mult) + "\n")
-       for i in range (1, len(geom)+1):
+      # Mostly there will not be occasion where user gives more than 40-50 points, but such situation is covered.
+      BQs_strings = BQs_string.split("break")
+      for ring in range (0, len(BQs_strings)): 
+         ringf = open(inpdir + flprfx + "-center" + repr(ring+1) + GaussInpExt, "w") 
+         if (flag_chk): ringf.write("%chk=" + chkdir + flprfx + "-center" + repr(ring+1) + ".chk\n")
+         ringf.write(hashLine_rev + title + " # Center " + repr(ring+1) + "\n\n" + repr(charge) + " " + repr(mult) + "\n")
+         for i in range (1, len(geom)+1):
 #          # The dummy atoms are considered as BQs, therefore, remove them
 #          if (new_geom[i][0] != 0):
-          geomline = repr(geom[i][0]) + "   " + coord_format.format(geom[i][1]) + "   " + coord_format.format(geom[i][2]) + "   " + coord_format.format(geom[i][3]) + "\n"
-          ringf.write(geomline)
-       ringf.write(BQs_strings[ring] + "\n")
+            geomline = repr(geom[i][0]) + "   " + coord_format.format(geom[i][1]) + "   " + coord_format.format(geom[i][2]) + "   " + coord_format.format(geom[i][3]) + "\n"
+            ringf.write(geomline)
+         ringf.write(BQs_strings[ring] + "\n")
 
-       # If NCS run is requested, then add NBO keywords at the end of the Gaussian input
-       if (ncs_flag):
-          ringf.write(hashLine_nbo + "\n")
+         # If NCS run is requested, then add NBO keywords at the end of the Gaussian input
+         if (ncs_flag):
+            ringf.write(hashLine_nbo + "\n")
 
-       ringf.close()
+         ringf.close()
 
 
    if (not xy_flag):
@@ -640,7 +639,7 @@ def generateBQs_XY(geom, Conn):
             BQs_string += 'bq     ' + coord_format.format(bq_coord[0]) + "     " + coord_format.format(bq_coord[1]) + "     " + coord_format.format(bq_coord[2]) + "\n"
             bq_count += 1
             bq_coord_prvs = bq_coord
-            if (bq_count%50 == 0): BQs_string += "break"
+            if (bq_count%MAX_BQS_IN_INPFL == 0): BQs_string += "break"
 
       a = BQGuide[seq_BQGuide[i]][1]
       b = BQGuide[seq_BQGuide[i+1]][1]
@@ -657,7 +656,7 @@ def generateBQs_XY(geom, Conn):
          BQs_string += 'bq     ' + coord_format.format(bq_coord[0]) + "     " + coord_format.format(bq_coord[1]) + "     " + coord_format.format(bq_coord[2]) + "\n"
          bq_count += 1
          bq_coord_prvs = bq_coord
-         if (bq_count%50 == 0): BQs_string += "break"
+         if (bq_count%MAX_BQS_IN_INPFL == 0): BQs_string += "break"
 
    # For the last BQ
    if (vectorMagnitude(getVector(bq_coord, b)) < BQ_Step):
@@ -679,7 +678,7 @@ def generateBQs_XY(geom, Conn):
       BQs_string += 'bq     ' + coord_format.format(bq_coord[0]) + "     " + coord_format.format(bq_coord[1]) + "     " + coord_format.format(bq_coord[2]) + "\n"
       bq_count += 1
       bq_coord_prvs = bq_coord
-      if (bq_count%50 == 0): BQs_string += "break"
+      if (bq_count%MAX_BQS_IN_INPFL == 0): BQs_string += "break"
 
    BQ_No = bq_count
    return BQs_string, new_geom
@@ -690,7 +689,7 @@ def run_Nics():
    # global flags
    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
    # global molecule-related
-   global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide,points, normals
+   global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
    # global technical 
    global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
 
@@ -712,6 +711,20 @@ def run_Nics():
       else : 
           print("It seems that the NICS SCAN run for ring/bond number " + repr(ring) + " did not terminated normally.\n")
 #          sys.exit(10)
+   
+   if (pointonly_flag): 
+       rcount = int((len(points)/MAX_BQS_IN_INPFL))+1
+       for ring in range (1, rcount+1):
+          flname = flprfx + "-center" + repr(ring)
+          print("Job " + GaussCmd + flname + " " + flname + " running ..")
+          status = execCmd(constructGaussCMD(flname))
+          status = 0
+          print("Job Over.")
+          if (not status) : continue 
+          else : 
+              print("It seems that the NICS SCAN run for ring/bond number " + repr(ring) + " did not terminated normally.\n")
+           
+        
 
 
 def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
@@ -1112,7 +1125,7 @@ def Execute(geom, title, charge, mult, Conn):
 
    print("\nStatus : NICS input for all the centers generated.")
 
-#   run_Nics()
+   run_Nics()
    print("\nAll the jobs are over")
    print("\nStatus : Filtering Appropriate Data .. ")
 

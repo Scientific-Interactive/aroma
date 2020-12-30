@@ -1,0 +1,18 @@
+
+--------------------------------------------------------------------
+                        ** Aroma Run **
+--------------------------------------------------------------------
+
+ --------- Input Dump ---------- 
+
+geomfile=c:/Users/user/Downloads/Aroma-1.01-Win-Bin/Aroma-1.0-Win-Bin/aroma/tests/pyrrole.in
+run=nicsscan, scan
+center:1,2,3,4,5
+keylines
+nics_template
+# HF/STO-3G nmr=giao IOP(10/46=1) POP(NBOREAD, FULL)
+end keyline
+bqstep=0.2
+bqrange=-2,2
+
+ --------- Input End ---------- 

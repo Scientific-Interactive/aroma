@@ -1,0 +1,35 @@
+
+--------------------------------------------------------------------
+                        ** Aroma Run **
+--------------------------------------------------------------------
+
+ --------- Input Dump ---------- 
+
+geomfile=c:/Users/user/Downloads/Aroma-1.01-Win-Bin/Aroma-1.0-Win-Bin/aroma/tests/benz-opt.log
+run=nicsscan, sigma
+center:1,2,3,4,5,6
+aromatic ring
+1,2,3,4,5,6
+end
+analyse area 
+
+ --------- Input End ---------- 
+
+
+For Center 1
+--------------------------------------------------------------------
+Polynomials for Doop and 3Diso are :
+
+      3         2
+1.26 x - 13.22 x + 48.01 x - 62.42
+        3        2
+0.7081 x - 8.55 x + 35.88 x - 53.93
+
+The mean NICS value is -26.13 with error 0.236
+--------------------------------------------------------------------
+
+The area in sq. ang. for each of the aromatic ring defined are: 
+1 : 5.049
+
+The total area is 5.049 sq. ang.
+

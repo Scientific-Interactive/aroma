@@ -31,11 +31,12 @@ TORSION_ANGLE_TOLERANCE = 15 # in degrees, ideal value 5
 ###########################################################################################################################################
 # Constants, Paths for setting Gaussian Runs
 
-inpdir = "input/"
-outdir = "output/"
+inpdir = "tests/"
+outdir = "tests/"
 chkdir = "chk/"
 FormChkCmd = "/usr/local/g09/formchk "
-GaussCmd = "/usr/local/g09/g09 "
+#GaussCmd = "/usr/local/g09/g09 "
+GaussCmd = "C:/Users/user/Documents/2.0Aroma/G09W/G09W/g09  "
 GaussInpExt = ".in"
 GaussOutExt = ".log"
 
@@ -57,18 +58,20 @@ EXTENSIONS_FOR_GAUSSIAN_FILES = {'input':['com','gjf','inp','in'], 'output':['lo
 ###########################################################################################################################################
 # Defaults for Aroma
 
-DEFAULT_OPTIMIZATION_KEYLINE = "%nproc=1\n%mem=1024MB\n# B3LYP/6-311G* OPT \n"
-DEFAULT_NICS_KEYLINE = "%nproc=1\n%mem=1024MB\n# B3LYP/6-311+G* NMR=GIAO INTEGRAL=(GRID=ULTRAFINE) CPHF=(GRID=FINE)\n"
-DEFAULT_NCS_KEYLINE = "%nproc=1\n%mem=1024MB\n# B3LYP/6-311+G* NMR=GIAO IOP(10/46=1) POP(NBOREAD, FULL) INTEGRAL=(GRID=ULTRAFINE) CPHF=(GRID=FINE)\n"
+DEFAULT_OPTIMIZATION_KEYLINE = "%nproc=1\n%mem=1024MB\n# HF/STO-3G OPT \n"
+DEFAULT_NICS_KEYLINE = "%nproc=1\n%mem=1024MB\n# HF/STO-3G NMR=GIAO INTEGRAL=(GRID=ULTRAFINE) CPHF=(GRID=FINE)\n"
+DEFAULT_NCS_KEYLINE = "%nproc=1\n%mem=1024MB\n# HF/STO-3G NMR=GIAO IOP(10/46=1) POP(NBOREAD, FULL) INTEGRAL=(GRID=ULTRAFINE) CPHF=(GRID=FINE)\n"
 DEFAULT_NBO_KEYLINE = "$NBO NCS=0.1 <I MO XYZ> $END\n"
 
 # Defaults for NICS
-DEFAULT_BQ_STEP = 0.3 # in angstrom
+DEFAULT_BQ_STEP = 0.1 # in angstrom
 DEFAULT_BQ_RANGE = [0, 4]
 # Default for distance from molecular plane in case of XY-Scan
 DEFAULT_XY_DISTANCE = 1.7
 # For fitting polynomials, the BQs from distance defined by following parameter onwards are considered
-DEFAULT_DISTANCE_FOR_ANALYSIS = 1.0
+DEFAULT_DISTANCE_FOR_ANALYSIS = 1.1
+
+MAX_BQS_IN_INPFL = 50
 ###########################################################################################################################################
 
 
