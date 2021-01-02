@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # Author : Anuja
 # 30.01.2013
-# Last Updated : 11.12.2020
+# Last Updated : 02.01.2021
 
 # Main Driver scipt for automation of NICS-Scan in Z and XY Directions, Sigma-Only Model and CMO-NICS 
 
@@ -146,7 +146,8 @@ def check(armfile):
    for i in range (0, len(armlines)):
       if (armlines[i].upper().find("BQRANGE") >= 0): BQ_Range = list(map(float, armlines[i].split("=")[1].split(","))); break;
 
-   BQ_No = int((BQ_Range[1] - BQ_Range[0])/BQ_Step)
+   if (not pointonly_flag): BQ_No = int((BQ_Range[1] - BQ_Range[0])/BQ_Step)
+   else: BQ_No = len(points)
    if ( ncs_flag and (BQ_No > 100) ):
       print("The package NBO can not handle more than 100 Bqs. Aborting thr Run.\nPlease change the BQRANGE or BQSTEP and Resubmit.")
       sys.exit(10)
@@ -313,10 +314,10 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
          if (flag_chk): ringf.write("%chk=" + chkdir + flprfx + "-center" + repr(ring+1) + ".chk\n")
          ringf.write(hashLine_rev + title + " # Center " + repr(ring+1) + "\n\n" + repr(charge) + " " + repr(mult) + "\n")
          for i in range (1, len(geom)+1):
-#          # The dummy atoms are considered as BQs, therefore, remove them
-#          if (new_geom[i][0] != 0):
-            geomline = repr(geom[i][0]) + "   " + coord_format.format(geom[i][1]) + "   " + coord_format.format(geom[i][2]) + "   " + coord_format.format(geom[i][3]) + "\n"
-            ringf.write(geomline)
+            # The dummy atoms are considered as BQs, therefore, remove them
+            if (geom[i][0] != 0):
+              geomline = repr(geom[i][0]) + "   " + coord_format.format(geom[i][1]) + "   " + coord_format.format(geom[i][2]) + "   " + coord_format.format(geom[i][3]) + "\n"
+              ringf.write(geomline)
          ringf.write(BQs_strings[ring] + "\n")
 
          # If NCS run is requested, then add NBO keywords at the end of the Gaussian input
@@ -326,7 +327,7 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
          ringf.close()
 
 
-   if (not xy_flag):
+   if (not xy_flag and not pointonly_flag):
       for ring in CenterOf:
          ring_atoms = CenterOf.get(ring)
 
@@ -701,16 +702,17 @@ def run_Nics():
             dict_cen[n_count+i] = normals[i]
 
    elif (xy_flag): dict_cen = n_xy_center
-   for ring in dict_cen:
-      flname = flprfx + "-center" + repr(ring)
-      print("Job " + GaussCmd + flname + " " + flname + " running ..")
-      status = execCmd(constructGaussCMD(flname))
-      status = 0
-      print("Job Over.")
-      if (not status) : continue 
-      else : 
-          print("It seems that the NICS SCAN run for ring/bond number " + repr(ring) + " did not terminated normally.\n")
-#          sys.exit(10)
+   if not pointonly_flag:
+      for ring in dict_cen:
+         flname = flprfx + "-center" + repr(ring)
+         print("Job " + GaussCmd + flname + " " + flname + " running ..")
+         status = execCmd(constructGaussCMD(flname))
+         status = 0
+         print("Job Over.")
+         if (not status) : continue 
+         else : 
+             print("It seems that the NICS SCAN run for ring/bond number " + repr(ring) + " did not terminated normally.\n")
+#             sys.exit(10)
    
    if (pointonly_flag): 
        rcount = int((len(points)/MAX_BQS_IN_INPFL))+1
@@ -1006,8 +1008,8 @@ def grepData():
          idx = 0
          dist = 0.0
          for i in range (0, len(dict_cen)-1):
-            nBQs.append(50)
-         nBQs.append(BQ_No - 50*(len(nBQs)))
+            nBQs.append(MAX_BQS_IN_INPFL)
+         nBQs.append(BQ_No - MAX_BQS_IN_INPFL*(len(nBQs)))
 
       for ring in dict_cen:
          Plane = 'XY'
@@ -1080,7 +1082,7 @@ def grepData():
          f_out.close()
          
       # In case of XY-Scan, Merge all armdats to one
-      if (xy_flag and len(dict_cen) > 1):
+      if ((xy_flag or pointonly_flag) and (len(dict_cen) > 1)):
          final_armdat = open(outdir + flprfx + "-center1" + ".armdat","a")
          for ring in range (1, len(dict_cen)):
             lines = readFile(outdir + flprfx + "-center" +repr(ring+1) + ".armdat")
