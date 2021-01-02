@@ -23,6 +23,7 @@ class RedirectText(object):
 
     def write(self, string):
         self.output.insert(tk.END, string)
+        self.output.see("end")
 
 
 class Application(tk.Frame):
@@ -81,7 +82,8 @@ class Application(tk.Frame):
 
     def selectFile(self):
         self.armfl = tkFileDialog.askopenfilename()
-        self.inpfl.insert(0,self.armfl)
+        self.inpfl.delete('1.0', tk.END)
+        self.inpfl.insert(0, self.armfl)
 
     def RunAroma(self):
         self.RunSButton = tk.Button(self, text='Run Single', command=self.threadRunS)
