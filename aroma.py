@@ -13,6 +13,9 @@ aroma_user_constants.loadUserConstants(sys.argv[0])
 import os
 print(os.getcwd())
 
+import shutil
+import glob
+
 import re
 import string
 import fpformat
@@ -1083,8 +1086,8 @@ def grepData():
                final_armdat.write(lines[i])
          final_armdat.close()
       if (xy_flag):
-         execCmd(" mv " + outdir + flprfx + "-center1" + ".armdat " + outdir + flprfx + "-allcenter" + ".armdat")
-
+         # execCmd(" mv " + outdir + flprfx + "-center1" + ".armdat " + outdir + flprfx + "-allcenter" + ".armdat")
+         shutil.move(outdir + flprfx + "-center1" + ".armdat ", outdir + flprfx + "-allcenter" + ".armdat")
 
 def Execute(geom, title, charge, mult, Conn):
 
@@ -1103,7 +1106,8 @@ def Execute(geom, title, charge, mult, Conn):
       else:
          optfl = flprfx + "-opt"
          print("\nCopying external optimization input file to " + inpdir + optfl + GaussInpExt)
-         execCmd("cp " + optfl_external + " " + inpdir + optfl + GaussInpExt)
+         # execCmd("cp " + optfl_external + " " + inpdir + optfl + GaussInpExt)
+         shutil.copyfile(optfl_external, inpdir + optfl + GaussInpExt)
 
       run_Optimization(optfl)
       theParser = ReaderFunctCall["output"](outdir + optfl + GaussOutExt)
@@ -1225,10 +1229,20 @@ def aroma(armfile):
 
    if (clear_flag):
       print("\nClearing up unnecessary files .. \n")
-      execCmd("rm " + inpdir + flprfx + "-center*")
-      execCmd("rm " + inpdir + flprfx + "-guessonly* " + outdir + flprfx + "-guessonly*")
+      # execCmd("rm " + inpdir + flprfx + "-center*")
+      # execCmd("rm " + inpdir + flprfx + "-guessonly* " + outdir + flprfx + "-guessonly*")
+      for f in glob.glob(inpdir + flprfx + "-center*"):
+         os.remove(f) 
+      for f in glob.glob(inpdir + flprfx + "-guessonly*"):
+         os.remove(f) 
+      for f in glob.glob(outdir + flprfx + "-guessonly*"):
+         os.remove(f) 
+
       if (opt_flag):
-         execCmd("rm " + inpdir + flprfx + "-opt* ")
+         # execCmd("rm " + inpdir + flprfx + "-opt* ")
+         for f in glob.glob(inpdir + flprfx + "-opt* "):
+            os.remove(f) 
+         
 
    # Read For: For XY-Scan with Sigma-Model, just keep the final output as .armlog with r, ZZ and del-ZZ
    if (xy_flag and sigma_flag):
@@ -1283,8 +1297,17 @@ def aroma(armfile):
 
       if (clear_flag):
          print("\nClearing up unnecessary files .. \n")
-         execCmd("rm " + inpdir + flprfx + "-center*")
-         execCmd("rm " + inpdir + flprfx + "-guessonly* " + outdir + flprfx + "-guessonly*")
+         # execCmd("rm " + inpdir + flprfx + "-center*")
+         # execCmd("rm " + inpdir + flprfx + "-guessonly* " + outdir + flprfx + "-guessonly*")
+
+         for f in glob.glob(inpdir + flprfx + "-center*"):
+            os.remove(f)
+
+         for f in glob.glob(inpdir + flprfx + "-guessonly* "):
+            os.remove(f)
+
+         for f in glob.glob(outdir + flprfx + "-guessonly*"):
+            os.remove(f)
 
    numpy_flag = checkNumPy()
    if (sigma_flag and analyse_flag and numpy_flag and not xy_flag):
