@@ -82,8 +82,10 @@ class Application(tk.Frame):
 
     def selectFile(self):
         self.armfl = tkFileDialog.askopenfilename()
-        self.inpfl.delete('1.0', tk.END)
+        self.inpfl.delete(0, tk.END)
         self.inpfl.insert(0, self.armfl)
+        self.RunSButton['state']='normal'
+        self.RunMButton['state']='normal'
 
     def RunAroma(self):
         self.RunSButton = tk.Button(self, text='Run Single', command=self.threadRunS)

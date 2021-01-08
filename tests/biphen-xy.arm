@@ -1,4 +1,4 @@
-geomfile=C:/Users/user/Documents/aroma/tests/biphen.log
+geomfile=tests/biphen.log
 run=xy, nicsscan, sigma
 center:1,2,3,4,19,20
 center:1,2,13,14

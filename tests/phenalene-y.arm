@@ -1,4 +1,4 @@
-geomfile=c:/Users/user/Downloads/Aroma-1.01-Win-Bin/Aroma-1.0-Win-Bin/aroma/tests/phenalene.in
+geomfile=tests/phenalene.in
 aromatic rings
 1,2,3,5,6,7
 5,6,12,15,13,10

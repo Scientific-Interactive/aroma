@@ -5,15 +5,25 @@
 
  --------- Input Dump ---------- 
 
-geomfile=output/benz-opt.log
-run=nicsscan, sigma, ptonly
+geomfile=input/1-4-di-B-biphen.log
+run=xy,nicsscan,sigma
+center=3,4
+center=1,2,19,3,4,20
+center=1,2
+center=1,2,13,14
+center=13,14
+center=9,10,11,12,13,14
+center=10,11
 aromatic ring
-1,2,3,4,5,6
+1,2,19,3,4,20
+1,2,13,14
+9,10,11,12,13,14
 end
-point: 5.0, 5.0, 5.0
-point: 4.0, 4.0, 4.0
-point: -3.0, -3.0, -3.0
-sonly charge = 0
-sonly mult = 3
+sonly charge = -2
+
+
+
 
  --------- Input End ---------- 
+
+For the Original Molecule:

@@ -1,4 +1,4 @@
-geomfile=c:/Users/user/Downloads/Aroma-1.01-Win-Bin/Aroma-1.0-Win-Bin/aroma/tests/indene-opt.log
+geomfile=tests/indene-opt.log
 run=nicsscan, sigma
 center:1,2,3,4,5,6
 center:2,3,15,11,13

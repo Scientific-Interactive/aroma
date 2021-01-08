@@ -269,7 +269,6 @@ def run_Optimization(optfl):
     # Check status and print approprate msg before proceeding 
     print("Status: Optimization Running .. ")
     status = execCmd(constructGaussCMD(optfl))
-    status = 0
     print("Status: Optimization Over.")
     if (status) : 
        print("\nWARNING: Abnormal Termination of Optimization Run.")
@@ -707,12 +706,10 @@ def run_Nics():
          flname = flprfx + "-center" + repr(ring)
          print("Job " + GaussCmd + flname + " " + flname + " running ..")
          status = execCmd(constructGaussCMD(flname))
-         status = 0
-         print("Job Over.")
-         if (not status) : continue 
+         if (not status):
+            print("Job Over.")
          else : 
-             print("It seems that the NICS SCAN run for ring/bond number " + repr(ring) + " did not terminated normally.\n")
-#             sys.exit(10)
+            print("It seems that the NICS SCAN run for ring/bond number " + repr(ring) + " did not terminated normally.\n")
    
    if (pointonly_flag): 
        rcount = int((len(points)/MAX_BQS_IN_INPFL))+1
@@ -720,15 +717,11 @@ def run_Nics():
           flname = flprfx + "-center" + repr(ring)
           print("Job " + GaussCmd + flname + " " + flname + " running ..")
           status = execCmd(constructGaussCMD(flname))
-          status = 0
-          print("Job Over.")
-          if (not status) : continue 
-          else : 
-              print("It seems that the NICS SCAN run for ring/bond number " + repr(ring) + " did not terminated normally.\n")
+          if (not status): 
+             print("Job Over.")
+          else: 
+             print("It seems that the NICS SCAN run for ring/bond number " + repr(ring) + " did not terminated normally.\n")
            
-        
-
-
 def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
    global sigma_charge, sigma_mult, xy_flag, xy_ref_ring_info, normals, points, exocyclic
 
