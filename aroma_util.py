@@ -8,6 +8,7 @@
 import os
 import sys
 import math
+import glob
 import string
 
 import aroma_constants
@@ -180,4 +181,9 @@ def areaOfPolygon(vertices, ignore='z'):
 # execute an external command
 def execCmd(cmd):
     return os.system(cmd)
+
+# remove a set of files, with wildcard
+def removeFiles(fls):
+   for f in glob.glob(fls):
+      os.remove(f)
 

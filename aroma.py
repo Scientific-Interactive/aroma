@@ -1231,18 +1231,14 @@ def aroma(armfile):
       print("\nClearing up unnecessary files .. \n")
       # execCmd("rm " + inpdir + flprfx + "-center*")
       # execCmd("rm " + inpdir + flprfx + "-guessonly* " + outdir + flprfx + "-guessonly*")
-      for f in glob.glob(inpdir + flprfx + "-center*"):
-         os.remove(f) 
-      for f in glob.glob(inpdir + flprfx + "-guessonly*"):
-         os.remove(f) 
-      for f in glob.glob(outdir + flprfx + "-guessonly*"):
-         os.remove(f) 
+       
+      removeFiles(inpdir + flprfx + "-center*")
+      removeFiles(inpdir + flprfx + "-guessonly*")
+      removeFiles(outdir + flprfx + "-guessonly*")
 
       if (opt_flag):
          # execCmd("rm " + inpdir + flprfx + "-opt* ")
-         for f in glob.glob(inpdir + flprfx + "-opt* "):
-            os.remove(f) 
-         
+         removeFiles(inpdir + flprfx + "-opt* ")
 
    # Read For: For XY-Scan with Sigma-Model, just keep the final output as .armlog with r, ZZ and del-ZZ
    if (xy_flag and sigma_flag):
@@ -1300,14 +1296,9 @@ def aroma(armfile):
          # execCmd("rm " + inpdir + flprfx + "-center*")
          # execCmd("rm " + inpdir + flprfx + "-guessonly* " + outdir + flprfx + "-guessonly*")
 
-         for f in glob.glob(inpdir + flprfx + "-center*"):
-            os.remove(f)
-
-         for f in glob.glob(inpdir + flprfx + "-guessonly* "):
-            os.remove(f)
-
-         for f in glob.glob(outdir + flprfx + "-guessonly*"):
-            os.remove(f)
+         removeFiles(inpdir + flprfx + "-center*")
+         removeFiles(inpdir + flprfx + "-guessonly*")
+         removeFiles(outdir + flprfx + "-guessonly*")
 
    numpy_flag = checkNumPy()
    if (sigma_flag and analyse_flag and numpy_flag and not xy_flag):
