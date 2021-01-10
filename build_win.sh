@@ -1,12 +1,12 @@
-rm -fr dist build
+rm -fr dist build aroma_win aroma_win.zip
 pyinstaller --windowed --onefile --name Aroma --hidden-import='PIL._tkinter_finder' aroma_gui.py
 cd dist
-mkdir aroma_linux
-mv Aroma aroma_linux/
-cp ../*png aroma_linux/
-cp ../user_aroma_constants.py aroma_linux/
-cp -r ../tests aroma_linux/
-tar zcvf aroma_linux.tar.gz aroma_linux/
-mv aroma_linux.tar.gz ../
+mkdir aroma_win
+mv Aroma aroma_win/
+cp ../*png aroma_win/
+cp ../user_aroma_constants.py aroma_win/
+cp -r ../tests aroma_win/
+zip -r aroma_win.zip aroma_win/
+mv aroma_win.zip ../
 cd ..
 rm -fr dist build
