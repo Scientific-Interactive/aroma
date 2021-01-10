@@ -5,7 +5,7 @@
 
 # A Python Script for setting the constants and paths for Package Aroma 
 
-print("system config import")
+print("user config import")
 
 ###########################################################################################################################################
 # Atom information
