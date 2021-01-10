@@ -1212,6 +1212,7 @@ def aroma(armfile):
    outfl = open(outfilename, "w")
    outfl.write("\n--------------------------------------------------------------------")
    outfl.write("\n                        ** Aroma Run **")
+   outfl.write("\n                        ** " + aromaVersion() + " **")
    outfl.write("\n--------------------------------------------------------------------\n")
    outfl.write("\n --------- Input Dump ---------- \n\n")
    armlines = readFile(armpath + flprfx + ".arm") 

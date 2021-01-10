@@ -187,3 +187,7 @@ def removeFiles(fls):
    for f in glob.glob(fls):
       os.remove(f)
 
+# aroma version
+def aromaVersion():
+   return "v2.0.10012021"
+

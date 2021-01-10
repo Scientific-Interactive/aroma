@@ -8,6 +8,8 @@
 import aroma
 import aroma_su
 
+import aroma_util
+
 import tkinter as tk
 import tkinter.filedialog as tkFileDialog
 import tkinter.scrolledtext as ScrolledText
@@ -161,5 +163,5 @@ top = tk.Tk()
 top.columnconfigure(0, weight=1)
 top.rowconfigure(0, weight=1) 
 app = Application(top)
-app.master.title('AROMA')    
+app.master.title('AROMA [' + aroma_util.aromaVersion() + ']')    
 app.mainloop()                  
