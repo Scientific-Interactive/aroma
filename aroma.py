@@ -1013,7 +1013,7 @@ def grepData():
          outlines = readFile(outdir + flprfx + "-center" + repr(ring) + GaussOutExt)
 
          for i in range (0, len(outlines)):
-           if (outlines[i].find("NAT") >= 0 ): break;
+           if (outlines[i].upper().find("NAT") >= 0 ): break;
          nat = int(outlines[i].split()[2])
 
          for i in range (0, len(outlines)):

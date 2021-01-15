@@ -121,7 +121,7 @@ class OutputFileParser(FileParser):
          if ( (glines[j].find("Charge") >= 0) and (glines[j].find("Multiplicity") >= 0) ):
             break;
 
-      self.title = glines[j-2].strip()
+      self.title = glines[j-3].strip()
       words = glines[j].strip().split()
       self.charge = int(words[2])
       self.mult = int(words[5])
@@ -129,7 +129,7 @@ class OutputFileParser(FileParser):
       # If its an output of an optimization run, then the last goemetry should be read
       # Therefore, here a reverse loop is necessary
       for i in range (len(glines)-1, -1, -1):
-         if (glines[i].upper().find("ORIENTATION") >= 0 ): break;
+         if (glines[i].upper().find("STANDARD ORIENTATION") >= 0 ): break;
 
       nat = 0
       for j in range (i+5, len(glines)):
