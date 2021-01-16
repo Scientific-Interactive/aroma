@@ -129,7 +129,7 @@ class OutputFileParser(FileParser):
       # If its an output of an optimization run, then the last goemetry should be read
       # Therefore, here a reverse loop is necessary
       for i in range (len(glines)-1, -1, -1):
-         if (glines[i].upper().find("STANDARD ORIENTATION") >= 0 ): break;
+         if ((glines[i].upper().find("STANDARD ORIENTATION") >= 0) or (glines[i].find("Input orientation") >= 0)): break;
 
       nat = 0
       for j in range (i+5, len(glines)):
