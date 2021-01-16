@@ -189,5 +189,5 @@ def removeFiles(fls):
 
 # aroma version
 def aromaVersion():
-   return "v2.0.10012021"
+   return "v2.0.16012021"
 
