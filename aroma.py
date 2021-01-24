@@ -55,7 +55,7 @@ def init():
    geomflext = ""; geomfl = ""; flprfx = ""; outfilename = ""
    sigma_direction = 'POSITIVE'
    n_xy_center = {1:1}; xy_ref_ring_info =[]; BQGuide = {}; xy_BQ_dist = []
-   runtype = "NICSSCAN"; hashLine_opt = externalProgram.defaultOptimizationKeyline; hashLine_nics = externalProgram.defaultNicsKeyline; hashLine_ncs = externalProgram.defaultNcsKeyline; hashLine_nbo = externalProgram.defaultNboKeyline
+   runtype = "NICSSCAN"; hashLine_opt = externalProgram["defaultOptimizationKeyline"]; hashLine_nics = externalProgram["defaultNicsKeyline"]; hashLine_ncs = externalProgram["defaultNcsKeyline"]; hashLine_nbo = externalProgram["defaultNboKeyline"]
    BQ_Step = DEFAULT_BQ_STEP; BQ_Range = DEFAULT_BQ_RANGE
    sigma_charge = 0; s_charge_flag = 0
    sigma_mult = 1; s_mult_flag = 0
@@ -271,7 +271,7 @@ def run_Optimization(optfl):
     # Run Gaussian for optimization
     # Check status and print approprate msg before proceeding 
     print("Status: Optimization Running .. ")
-    status = execCmd(externalProgram.constructCmd((optfl))
+    status = execCmd(externalProgram["constructCmd"](optfl))
     print("Status: Optimization Over.")
     if (status) : 
        print("\nWARNING: Abnormal Termination of Optimization Run.")
@@ -708,7 +708,7 @@ def run_Nics():
       for ring in dict_cen:
          flname = flprfx + "-center" + repr(ring)
          print("Job " + externalProgram["extCmd"] + flname + " " + flname + " running ..")
-         status = execCmd(externalProgram.constructCmd(flname))
+         status = execCmd(externalProgram["constructCmd"](flname))
          if (not status):
             print("Job Over.")
          else : 
@@ -719,7 +719,7 @@ def run_Nics():
        for ring in range (1, rcount+1):
           flname = flprfx + "-center" + repr(ring)
           print("Job " + externalProgram["extCmd"] + flname + " " + flname + " running ..")
-          status = execCmd(externalProgram.constructCmd(flname))
+          status = execCmd(externalProgram["constructCmd"](flname))
           if (not status): 
              print("Job Over.")
           else: 

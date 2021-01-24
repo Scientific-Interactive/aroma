@@ -19,7 +19,7 @@ class FileParser:
    def __init__(self, geomfl):
       self.geomfl = geomfl
       self.geom = {}
-      self.hashLine = aroma_constants.DEFAULT_NICS_KEYLINE 
+      self.hashLine = aroma_constants.externalProgram["defaultNicsKeyline"]
       self.title = "DEFAULT TITLE SET BY AROMA"
       self.charge = 0
       self.mult = 0
@@ -57,11 +57,11 @@ class InputFileParser(FileParser):
          for j in range (i+1, len(glines)):
             f.write(glines[j] )
          f.close()
-         status = execCmd(aroma_constants.externalProgram.constructCmd(self.newflprfx))
+         status = execCmd(aroma_constants.externalProgram["constructCmd"](self.newflprfx))
          if (status):
             print("WARNING: An error occured while running a Guess=Only job for converting Z-matrix to cartesian coordinates.\nConsequently, Aroma may terminate abnormally.")
          
-         theParser = OutputFileParser(aroma_constants.outdir + self.newflprfx + aroma_constants.externalProgram["outExt"])
+         theParser = OutputFileParser(aroma_constants.externalProgram["outdir"] + self.newflprfx + aroma_constants.externalProgram["outExt"])
          self.geom, self.hashLine, self.title, self.charge, self.mult = theParser.getInpData()
 
       else:
