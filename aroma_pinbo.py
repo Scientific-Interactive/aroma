@@ -97,12 +97,12 @@ def identifyPiMOs(outfl):
    return piMOs, nocc
 
 
-def grepPiCMO(nat, piMOs, nocc, nghost, BQ_Range, BQ_Step, outfl, GaussOutExt):
+def grepPiCMO(nat, piMOs, nocc, nghost, BQ_Range, BQ_Step, outfl, outExt):
 
 #  Now plane is always 'XY'
    Plane = 'XY'
 
-   olines = readFile(outfl + GaussOutExt)
+   olines = readFile(outfl + outExt)
    lable_string = "pi-MO#  "
    for i in range (0, len(piMOs)):
       lable_string += repr(piMOs[i]) + "    "

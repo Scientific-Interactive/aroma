@@ -25,8 +25,8 @@ def ring_area(geomfl, idx):
 
    geomflext = geomfl[geomfl.rindex(".")+1:len(geomfl)+1]
 
-   for extension in EXTENSIONS_FOR_GAUSSIAN_FILES:
-      if (EXTENSIONS_FOR_GAUSSIAN_FILES[extension].count(geomflext) == 1): exttype = extension
+   for extension in externalProgram["extensions"]:
+      if (externalProgram["extensions"][extension].count(geomflext) == 1): exttype = extension
 
    # Read and store molecular geometry
    theParser = ReaderFunctCall[exttype](geomfl)

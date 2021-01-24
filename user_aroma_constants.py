@@ -27,42 +27,62 @@ TORSION_ANGLE_TOLERANCE = 15 # in degrees, ideal value 5
 
 
 
-
 ###########################################################################################################################################
+# external program settings 
+
 # Constants, Paths for setting Gaussian Runs
+GaussianSettings = {
+  "inpdir": "tests/",
+  "outdir": "tests/",
+  "chkdir": "chk/",
 
-inpdir = "tests/"
-outdir = "tests/"
-chkdir = "chk/"
-FormChkCmd = "/usr/local/g09/formchk "
-#GaussCmd = "/usr/local/g09/g09 "
-GaussCmd = "C:/Users/user/Documents/2.0Aroma/G09W/G09W/g09  "
-GaussInpExt = ".in"
-GaussOutExt = ".log"
+  "inpExt": ".in",
+  "outExt": ".out",
 
-# Define construction of command to run Gaussian
-def constructGaussCMD(flprfx):
-   return GaussCmd + inpdir + flprfx + GaussInpExt + " " + outdir + flprfx + GaussOutExt
+  "extCmd": "C:/Users/user/Documents/2.0Aroma/G09W/G09W/g09 ",
+  "chkCmd": "/usr/local/g09/formchk ",
 
+  "extensions": { 'input': ['com','gjf','inp','in'], 'output': ['log', 'out'], 'checkpoint': ['chk'] }, # list of possibile extensions for Gaussian Files
 
-# List of Possible extensions for a Gaussian Files
-# This Dictionary can be updated as per your convience.
-# Note: The Extension can be anything, however, the Format of the File should be maintained as standard
-EXTENSIONS_FOR_GAUSSIAN_FILES = {'input':['com','gjf','inp','in'], 'output':['log', 'out'], 'checkpoint':['chk']}
+  # Aroma defaults for Gaussian run
+  "defaultOptimizationKeyline": "%nproc=1\n%mem=1024MB\n# HF/STO-3G OPT \n",
+  "defaultNicsKeyline": "%nproc=1\n%mem=1024MB\n# HF/STO-3G NMR=GIAO INTEGRAL=(GRID=ULTRAFINE) CPHF=(GRID=FINE)\n",
+  "defaultNcsKeyline": "%nproc=1\n%mem=1024MB\n# HF/STO-3G NMR=GIAO IOP(10/46=1) POP(NBOREAD, FULL) INTEGRAL=(GRID=ULTRAFINE) CPHF=(GRID=FINE)\n",
+  "defaultNboKeyline": "$NBO NCS=0.1 <I MO XYZ> $END\n",
 
+  # define construction of command to run Gaussian Files
+  "constructCmd": lambda flprfx: GaussianSettings["extCmd"] + GaussianSettings["inpdir"] + flprfx + GaussianSettings["inpExt"] + " " + GaussianSettings["outdir"] + flprfx + GaussianSettings["outExt"]  
+}
+
+# Constants, Paths for setting ORCA Runs
+OrcaSettings = {
+  "inpdir": "tests/",
+  "outdir": "tests/",
+  "chkdir": "chk/",
+
+  "inpExt": ".in",
+  "outExt": ".out",
+
+  "extCmd": "/usr/local/orca/orca ",
+  "chkCmd": "/usr/local/orca/orca ",
+
+  "extensions": { 'input': ['inp','in'], 'output': ['log', 'out'], 'checkpoint': ['chk'] }, # list of possibile extensions for ORCA Files
+
+  # Aroma defaults for ORCA run
+  "defaultOptimizationKeyline": "! B3LYP/G 6-311G(d,p) nmr Grid6 rijk def2/jk \n%pal nprocs 12 end \n%maxcore 3000",
+  "defaultNicsKeyline": "",
+  "defaultNcsKeyline": "",
+  "defaultNboKeyline": "",
+
+  # define construction to run ORCA Files
+  "constructCmd": lambda flprfx: OrcaSettings["extCmd"] + OrcaSettings["inpdir"] + flprfx + OrcaSettings["inpExt"] + " " + OrcaSettings["outdir"] + flprfx + OrcaSettings["outExt"]  
+}
+
+# program to use - edit this with either GaussianSettings or OrcaSettings depending on your backend 
+externalProgram = GaussianSettings
 ###########################################################################################################################################
 
-
-
-
 ###########################################################################################################################################
-# Defaults for Aroma
-
-DEFAULT_OPTIMIZATION_KEYLINE = "%nproc=1\n%mem=1024MB\n# HF/STO-3G OPT \n"
-DEFAULT_NICS_KEYLINE = "%nproc=1\n%mem=1024MB\n# HF/STO-3G NMR=GIAO INTEGRAL=(GRID=ULTRAFINE) CPHF=(GRID=FINE)\n"
-DEFAULT_NCS_KEYLINE = "%nproc=1\n%mem=1024MB\n# HF/STO-3G NMR=GIAO IOP(10/46=1) POP(NBOREAD, FULL) INTEGRAL=(GRID=ULTRAFINE) CPHF=(GRID=FINE)\n"
-DEFAULT_NBO_KEYLINE = "$NBO NCS=0.1 <I MO XYZ> $END\n"
-
 # Defaults for NICS
 DEFAULT_BQ_STEP = 0.1 # in angstrom
 DEFAULT_BQ_RANGE = [0, 4]
@@ -85,5 +105,4 @@ FIXED_SIGMA_DIHEDRAL_ANGLE = '0.0'
 ATM_H_BL = {5:'1.19', 6:'1.00', 7:'1.00', 8:'0.96', 13:'1.55', 14:'1.47',15:'1.35', 16:'1.31', 22:'1.60'}
 
 ###########################################################################################################################################
-
 

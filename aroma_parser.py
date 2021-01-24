@@ -52,18 +52,16 @@ class InputFileParser(FileParser):
          # so that I dont have to write a separate function to do that ;)
          self.fl = self.geomfl[self.geomfl.rindex("/")+1:len(self.geomfl)+1] # chops off the path string
          self.newflprfx =  self.fl[0:self.fl.rindex(".")] + "-guessonly" # chops off the extension       
-         f = open(self.geomfl[0:self.geomfl.rindex("/")+1] + self.newflprfx + aroma_constants.GaussInpExt, "w") 
+         f = open(self.geomfl[0:self.geomfl.rindex("/")+1] + self.newflprfx + aroma_constants.externalProgram["inpExt"], "w") 
          f.write("# guess=only\n")
          for j in range (i+1, len(glines)):
             f.write(glines[j] )
          f.close()
-         status = execCmd(aroma_constants.constructGaussCMD(self.newflprfx))
+         status = execCmd(aroma_constants.externalProgram.constructCmd(self.newflprfx))
          if (status):
             print("WARNING: An error occured while running a Guess=Only job for converting Z-matrix to cartesian coordinates.\nConsequently, Aroma may terminate abnormally.")
-#            print("Aborting Aroma ..")
-#            sys.exit(10)
          
-         theParser = OutputFileParser(aroma_constants.outdir + self.newflprfx + aroma_constants.GaussOutExt)
+         theParser = OutputFileParser(aroma_constants.outdir + self.newflprfx + aroma_constants.externalProgram["outExt"])
          self.geom, self.hashLine, self.title, self.charge, self.mult = theParser.getInpData()
 
       else:

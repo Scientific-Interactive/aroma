@@ -17,7 +17,7 @@ import aroma_constants
 from aroma_constants import *
 
 def readAndCheck(fl):
-   lines = readFile(outdir + fl)
+   lines = readFile(externalProgram["outdir"] + fl)
    if (len(lines) == 1):
       print("AROMA output " + fl + " is empty. Hence, aborting ..")
       sys.exit(10)

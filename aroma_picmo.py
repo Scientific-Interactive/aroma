@@ -17,12 +17,12 @@ from aroma_constants import *
 import aroma_util
 from aroma_util import *
 
-def grepPiCMO(piMOs, outfl, GaussOutExt):
+def grepPiCMO(piMOs, outfl, outExt):
 
 #  Now plane is always 'XY'
    Plane = 'XY'
 
-   olines = readFile(outfl + GaussOutExt)
+   olines = readFile(outfl + outExt)
 
 #  Find out No. of atoms and Bqs
    for o in olines:
@@ -87,7 +87,7 @@ def main(Prfx):
    else: print("Error: MOs are not specified .. Aborting .. "); sys.exit(10)
 
    outfl = sys.argv[1]
-   grepPiCMO(piMOs, outfl, GaussOutExt)
+   grepPiCMO(piMOs, outfl, externalProgram["outExt"])
 
 if __name__ == "__main__":
    main (sys.argv[1:len(sys.argv)])

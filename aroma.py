@@ -55,7 +55,7 @@ def init():
    geomflext = ""; geomfl = ""; flprfx = ""; outfilename = ""
    sigma_direction = 'POSITIVE'
    n_xy_center = {1:1}; xy_ref_ring_info =[]; BQGuide = {}; xy_BQ_dist = []
-   runtype = "NICSSCAN"; hashLine_opt = DEFAULT_OPTIMIZATION_KEYLINE; hashLine_nics = DEFAULT_NICS_KEYLINE; hashLine_ncs = DEFAULT_NCS_KEYLINE; hashLine_nbo = DEFAULT_NBO_KEYLINE
+   runtype = "NICSSCAN"; hashLine_opt = externalProgram.defaultOptimizationKeyline; hashLine_nics = externalProgram.defaultNicsKeyline; hashLine_ncs = externalProgram.defaultNcsKeyline; hashLine_nbo = externalProgram.defaultNboKeyline
    BQ_Step = DEFAULT_BQ_STEP; BQ_Range = DEFAULT_BQ_RANGE
    sigma_charge = 0; s_charge_flag = 0
    sigma_mult = 1; s_mult_flag = 0
@@ -76,7 +76,7 @@ def check(armfile):
    flprfx = armfile[armfile.rindex("/")+1:len(armfile)]
    armlines = readFile(armpath + flprfx + ".arm")
 
-   outfilename = outdir + flprfx + ".armlog"
+   outfilename = externalProgram["outdir"] + flprfx + ".armlog"
 
    # Check for Validity of the RunType
    for i in range (0, len(armlines)):
@@ -109,8 +109,8 @@ def check(armfile):
       geomflext = geomfl[geomfl.rindex(".")+1:len(geomfl)+1]
 
       valid_ext_flag = 1
-      for extension in EXTENSIONS_FOR_GAUSSIAN_FILES:
-         if (EXTENSIONS_FOR_GAUSSIAN_FILES[extension].count(geomflext) > 0): valid_ext_flag = 1
+      for extension in externalProgram["extensions"]:
+         if (externalProgram["extensions"][extension].count(geomflext) > 0): valid_ext_flag = 1
       if (not valid_ext_flag): print("Gaussian File with \"" + geomflext + "\" Extension Can Not be Read.\nTherefore, Aborting the Run .."); sys.exit(10)
 
    if (xy_flag): 
@@ -242,7 +242,7 @@ def check(armfile):
    
 
 def generate_Opt_Input(geom, hashLine, title, charge, mult):
-    global flprfx, inpdir
+    global flprfx, externalProgram
 
     # The chk file name for optimization can be same as given by the user.
     # Remove the above lines after testing this.
@@ -250,7 +250,7 @@ def generate_Opt_Input(geom, hashLine, title, charge, mult):
 
     # Generate input file for optimization
     optfl = flprfx + "-opt" 
-    f_opt = open(inpdir + optfl + GaussInpExt, "w")
+    f_opt = open(externalProgram["inpdir"] + optfl + externalProgram["inpExt"], "w")
 
     title += " Optimization By Aroma "
     f_opt.write(hashLine_rev + "\n" + title + "\n\n" + repr(charge) + " " + repr(mult) + "\n")
@@ -271,7 +271,7 @@ def run_Optimization(optfl):
     # Run Gaussian for optimization
     # Check status and print approprate msg before proceeding 
     print("Status: Optimization Running .. ")
-    status = execCmd(constructGaussCMD(optfl))
+    status = execCmd(externalProgram.constructCmd((optfl))
     print("Status: Optimization Over.")
     if (status) : 
        print("\nWARNING: Abnormal Termination of Optimization Run.")
@@ -312,8 +312,8 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
       # Mostly there will not be occasion where user gives more than 40-50 points, but such situation is covered.
       BQs_strings = BQs_string.split("break")
       for ring in range (0, len(BQs_strings)): 
-         ringf = open(inpdir + flprfx + "-center" + repr(ring+1) + GaussInpExt, "w") 
-         if (flag_chk): ringf.write("%chk=" + chkdir + flprfx + "-center" + repr(ring+1) + ".chk\n")
+         ringf = open(externalProgram["inpdir"] + flprfx + "-center" + repr(ring+1) + externalProgram["inpExt"], "w") 
+         if (flag_chk): ringf.write("%chk=" + externalProgram["chkdir"] + flprfx + "-center" + repr(ring+1) + ".chk\n")
          ringf.write(hashLine_rev + title + " # Center " + repr(ring+1) + "\n\n" + repr(charge) + " " + repr(mult) + "\n")
          for i in range (1, len(geom)+1):
             # The dummy atoms are considered as BQs, therefore, remove them
@@ -340,8 +340,8 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
             BQs_string = generateBQs(new_geom, Conn, ring_atoms)
     
             coord_format = "{0:.5f}"
-            ringf = open(inpdir + flprfx + "-center" + repr(ring) + GaussInpExt, "w")
-            if (flag_chk): ringf.write("%chk=" + chkdir + flprfx + "-center" + repr(ring) + ".chk\n")
+            ringf = open(externalProgram["inpdir"] + flprfx + "-center" + repr(ring) + externalProgram["inpExt"], "w")
+            if (flag_chk): ringf.write("%chk=" + externalProgram["chkdir"] + flprfx + "-center" + repr(ring) + ".chk\n")
             ringf.write(hashLine_rev + title + " # Center " + repr(ring) + "\n\n" + repr(charge) + " " + repr(mult) + "\n")
             for i in range (1, len(geom)+1):
                # The dummy atoms are considered as BQs, therefore, remove them
@@ -371,8 +371,8 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
             BQs_string = generateBQs(new_geom, Conn, ring_atoms, new_normal)
     
             coord_format = "{0:.5f}"
-            ringf = open(inpdir + flprfx + "-center" + repr(n_count) + GaussInpExt, "w")
-            if (flag_chk): ringf.write("%chk=" + chkdir + flprfx + "-center" + repr(n_count) + ".chk\n")
+            ringf = open(externalProgram["inpdir"] + flprfx + "-center" + repr(n_count) + externalProgram["inpExt"], "w")
+            if (flag_chk): ringf.write("%chk=" + externalProgram["chkdir"] + flprfx + "-center" + repr(n_count) + ".chk\n")
             ringf.write(hashLine_rev + title + " # Center " + repr(n_count) + "\n\n" + repr(charge) + " " + repr(mult) + "\n")
             for i in range (1, len(geom)+1):
                # The dummy atoms are considered as BQs, therefore, remove them
@@ -398,8 +398,8 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
       for c in range (1, n_fl+1):
          if (c > 1): n_xy_center[c] = c
          coord_format = "{0:.5f}"
-         ringf = open(inpdir + flprfx + "-center" + repr(c) + GaussInpExt, "w")
-         if (flag_chk): ringf.write("%chk=" + chkdir + flprfx + "-center" + repr(c) + ".chk\n")
+         ringf = open(externalProgram["inpdir"] + flprfx + "-center" + repr(c) + externalProgram["inpExt"], "w")
+         if (flag_chk): ringf.write("%chk=" + externalProgram["chkdir"] + flprfx + "-center" + repr(c) + ".chk\n")
          ringf.write(hashLine_rev + title + " # Center " + repr(c) + "\n\n" + repr(charge) + " " + repr(mult) + "\n")
 
          for i in range (1, len(new_geom)+1):
@@ -707,8 +707,8 @@ def run_Nics():
    if not pointonly_flag:
       for ring in dict_cen:
          flname = flprfx + "-center" + repr(ring)
-         print("Job " + GaussCmd + flname + " " + flname + " running ..")
-         status = execCmd(constructGaussCMD(flname))
+         print("Job " + externalProgram["extCmd"] + flname + " " + flname + " running ..")
+         status = execCmd(externalProgram.constructCmd(flname))
          if (not status):
             print("Job Over.")
          else : 
@@ -718,8 +718,8 @@ def run_Nics():
        rcount = int((len(points)/MAX_BQS_IN_INPFL))+1
        for ring in range (1, rcount+1):
           flname = flprfx + "-center" + repr(ring)
-          print("Job " + GaussCmd + flname + " " + flname + " running ..")
-          status = execCmd(constructGaussCMD(flname))
+          print("Job " + externalProgram["extCmd"] + flname + " " + flname + " running ..")
+          status = execCmd(externalProgram.constructCmd(flname))
           if (not status): 
              print("Job Over.")
           else: 
@@ -959,7 +959,7 @@ def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
          sigma_charge = user_sigma_charge
    else: sigma_charge = aroma_sigma_charge
 
-   sigma_flprfx = inpdir + flprfx + "-sigma" +  GaussInpExt
+   sigma_flprfx = externalProgram["inpdir"] + flprfx + "-sigma" + externalProgram["inpExt"]
    f = open (sigma_flprfx, "w")
    f.write("# \n\n" + title + " sigma only model " + "\n\n" + repr(sigma_charge) + " " + repr(sigma_mult) + "\n")
    f.write(zmat_str + "\n") 
@@ -1010,7 +1010,7 @@ def grepData():
       for ring in dict_cen:
          Plane = 'XY'
 
-         outlines = readFile(outdir + flprfx + "-center" + repr(ring) + GaussOutExt)
+         outlines = readFile(externalProgram["outdir"] + flprfx + "-center" + repr(ring) + externalProgram["outExt"])
 
          for i in range (0, len(outlines)):
            if (outlines[i].upper().find("NAT") >= 0 ): break;
@@ -1019,7 +1019,7 @@ def grepData():
          for i in range (0, len(outlines)):
            if (outlines[i].find("Magnetic shielding tensor") >= 0 ): break;
 
-         f_out = open(outdir + flprfx + "-center" +repr(ring) + ".armdat", "w")
+         f_out = open(externalProgram["outdir"] + flprfx + "-center" + repr(ring) + ".armdat", "w")
          f_out.write("#       oop       in1        in2       inp       iso        x         y         z\n")
 
          # i + 5*nat + 1, i + 5*nat + BQ_No*nat + 1 are start and end line numbers in the output file for the data for BQs
@@ -1079,15 +1079,14 @@ def grepData():
          
       # In case of XY-Scan, Merge all armdats to one
       if ((xy_flag or pointonly_flag) and (len(dict_cen) > 1)):
-         final_armdat = open(outdir + flprfx + "-center1" + ".armdat","a")
+         final_armdat = open(externalProgram["outdir"] + flprfx + "-center1" + ".armdat", "a")
          for ring in range (1, len(dict_cen)):
-            lines = readFile(outdir + flprfx + "-center" +repr(ring+1) + ".armdat")
+            lines = readFile(externalProgram["outdir"] + flprfx + "-center" + repr(ring+1) + ".armdat")
             for i in range (1, len(lines)):
                final_armdat.write(lines[i])
          final_armdat.close()
       if (xy_flag):
-         # execCmd(" mv " + outdir + flprfx + "-center1" + ".armdat " + outdir + flprfx + "-allcenter" + ".armdat")
-         shutil.move(outdir + flprfx + "-center1" + ".armdat ", outdir + flprfx + "-allcenter" + ".armdat")
+         shutil.move(externalProgram["outdir"] + flprfx + "-center1" + ".armdat ", externalProgram["outdir"] + flprfx + "-allcenter" + ".armdat")
 
 def Execute(geom, title, charge, mult, Conn):
 
@@ -1099,18 +1098,17 @@ def Execute(geom, title, charge, mult, Conn):
    global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
 
    # Run optimization, if required
-   if (hashLine_opt == "DEFAULT\n"): hashLine_opt = DEFAULT_OPTIMIZATION_KEYLINE
+   if (hashLine_opt == "DEFAULT\n"): hashLine_opt = externalProgram.defaultOptimizationKeyline
    if (opt_flag):
       if (not opt_external):
          optfl = generate_Opt_Input(geom, hashLine_opt, title, charge, mult)
       else:
          optfl = flprfx + "-opt"
-         print("\nCopying external optimization input file to " + inpdir + optfl + GaussInpExt)
-         # execCmd("cp " + optfl_external + " " + inpdir + optfl + GaussInpExt)
-         shutil.copyfile(optfl_external, inpdir + optfl + GaussInpExt)
+         print("\nCopying external optimization input file to " + externalProgram["inpdir"] + externalProgram["optfl"] + externalProgram["inpExt"])
+         shutil.copyfile(optfl_external, externalProgram["inpdir"] + externalProgram["optfl"] + externalProgram["inpExt"])
 
       run_Optimization(optfl)
-      theParser = ReaderFunctCall["output"](outdir + optfl + GaussOutExt)
+      theParser = ReaderFunctCall["output"](externalProgram["outdir"] + optfl + externalProgram["outExt"])
       geom, hashLine, title, charge, mult = theParser.getInpData()
       conn_mat, Conn = genConnectivityMatrix(geom)
 
@@ -1132,10 +1130,10 @@ def Execute(geom, title, charge, mult, Conn):
 
    if (ncs_flag):
       # pi-MOs are same in all the output files, so just identify them from the first file.
-      piMOs, nocc = identifyPiMOs(outdir + flprfx + "-center1" + GaussOutExt)
+      piMOs, nocc = identifyPiMOs(externalProgram["outdir"] + flprfx + "-center1" + externalProgram["outExt"])
       for ring in CenterOf:
-         outfl = outdir + flprfx + "-center" + repr(ring)
-         grepPiCMO(len(geom), piMOs, nocc, BQ_No, BQ_Range, BQ_Step, outfl, GaussOutExt)
+         outfl = externalProgram["outdir"] + flprfx + "-center" + repr(ring)
+         grepPiCMO(len(geom), piMOs, nocc, BQ_No, BQ_Range, BQ_Step, outfl, externalProgram["outExt"])
 
    if (xy_flag):
       outfl = open(outfilename, "a")
@@ -1172,7 +1170,7 @@ def callAnalyse(flprfx, geom, CenterOf, all_aromatic_rings, analyse_dist, outfl)
       outfl.write("\nThe area in sq. ang. for each of the aromatic ring defined are: ")
       for ring in all_aromatic_rings:
           ring_atoms = all_aromatic_rings.get(ring)
-          area[ring] = ring_area(inpdir + flprfx + "-center1.in", ring_atoms)
+          area[ring] = ring_area(externalProgram["inpdir"] + flprfx + "-center1.in", ring_atoms)
           outfl.write("\n" + repr(ring) + " : " + repr(area[ring]))
           tot_area += area[ring]
        
@@ -1198,8 +1196,8 @@ def aroma(armfile):
    check(armfile)
       
    if (not opt_external):
-      for extension in EXTENSIONS_FOR_GAUSSIAN_FILES:
-         if (EXTENSIONS_FOR_GAUSSIAN_FILES[extension].count(geomflext) == 1): exttype = extension
+      for extension in externalProgram["extensions"]:
+         if (externalProgram["extensions"][extension].count(geomflext) == 1): exttype = extension
 
       #  Read the geometry and other data
       theParser = ReaderFunctCall[exttype](geomfl)
@@ -1230,25 +1228,22 @@ def aroma(armfile):
 
    if (clear_flag):
       print("\nClearing up unnecessary files .. \n")
-      # execCmd("rm " + inpdir + flprfx + "-center*")
-      # execCmd("rm " + inpdir + flprfx + "-guessonly* " + outdir + flprfx + "-guessonly*")
        
-      removeFiles(inpdir + flprfx + "-center*")
-      removeFiles(inpdir + flprfx + "-guessonly*")
-      removeFiles(outdir + flprfx + "-guessonly*")
+      removeFiles(externalProgram["inpdir"] + flprfx + "-center*")
+      removeFiles(externalProgram["inpdir"] + flprfx + "-guessonly*")
+      removeFiles(externalProgram["outdir"] + flprfx + "-guessonly*")
 
       if (opt_flag):
-         # execCmd("rm " + inpdir + flprfx + "-opt* ")
-         removeFiles(inpdir + flprfx + "-opt* ")
+         removeFiles(externalProgram["inpdir"] + flprfx + "-opt* ")
 
    # Read For: For XY-Scan with Sigma-Model, just keep the final output as .armlog with r, ZZ and del-ZZ
    if (xy_flag and sigma_flag):
-       xarmlogfile = outdir + flprfx + "-alldiff.armlog"
-       armdatlines = readFile(outdir + flprfx + "-allcenter" + ".armdat")
+       xarmlogfile = externalProgram["outdir"] + flprfx + "-alldiff.armlog"
+       armdatlines = readFile(externalProgram["outdir"] + flprfx + "-allcenter" + ".armdat")
 
    if (sigma_flag):
       if (opt_flag or opt_external):
-         theParser = ReaderFunctCall["output"](outdir + flprfx + "-opt" + GaussOutExt)
+         theParser = ReaderFunctCall["output"](externalProgram["outdir"] + flprfx + "-opt" + externalProgram["outExt"])
          geom, hashLine, title, charge, mult = theParser.getInpData()
          conn_mat, Conn = genConnectivityMatrix(geom)
 
@@ -1294,12 +1289,10 @@ def aroma(armfile):
 
       if (clear_flag):
          print("\nClearing up unnecessary files .. \n")
-         # execCmd("rm " + inpdir + flprfx + "-center*")
-         # execCmd("rm " + inpdir + flprfx + "-guessonly* " + outdir + flprfx + "-guessonly*")
 
-         removeFiles(inpdir + flprfx + "-center*")
-         removeFiles(inpdir + flprfx + "-guessonly*")
-         removeFiles(outdir + flprfx + "-guessonly*")
+         removeFiles(externalProgram["inpdir"] + flprfx + "-center*")
+         removeFiles(externalProgram["inpdir"] + flprfx + "-guessonly*")
+         removeFiles(externalProgram["outdir"] + flprfx + "-guessonly*")
 
    numpy_flag = checkNumPy()
    if (sigma_flag and analyse_flag and numpy_flag and not xy_flag):
@@ -1312,7 +1305,7 @@ def aroma(armfile):
       armlog = open(xarmlogfile, "w")
       armlog.write("r       ZZ       Sigma-ZZ        Del-ZZ\n")
       if (xy_flag, sigma_flag):
-          sarmdatlines = readFile(outdir + flprfx + "-allcenter" + ".armdat")
+          sarmdatlines = readFile(externalProgram["outdir"] + flprfx + "-allcenter" + ".armdat")
           lineno = min(len(armdatlines), len(sarmdatlines))
           for i in range (1, lineno):
              awords = list(map(float, armdatlines[i].split()))
