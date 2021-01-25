@@ -29,7 +29,7 @@ def ring_area(geomfl, idx):
       if (externalProgram["extensions"][extension].count(geomflext) == 1): exttype = extension
 
    # Read and store molecular geometry
-   theParser = ReaderFunctCall[exttype](geomfl)
+   theParser = externalProgram.readerFunctCall[exttype](geomfl)
    geom, hashLine, title, charge, mult = theParser.getInpData()
    conn_mat, Conn = genConnectivityMatrix(geom)
 
