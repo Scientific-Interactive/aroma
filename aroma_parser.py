@@ -194,4 +194,5 @@ class ChkFileParser(FileParser):
 
 # Reader Function to Be Called for each Type of Format
 # (Ganesh: Moved this here to remove the cyclic dependency)
-externalProgram.readerFunctCall = {'input':InputFileParser, 'output':OutputFileParser, 'checkpoint':ChkFileParser}
+GaussianSettings["readerFunctCall"] = {'input':InputFileParser, 'output':OutputFileParser, 'checkpoint':ChkFileParser}
+

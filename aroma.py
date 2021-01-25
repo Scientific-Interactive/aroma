@@ -1108,17 +1108,18 @@ def Execute(geom, title, charge, mult, Conn):
          shutil.copyfile(optfl_external, externalProgram["inpdir"] + externalProgram["optfl"] + externalProgram["inpExt"])
 
       run_Optimization(optfl)
-      theParser = externalProgram.readerFunctCall["output"](externalProgram["outdir"] + optfl + externalProgram["outExt"])
+      theParser = externalProgram["readerFunctCall"]["output"](externalProgram["outdir"] + optfl + externalProgram["outExt"])
       geom, hashLine, title, charge, mult = theParser.getInpData()
       conn_mat, Conn = genConnectivityMatrix(geom)
 
-   if (hashLine_nics == "DEFAULT\n"): hashLine_nics = DEFAULT_NICS_KEYLINE 
-   if (hashLine_ncs == "DEFAULT\n"): hashLine_ncs = DEFAULT_NCS_KEYLINE 
-   if (hashLine_nbo == "DEFAULT\n"): hashLine_nbo = DEFAULT_NBO_KEYLINE 
+   if (hashLine_nics == "DEFAULT\n"): hashLine_nics = externalProgram.defaultNicsKeyline 
+   if (hashLine_ncs == "DEFAULT\n"): hashLine_ncs = externalProgram.defaultNcsKeyline 
+   if (hashLine_nbo == "DEFAULT\n"): hashLine_nbo = externalProgram.defaultNboKeyline 
 
    if (ncs_flag):
       genNicsInputs(geom, Conn, hashLine_ncs, title, charge, mult)
-   else : genNicsInputs(geom, Conn, hashLine_nics, title, charge, mult)
+   else: 
+      genNicsInputs(geom, Conn, hashLine_nics, title, charge, mult)
 
    print("\nStatus : NICS input for all the centers generated.")
 
@@ -1200,7 +1201,7 @@ def aroma(armfile):
          if (externalProgram["extensions"][extension].count(geomflext) == 1): exttype = extension
 
       #  Read the geometry and other data
-      theParser = externalProgram.readerFunctCall[exttype](geomfl)
+      theParser = externalProgram["readerFunctCall"][exttype](geomfl)
       geom, hashLine, title, charge, mult = theParser.getInpData() 
       conn_mat, Conn = genConnectivityMatrix(geom)
    else:
@@ -1243,7 +1244,7 @@ def aroma(armfile):
 
    if (sigma_flag):
       if (opt_flag or opt_external):
-         theParser = externalProgram.readerFunctCall["output"](externalProgram["outdir"] + flprfx + "-opt" + externalProgram["outExt"])
+         theParser = externalProgram["readerFunctCall"]["output"](externalProgram["outdir"] + flprfx + "-opt" + externalProgram["outExt"])
          geom, hashLine, title, charge, mult = theParser.getInpData()
          conn_mat, Conn = genConnectivityMatrix(geom)
 
@@ -1253,7 +1254,7 @@ def aroma(armfile):
       geomfl, zmat_idx = genSigmaModel(flprfx, geom, Conn, title, charge, sigma_mult)
 
       # Read the geometry and other data
-      theParser = externalProgram.readerFunctCall[exttype](geomfl)
+      theParser = externalProgram["readerFunctCall"][exttype](geomfl)
       sigma_geom, hashLine, title, charge, mult = theParser.getInpData()
 
       # Take out the normals from the geometry, if defined
