@@ -23,14 +23,14 @@ class FileWriter:
       self.charge = 0
       self.mult = 0
 
-   def write(self):
+   def writeOptFile(self):
       pass
 
 class GaussianInputFileWriter(FileParser):
    def __init__(self, geomfl):
       FileParser.__init__(self, geomfl)
 
-   def write(self, flprfx, externalProgram):
+   def writeOptFile(self, flprfx, externalProgram):
       # The chk file name for optimization can be same as given by the user.
       # Remove the above lines after testing this.
       hashLine_rev = hashLine
@@ -50,7 +50,6 @@ class GaussianInputFileWriter(FileParser):
       f_opt.write("\n")
       f_opt.close()
 
-      print("Input file for Opitmization named as " + optfl + " is generated.")
       return optfl
 
 # Reader Function to Be Called for each Type of Format

@@ -244,31 +244,11 @@ def check(armfile):
 def generate_Opt_Input(geom, hashLine, title, charge, mult):
     global flprfx, externalProgram
 
-    return externalProgram["writerFunctCall"]["geomInput"].write(flprfx, externalProgram)
+    optfl = externalProgram["writerFunctCall"]["geomInput"].writeOptFile(flprfx, externalProgram)
 
-    """
-    # The chk file name for optimization can be same as given by the user.
-    # Remove the above lines after testing this.
-    hashLine_rev = hashLine
+    print("Input file for Optimization named as " + optfl + " is genereated.")
 
-    # Generate input file for optimization
-    optfl = flprfx + "-opt" 
-    f_opt = open(externalProgram["inpdir"] + optfl + externalProgram["inpExt"], "w")
-
-    title += " Optimization By Aroma "
-    f_opt.write(hashLine_rev + "\n" + title + "\n\n" + repr(charge) + " " + repr(mult) + "\n")
-    
-    coord_format = "{0:.5f}"
-    for i in range (1, len(geom)+1):
-       geomline = repr(geom[i][0]) + "   " + coord_format.format(geom[i][1]) + "   " + coord_format.format(geom[i][2]) + "   " + coord_format.format(geom[i][3]) + "\n"
-       f_opt.write(geomline)
-
-    f_opt.write("\n")
-    f_opt.close()
-
-    print("Input file for Opitmization named as " + optfl + " is generated.")
     return optfl
-    """
 
 def run_Optimization(optfl):
   
