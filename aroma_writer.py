@@ -32,7 +32,7 @@ class FileWriter:
    def genGeomLine(self, geom):
       pass
 
-class GaussianInputFileWriter(FileParser):
+class GaussianInputFileWriter(FileWriter):
    def __init__(self, geomfl):
       FileParser.__init__(self, geomfl)
 
