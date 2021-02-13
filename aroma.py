@@ -244,7 +244,7 @@ def check(armfile):
 def generate_Opt_Input(geom, hashLine, title, charge, mult):
     global flprfx, externalProgram
 
-    optfl = externalProgram["writerFunctCall"]["geomInput"].writeOptFile(flprfx, externalProgram)
+    optfl = externalProgram["writerFunctCall"]["geomInput"].writeOptFile(flprfx, externalProgram, geom, hashLine, title, charge, mult)
 
     print("Input file for Optimization named as " + optfl + " is genereated.")
 

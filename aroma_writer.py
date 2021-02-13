@@ -23,14 +23,29 @@ class FileWriter:
       self.charge = 0
       self.mult = 0
 
-   def writeOptFile(self):
+   def writeOptFile(self, flprfx, externalProgram, geom, hashLine, title, charge, mult):
+      pass
+
+   def genHeader(self, title, charge, mult):
+      pass
+
+   def genGeomLine(self, geom):
       pass
 
 class GaussianInputFileWriter(FileParser):
    def __init__(self, geomfl):
       FileParser.__init__(self, geomfl)
 
-   def writeOptFile(self, flprfx, externalProgram):
+   def genHeader(self, title, charge, mult):
+      header = title + " Optimization By Aroma "
+      header = hashLine_rev + "\n" + header + "\n\n" + repr(charge) + " " + repr(mult) + "\n"
+      return header
+
+   def genGeomLine(self, geom):
+      geomline = repr(geom[0]) + "   " + coord_format.format(geom[1]) + "   " + coord_format.format(geom[2]) + "   " + coord_format.format(geom[3]) + "\n"
+      return geomline
+
+   def writeOptFile(self, flprfx, externalProgram, geom, hashLine, title, charge, mult):
       # The chk file name for optimization can be same as given by the user.
       # Remove the above lines after testing this.
       hashLine_rev = hashLine
@@ -39,12 +54,12 @@ class GaussianInputFileWriter(FileParser):
       optfl = flprfx + "-opt"
       f_opt = open(externalProgram["inpdir"] + optfl + externalProgram["inpExt"], "w")
 
-      title += " Optimization By Aroma "
-      f_opt.write(hashLine_rev + "\n" + title + "\n\n" + repr(charge) + " " + repr(mult) + "\n")
+      header = self.genHeader(title, charge, mult)
+      f_opt.write(header)
 
       coord_format = "{0:.5f}"
       for i in range (1, len(geom)+1):
-         geomline = repr(geom[i][0]) + "   " + coord_format.format(geom[i][1]) + "   " + coord_format.format(geom[i][2]) + "   " + coord_format.format(geom[i][3]) + "\n"
+         geomline = self.genGeomLine(geom[i]) 
          f_opt.write(geomline)
 
       f_opt.write("\n")
