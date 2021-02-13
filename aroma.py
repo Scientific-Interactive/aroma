@@ -29,6 +29,9 @@ from aroma_util import *
 import aroma_parser
 from aroma_parser import *
 
+import aroma_writer
+from aroma_writer import *
+
 import aroma_molecule
 from aroma_molecule import *
 
