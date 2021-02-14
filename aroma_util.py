@@ -191,3 +191,15 @@ def removeFiles(fls):
 def aromaVersion():
    return "v2.0.16012021"
 
+# nics integral fit
+def nicsIntegralFit(xdata, ydata):
+  from scipy.optimize import curve_fit
+
+  def func(x, a, b, c):
+    return a*(b**x)
+
+  popt, pcov = curve_fit(func, xdata, ydata)
+  print("nics fit", popt)
+
+  return popt
+
