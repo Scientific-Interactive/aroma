@@ -53,7 +53,7 @@ class GaussianInputFileWriter(FileWriter):
       return geomline
 
    def genGhostAtomLine(self, pt):
-      ghostAtm = "bq " + self.coord_format.format(pt[0]) + "     " + self.coord_format.format(pt[1]) + "     " + self.coord_format.format(pt[2]) + "\n"
+      ghostAtm = 'bq     ' + self.coord_format.format(pt[0]) + "     " + self.coord_format.format(pt[1]) + "     " + self.coord_format.format(pt[2]) + "\n"
       return ghostAtm
 
    def genGhostAtomSetBreak(self):
