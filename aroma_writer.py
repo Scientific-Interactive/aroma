@@ -45,7 +45,7 @@ class GaussianInputFileWriter(FileWriter):
 
    def genHeader(self, hashLine, title, charge, mult):
       header = title 
-      header = hashLine + "\n" + header + "\n\n" + repr(charge) + " " + repr(mult) + "\n"
+      header = hashLine + header + "\n\n" + repr(charge) + " " + repr(mult) + "\n"
       return header
 
    def genGeomLine(self, geom):
