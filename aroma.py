@@ -253,8 +253,10 @@ def generate_Opt_Input(geom, hashLine, title, charge, mult):
 
     return optfl
 
+
 def run_Optimization(optfl):
-  
+    global externalProgram
+ 
     # Run Gaussian for optimization
     # Check status and print approprate msg before proceeding 
     print("Status: Optimization Running .. ")
@@ -267,6 +269,7 @@ def run_Optimization(optfl):
 
 
 def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
+   global externalProgram
 
    # global flags
    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
@@ -291,21 +294,24 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
       p_count = 0
       bq_count = 0
       for p in points: 
-          BQs_string += "bq " + coord_format.format(points[p_count,0][0]) + "     " + coord_format.format(points[p_count,0][1]) + "     " + coord_format.format(points[p_count,0][2]) + "\n" 
+          # BQs_string += "bq " + coord_format.format(points[p_count,0][0]) + "     " + coord_format.format(points[p_count,0][1]) + "     " + coord_format.format(points[p_count,0][2]) + "\n" 
+          BQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomLine(points[p_count, 0])
           p_count += 1
           bq_count += 1
-          if (bq_count%MAX_BQS_IN_INPFL == 0): BQs_string += "break"
+          if (bq_count%MAX_BQS_IN_INPFL == 0): BQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomSetBreak()
 
       # Mostly there will not be occasion where user gives more than 40-50 points, but such situation is covered.
       BQs_strings = BQs_string.split("break")
       for ring in range (0, len(BQs_strings)): 
          ringf = open(externalProgram["inpdir"] + flprfx + "-center" + repr(ring+1) + externalProgram["inpExt"], "w") 
-         if (flag_chk): ringf.write("%chk=" + externalProgram["chkdir"] + flprfx + "-center" + repr(ring+1) + ".chk\n")
-         ringf.write(hashLine_rev + title + " # Center " + repr(ring+1) + "\n\n" + repr(charge) + " " + repr(mult) + "\n")
+         if (flag_chk): ringf.write(externalProgram["writerFunctCall"]["geomInput"].genCheckpointLine(externalProgram["chkdir"] + flprfx + "-center" + repr(ring+1) + ".chk"))
+         # ringf.write(hashLine_rev + title + " # Center " + repr(ring+1) + "\n\n" + repr(charge) + " " + repr(mult) + "\n")
+         ringf.write(externalProgram["writerFunctCall"]["geomInput"].genHeader(hashLine_rev, title + " # Center " + repr(ring+1), charge, mult))
          for i in range (1, len(geom)+1):
             # The dummy atoms are considered as BQs, therefore, remove them
             if (geom[i][0] != 0):
-              geomline = repr(geom[i][0]) + "   " + coord_format.format(geom[i][1]) + "   " + coord_format.format(geom[i][2]) + "   " + coord_format.format(geom[i][3]) + "\n"
+              # geomline = repr(geom[i][0]) + "   " + coord_format.format(geom[i][1]) + "   " + coord_format.format(geom[i][2]) + "   " + coord_format.format(geom[i][3]) + "\n"
+              geomline = externalProgram["writerFunctCall"]["geomInput"].getGeomLine(geom[i])
               ringf.write(geomline)
          ringf.write(BQs_strings[ring] + "\n")
 
@@ -328,12 +334,15 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
     
             coord_format = "{0:.5f}"
             ringf = open(externalProgram["inpdir"] + flprfx + "-center" + repr(ring) + externalProgram["inpExt"], "w")
-            if (flag_chk): ringf.write("%chk=" + externalProgram["chkdir"] + flprfx + "-center" + repr(ring) + ".chk\n")
-            ringf.write(hashLine_rev + title + " # Center " + repr(ring) + "\n\n" + repr(charge) + " " + repr(mult) + "\n")
+            if (flag_chk): ringf.write(externalProgram["writerFunctCall"]["geomInput"].genCheckpointLine(externalProgram["chkdir"] + flprfx + "-center" + repr(ring) + ".chk"))
+            # ringf.write(hashLine_rev + title + " # Center " + repr(ring) + "\n\n" + repr(charge) + " " + repr(mult) + "\n")
+            ringf.write(externalProgram["writerFunctCall"]["geomInput"].genHeader(hashLine_rev, title + " # Center " + repr(ring), charge, mult))
             for i in range (1, len(geom)+1):
                # The dummy atoms are considered as BQs, therefore, remove them
                if (new_geom[i][0] != 0):
-                  geomline = repr(new_geom[i][0]) + "   " + coord_format.format(new_geom[i][1]) + "   " + coord_format.format(new_geom[i][2]) + "   " + coord_format.format(new_geom[i][3]) + "\n"
+                  # geomline = repr(new_geom[i][0]) + "   " + coord_format.format(new_geom[i][1]) + "   " + coord_format.format(new_geom[i][2]) + "   " + coord_format.format(new_geom[i][3]) + "\n"
+                  geomline = externalProgram["writerFunctCall"]["geomInput"].genGeomLine(new_geom[i])
+
                   ringf.write(geomline)
 
             ringf.write(BQs_string + "\n")
@@ -359,12 +368,15 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
     
             coord_format = "{0:.5f}"
             ringf = open(externalProgram["inpdir"] + flprfx + "-center" + repr(n_count) + externalProgram["inpExt"], "w")
-            if (flag_chk): ringf.write("%chk=" + externalProgram["chkdir"] + flprfx + "-center" + repr(n_count) + ".chk\n")
-            ringf.write(hashLine_rev + title + " # Center " + repr(n_count) + "\n\n" + repr(charge) + " " + repr(mult) + "\n")
+            if (flag_chk): ringf.write(externalProgram["writerFunctCall"]["geomInput"].genCheckpointLine(externalProgram["chkdir"] + flprfx + "-center" + repr(n_count) + ".chk"))
+            # ringf.write(hashLine_rev + title + " # Center " + repr(n_count) + "\n\n" + repr(charge) + " " + repr(mult) + "\n")
+            ringf.write(externalProgram["writerFunctCall"]["geomInput"].genHeader(hashLine_rev, title + " # Center " + repr(n_count), charge, mult))
             for i in range (1, len(geom)+1):
                # The dummy atoms are considered as BQs, therefore, remove them
                if (new_geom[i][0] != 0):
-                  geomline = repr(new_geom[i][0]) + "   " + coord_format.format(new_geom[i][1]) + "   " + coord_format.format(new_geom[i][2]) + "   " + coord_format.format(new_geom[i][3]) + "\n"
+                  # geomline = repr(new_geom[i][0]) + "   " + coord_format.format(new_geom[i][1]) + "   " + coord_format.format(new_geom[i][2]) + "   " + coord_format.format(new_geom[i][3]) + "\n"
+                  geomline = externalProgram["writerFunctCall"]["geomInput"].genGeomLine(new_geom[i])
+
                   ringf.write(geomline)
 
             ringf.write(BQs_string + "\n")
@@ -386,13 +398,15 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
          if (c > 1): n_xy_center[c] = c
          coord_format = "{0:.5f}"
          ringf = open(externalProgram["inpdir"] + flprfx + "-center" + repr(c) + externalProgram["inpExt"], "w")
-         if (flag_chk): ringf.write("%chk=" + externalProgram["chkdir"] + flprfx + "-center" + repr(c) + ".chk\n")
-         ringf.write(hashLine_rev + title + " # Center " + repr(c) + "\n\n" + repr(charge) + " " + repr(mult) + "\n")
+         if (flag_chk): ringf.write(externalProgram["writerFunctCall"]["geomInput"].genCheckpointLine(externalProgram["chkdir"] + flprfx + "-center" + repr(c) + ".chk"))
+         # ringf.write(hashLine_rev + title + " # Center " + repr(c) + "\n\n" + repr(charge) + " " + repr(mult) + "\n")
+         ringf.write(externalProgram["writerFunctCall"]["geomInput"].genHeader(hashLine_rev, title + " # Center " + repr(c), charge, mult))
 
          for i in range (1, len(new_geom)+1):
             # The dummy atoms are considered as BQs, therefore, remove them
             if (new_geom[i][0] != 0):
-               geomline = repr(new_geom[i][0]) + "   " + coord_format.format(new_geom[i][1]) + "   " + coord_format.format(new_geom[i][2]) + "   " + coord_format.format(new_geom[i][3]) + "\n"
+               # geomline = repr(new_geom[i][0]) + "   " + coord_format.format(new_geom[i][1]) + "   " + coord_format.format(new_geom[i][2]) + "   " + coord_format.format(new_geom[i][3]) + "\n"
+               geomline = externalProgram["writerFunctCall"]["geomInput"].genGeomLine(new_geom[i])
                ringf.write(geomline)
 
          ringf.write(BQs_strings[c-1] + "\n")
@@ -407,6 +421,7 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
 # Here, the geom refers to the re-oriented geometry
 # Now, the plane is always XY plane
 def generateBQs(geom, Conn, ring_atoms, normal = []):
+   global externalProgram
 
    sigma_model = 0
    direction_bq = 'POSITIVE'
@@ -460,12 +475,15 @@ def generateBQs(geom, Conn, ring_atoms, normal = []):
    BQs_string = ""
    zcoord = cmz + BQ_Range[0] 
    for i in range (0, BQ_No):
-      BQs_string += 'bq     ' + coord_format.format(cmx) + "     " + coord_format.format(cmy) + "     " + coord_format.format(zcoord) + "\n"
+      # BQs_string += 'bq     ' + coord_format.format(cmx) + "     " + coord_format.format(cmy) + "     " + coord_format.format(zcoord) + "\n"
+      bqpt = [cmx, cmy, zcoord]
+      BQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomLine(bqpt)
       zcoord += zinc
 
    return BQs_string
 
 def generateBQs_XY(geom, Conn):
+   global externalProgram
 
    # global flags
    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
@@ -626,7 +644,8 @@ def generateBQs_XY(geom, Conn):
             bq_coord = [BQ_Step*j*v for v in n_vec_ca]
             bq_coord[:] = [c[v]+bq_coord[v] for v in range (0,3)]
             xy_BQ_dist.append(round(getDistance(bq_coord, bq_coord_prvs),3))
-            BQs_string += 'bq     ' + coord_format.format(bq_coord[0]) + "     " + coord_format.format(bq_coord[1]) + "     " + coord_format.format(bq_coord[2]) + "\n"
+            # BQs_string += 'bq     ' + coord_format.format(bq_coord[0]) + "     " + coord_format.format(bq_coord[1]) + "     " + coord_format.format(bq_coord[2]) + "\n"
+            BQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomLine(bq_coord)
             bq_count += 1
             bq_coord_prvs = bq_coord
             if (bq_count%MAX_BQS_IN_INPFL == 0): BQs_string += "break"
@@ -643,7 +662,8 @@ def generateBQs_XY(geom, Conn):
          bq_coord = [BQ_Step*j*v for v in n_vec_ab]
          bq_coord[:] = [a[v]+bq_coord[v] for v in range (0,3)]
          xy_BQ_dist.append(round(getDistance(bq_coord, bq_coord_prvs),3))
-         BQs_string += 'bq     ' + coord_format.format(bq_coord[0]) + "     " + coord_format.format(bq_coord[1]) + "     " + coord_format.format(bq_coord[2]) + "\n"
+         # BQs_string += 'bq     ' + coord_format.format(bq_coord[0]) + "     " + coord_format.format(bq_coord[1]) + "     " + coord_format.format(bq_coord[2]) + "\n"
+         BQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomLine(bq_coord)
          bq_count += 1
          bq_coord_prvs = bq_coord
          if (bq_count%MAX_BQS_IN_INPFL == 0): BQs_string += "break"
@@ -653,7 +673,8 @@ def generateBQs_XY(geom, Conn):
       bq_coord = [BQ_Step*(j+1)*v for v in n_vec_ab]
       bq_coord[:] = [a[v]+bq_coord[v] for v in range (0,3)]
       xy_BQ_dist.append(round(getDistance(bq_coord, bq_coord_prvs),3))
-      BQs_string += 'bq     ' + coord_format.format(bq_coord[0]) + "     " + coord_format.format(bq_coord[1]) + "     " + coord_format.format(bq_coord[2]) + "\n"
+      # BQs_string += 'bq     ' + coord_format.format(bq_coord[0]) + "     " + coord_format.format(bq_coord[1]) + "     " + coord_format.format(bq_coord[2]) + "\n"
+      BQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomLine(bq_coord)
       bq_count += 1
       bq_coord_prvs = bq_coord
 
@@ -665,7 +686,8 @@ def generateBQs_XY(geom, Conn):
       bq_coord = [BQ_Step*j*v for v in n_vec_ab]
       bq_coord[:] = [b[v]+bq_coord[v] for v in range (0,3)]
       xy_BQ_dist.append(round(getDistance(bq_coord, bq_coord_prvs),3))
-      BQs_string += 'bq     ' + coord_format.format(bq_coord[0]) + "     " + coord_format.format(bq_coord[1]) + "     " + coord_format.format(bq_coord[2]) + "\n"
+      # BQs_string += 'bq     ' + coord_format.format(bq_coord[0]) + "     " + coord_format.format(bq_coord[1]) + "     " + coord_format.format(bq_coord[2]) + "\n"
+      BQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomLine(bq_coord)
       bq_count += 1
       bq_coord_prvs = bq_coord
       if (bq_count%MAX_BQS_IN_INPFL == 0): BQs_string += "break"
@@ -675,6 +697,7 @@ def generateBQs_XY(geom, Conn):
 
    
 def run_Nics():
+   global externalProgram
 
    # global flags
    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external

@@ -15,35 +15,52 @@ import aroma_constants
 from aroma_constants import *
 
 class FileWriter:
-   def __init__(self, geomfl):
-      self.geomfl = geomfl
-      self.geom = {}
+   def __init__(self):
       self.hashLine = aroma_constants.externalProgram["defaultNicsKeyline"]
       self.title = "DEFAULT TITLE SET BY AROMA"
-      self.charge = 0
-      self.mult = 0
 
    def writeOptFile(self, flprfx, externalProgram, geom, hashLine, title, charge, mult):
       pass
 
-   def genHeader(self, title, charge, mult):
+   def genHeader(self, hashLine, title, charge, mult):
       pass
 
    def genGeomLine(self, geom):
+      pass
+
+   def genGhostAtomLine(self, pt):
+      pass
+
+   def genGhostAtomSetBreak(self):
+      pass
+
+   def genCheckpointLine(self, chkFile):
       pass
 
 class GaussianInputFileWriter(FileWriter):
-   def __init__(self, geomfl):
-      FileParser.__init__(self, geomfl)
+   def __init__(self):
+      FileWriter.__init__(self)
 
-   def genHeader(self, title, charge, mult):
-      header = title + " Optimization By Aroma "
-      header = hashLine_rev + "\n" + header + "\n\n" + repr(charge) + " " + repr(mult) + "\n"
+      self.coord_format = "{0:.5f}"
+
+   def genHeader(self, hashLine, title, charge, mult):
+      header = title 
+      header = hashLine + "\n" + header + "\n\n" + repr(charge) + " " + repr(mult) + "\n"
       return header
 
    def genGeomLine(self, geom):
-      geomline = repr(geom[0]) + "   " + coord_format.format(geom[1]) + "   " + coord_format.format(geom[2]) + "   " + coord_format.format(geom[3]) + "\n"
+      geomline = repr(geom[0]) + "   " + self.coord_format.format(geom[1]) + "   " + self.coord_format.format(geom[2]) + "   " + self.coord_format.format(geom[3]) + "\n"
       return geomline
+
+   def genGhostAtomLine(self, pt):
+      ghostAtm = "bq " + self.coord_format.format(pt[0]) + "     " + self.coord_format.format(pt[1]) + "     " + self.coord_format.format(pt[2]) + "\n"
+      return ghostAtm
+
+   def genGhostAtomSetBreak(self):
+      return "break"
+
+   def genCheckpointLine(self, chkFile):
+      return "%chk=" + chkFile + "\n"
 
    def writeOptFile(self, flprfx, externalProgram, geom, hashLine, title, charge, mult):
       # The chk file name for optimization can be same as given by the user.
@@ -54,7 +71,7 @@ class GaussianInputFileWriter(FileWriter):
       optfl = flprfx + "-opt"
       f_opt = open(externalProgram["inpdir"] + optfl + externalProgram["inpExt"], "w")
 
-      header = self.genHeader(title, charge, mult)
+      header = self.genHeader(hashLine_rev, title + " Optimization By Aroma ", charge, mult)
       f_opt.write(header)
 
       coord_format = "{0:.5f}"
@@ -69,5 +86,5 @@ class GaussianInputFileWriter(FileWriter):
 
 # Reader Function to Be Called for each Type of Format
 # (Ganesh: Moved this here to remove the cyclic dependency)
-GaussianSettings["writerFunctCall"] = {'geomInput':GaussianInputFileWriter}
+GaussianSettings["writerFunctCall"] = {'geomInput':GaussianInputFileWriter()}
 
