@@ -7,6 +7,7 @@
 
 import os
 import sys
+import math
 import string
 import fpformat
 import numpy
@@ -80,6 +81,55 @@ def analyse(mfile, sfile, dist_start = DEFAULT_DISTANCE_FOR_ANALYSIS, outfl = sy
    outfl.write("Polynomials for Doop and 3Diso are :\n")
    outfl.write("\n" + str(p_oup) + "\n" + str(p_3iso) + "\n")
    outfl.write("\nThe mean NICS value is " + repr(round(nics,3)) + " with error " + repr(round(err,3)))
+   outfl.write("\n--------------------------------------------------------------------\n")
+
+def integralnics_analyse(mfile, sfile, dist_start = 2.0, outfl = sys.stdout):
+
+   numpy_flag = checkNumPy()
+   if (not numpy_flag): sys.exit(10)
+
+   if (len(sys.argv) > 3): dist_start = float(sys.argv[3]) 
+   
+   mlines = readAndCheck(mfile)
+   slines = readAndCheck(sfile)
+
+   m_dict = processData(mlines) 
+   s_dict = processData(slines) 
+
+   for i in range (0, len(m_dict)):
+      if (float(m_dict[i][0]) >= float(dist_start)):
+          dist_start = i
+          break;
+
+   dist = []; del_oup = []; del_inp = []; del_3iso = []; del_zz = []
+   for i in range (dist_start, len(m_dict)):
+       dist.append(m_dict[i][0])
+       del_oup.append(m_dict[i][1] - s_dict[i][1])
+       del_inp.append(m_dict[i][2] - s_dict[i][2])
+       del_3iso.append(3*(m_dict[i][3] - s_dict[i][3]))
+       del_zz.append(m_dict[i][4] - s_dict[i][4])
+  
+   for i in range (0, len(del_inp)):
+       if (del_inp[i] > 5.0):
+           print("Warning: For some points chosen for fitting the Doop and 3Diso data, the del-inp values exceeds 5.0")
+           break;
+
+   p_3iso = nicsIntegralFit(dist, del_3iso)
+   p_zz = nicsIntegralFit(dist, del_zz) 
+
+   nicsint_val_3iso = ((p_3iso[0]*(p_3iso[1]**100))/math.log(p_3iso[1])) - (p_3iso[0]/math.log(p_3iso[1]))
+   nicsint_val_zz = ((p_zz[0]*(p_zz[1]**100))/math.log(p_zz[1])) - (p_zz[0]/math.log(p_zz[1]))
+
+   nics = (nicsint_val_3iso + nicsint_val_zz)/2
+   err = abs(nicsint_val_3iso - nics)
+
+   outfl.write("\n--------------------------------------------------------------------\n")
+   outfl.write("Parameters of the AB^r curve fitting for Dzz and 3Diso are :\n")
+   outfl.write("\n A = " + str(p_zz[0]) + "     B = " + str(p_zz[1]) + "\n")
+   outfl.write("Integral NICS Dzz = " + str(nicsint_val_zz) + "\n")
+   outfl.write("\n A = " + str(p_3iso[0]) + "     b = " + str(p_3iso[1]) + "\n")
+   outfl.write("Integral NICS 3Diso = " + str(nicsint_val_3iso) + "\n")
+   outfl.write("\nThe mean Integral-NICS value is " + repr(round(nics,3)) + " with error " + repr(round(err,3)))
    outfl.write("\n--------------------------------------------------------------------\n")
 
 if __name__ == "__main__":

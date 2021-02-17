@@ -199,7 +199,6 @@ def nicsIntegralFit(xdata, ydata):
     return a*(b**x)
 
   popt, pcov = curve_fit(func, xdata, ydata)
-  print("nics fit", popt)
 
   return popt
 
