@@ -192,7 +192,40 @@ class ChkFileParser(FileParser):
 
       return self.geom, self.hashLine, self.title, self.charge, self.mult
 
+class OrcaOutputFileParser(FileParser):
+   def __init__(self, geomfl):
+      FileParser.__init__(self, geomfl)
+
+   def getInpData(self):
+      glines = readFile(self.geomfl)
+
+      i = 0
+
+      # If its an output of an optimization run, then the last goemetry should be read
+      # Therefore, here a reverse loop is necessary
+      for i in range (len(glines)-1, -1, -1):
+         if (glines[i].upper().find("CARTESIAN COORDINATES (ANGSTROEM)") >= 0): break;
+
+      nat = 0
+      for j in range (i+2, len(glines)):
+         if ( glines[j].find("----------------------------") >= 0 ): break;
+
+         words = glines[j].split()
+
+         if (len(words) < 3): continue  # skip any empty or incomplete lines
+
+         nat += 1
+         self.geom[nat] = []
+         self.geom[nat].append(AtmSym[words[0].upper()])
+
+         for k in range (1,4):
+            self.geom[nat].append(round(float(words[k]),6))
+
+      return self.geom, self.hashLine, self.title, self.charge, self.mult
+
 # Reader Function to Be Called for each Type of Format
 # (Ganesh: Moved this here to remove the cyclic dependency)
 GaussianSettings["readerFunctCall"] = {'input':InputFileParser, 'output':OutputFileParser, 'checkpoint':ChkFileParser}
+OrcaSettings["readerFunctCall"] = {'output':OrcaOutputFileParser}
+
 

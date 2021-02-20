@@ -70,7 +70,7 @@ OrcaSettings = {
 
   # Aroma defaults for ORCA run
   "defaultOptimizationKeyline": "! B3LYP/G 6-311G(d,p) nmr Grid6 rijk def2/jk \n%pal nprocs 12 end \n%maxcore 3000",
-  "defaultNicsKeyline": "",
+  "defaultNicsKeyline": "! B3LYP/G 6-311G(d,p) nmr Grid6 rijk def2/jk \n%pal nprocs 12 end \n%maxcore 3000",
   "defaultNcsKeyline": "",
   "defaultNboKeyline": "",
 
