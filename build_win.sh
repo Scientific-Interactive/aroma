@@ -6,7 +6,7 @@ mv Aroma aroma-win/
 cp ../*png aroma-win/
 cp ../user_aroma_constants.py aroma-win/
 cp -r ../tests aroma-win/
-zip -r aroma-win.zip aroma-win/
+7z a -r aroma-win.zip aroma-win/
 mv aroma-win.zip ../
 cd ..
 rm -fr dist build
