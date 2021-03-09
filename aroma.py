@@ -53,7 +53,7 @@ def init():
    global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
 
    # Initializing some global variables
-   opt_flag = 0; ncs_flag = 0; sigma_flag = 0; opt_external = 0; xy_flag = 0; pointonly_flag = 0; analyse_flag = 0; area_flag = 0
+   opt_flag = 0; ncs_flag = 0; sigma_flag = 0; opt_external = 0; xy_flag = 0; pointonly_flag = 0; integralnics_flag = 0; analyse_flag = 0; area_flag = 0
    CenterOf = {}; all_aromatic_rings = {}; exocyclic = {}; points = {}; normals = {}
    geomflext = ""; geomfl = ""; flprfx = ""; outfilename = ""
    sigma_direction = 'POSITIVE'
