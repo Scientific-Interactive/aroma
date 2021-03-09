@@ -1045,7 +1045,7 @@ def grepData():
                final_armdat.write(lines[i])
          final_armdat.close()
       if (xy_flag):
-         shutil.move(externalProgram["outdir"] + flprfx + "-center1" + ".armdat ", externalProgram["outdir"] + flprfx + "-allcenter" + ".armdat")
+         shutil.move(externalProgram["outdir"] + flprfx + "-center1" + ".armdat", externalProgram["outdir"] + flprfx + "-allcenter" + ".armdat")
 
 def Execute(geom, title, charge, mult, Conn):
 

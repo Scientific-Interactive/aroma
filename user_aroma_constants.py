@@ -1,7 +1,7 @@
 #! /usr/bin/env python
-# Author : Anuja
+# Author : Anuja, Ganesh
 # 30.01.2013
-# Last Updated : 05.02.2014
+# Last Updated : 08.03.2021
 
 # A Python Script for setting the constants and paths for Package Aroma 
 
