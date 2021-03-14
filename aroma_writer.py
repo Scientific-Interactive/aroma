@@ -37,6 +37,9 @@ class FileWriter:
    def genCheckpointLine(self, chkFile):
       pass
 
+   def genTerminator():
+      pass
+
 class GaussianInputFileWriter(FileWriter):
    def __init__(self):
       FileWriter.__init__(self)
@@ -61,6 +64,9 @@ class GaussianInputFileWriter(FileWriter):
 
    def genCheckpointLine(self, chkFile):
       return "%chk=" + chkFile + "\n"
+
+   def genTerminator():
+      return ""
 
    def writeOptFile(self, flprfx, externalProgram, geom, hashLine, title, charge, mult):
       # The chk file name for optimization can be same as given by the user.
@@ -91,8 +97,8 @@ class OrcaInputFileWriter(FileWriter):
       self.coord_format = "{0:.5f}"
 
    def genHeader(self, hashLine, title, charge, mult):
-      header = title
-      header = hashLine + header + "\n\n*xyz" + repr(charge) + " " + repr(mult) + "\n"
+      header = ""
+      header = hashLine + header + "\n\n*xyz " + repr(charge) + " " + repr(mult) + "\n"
       return header
 
    def genGeomLine(self, geom):
@@ -100,7 +106,7 @@ class OrcaInputFileWriter(FileWriter):
       return geomline
 
    def genGhostAtomLine(self, pt):
-      ghostAtm = 'bq     ' + self.coord_format.format(pt[0]) + "     " + self.coord_format.format(pt[1]) + "     " + self.coord_format.format(pt[2]) + "\n"
+      ghostAtm = 'H:    ' + self.coord_format.format(pt[0]) + "     " + self.coord_format.format(pt[1]) + "     " + self.coord_format.format(pt[2]) + " newgto S 1 1 100000 1 end newauxJKgto S 1 1 200000 1 end\n"
       return ghostAtm
 
    def genGhostAtomSetBreak(self):
@@ -108,6 +114,9 @@ class OrcaInputFileWriter(FileWriter):
 
    def genCheckpointLine(self, chkFile):
       return ""
+
+   def genTerminator(self):
+      return "*"
 
    def writeOptFile(self, flprfx, externalProgram, geom, hashLine, title, charge, mult):
       # The chk file name for optimization can be same as given by the user.
@@ -126,7 +135,7 @@ class OrcaInputFileWriter(FileWriter):
          geomline = self.genGeomLine(geom[i])
          f_opt.write(geomline)
 
-      f_opt.write("\n")
+      f_opt.write("\n" + self.genTerminator() + "\n")
       f_opt.close()
 
       return optfl

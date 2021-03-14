@@ -270,6 +270,8 @@ def run_Optimization(optfl):
 def writeNicsInputs(flprfx, centerIdx, flag_chk, hashLine_rev, title, charge, mult, geom, BQs_strings):
    global externalProgram
 
+   externalProgram["cleanupCmd"](flprfx)
+
    ringf = open(externalProgram["inpdir"] + flprfx + "-center" + repr(centerIdx) + externalProgram["inpExt"], "w")
    if (flag_chk): ringf.write(externalProgram["writerFunctCall"]["geomInput"].genCheckpointLine(externalProgram["chkdir"] + flprfx + "-center" + repr(centerIdx) + ".chk"))
    # ringf.write(hashLine_rev + title + " # Center " + repr(centerIdx) + "\n\n" + repr(charge) + " " + repr(mult) + "\n")
@@ -280,7 +282,7 @@ def writeNicsInputs(flprfx, centerIdx, flag_chk, hashLine_rev, title, charge, mu
         # geomline = repr(geom[i][0]) + "   " + coord_format.format(geom[i][1]) + "   " + coord_format.format(geom[i][2]) + "   " + coord_format.format(geom[i][3]) + "\n"
         geomline = externalProgram["writerFunctCall"]["geomInput"].genGeomLine(geom[i])
         ringf.write(geomline)
-   ringf.write(BQs_strings + "\n")
+   ringf.write(BQs_strings + externalProgram["writerFunctCall"]["geomInput"].genTerminator() + "\n")
 
    # If NCS run is requested, then add NBO keywords at the end of the Gaussian input
    if (ncs_flag):

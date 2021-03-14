@@ -201,6 +201,14 @@ class OrcaOutputFileParser(FileParser):
 
       i = 0
 
+      # search for charge and multiplicy line in the file
+      for i in range(len(glines)):
+        if (glines[i].find("*xyz") >= 0):
+           ln = glines[i].split("*xyz")
+           ln = ln[1].strip()
+           self.charge, self.mult = map(lambda x: int(x.strip()), ln.split(" "))
+           break
+
       # If its an output of an optimization run, then the last goemetry should be read
       # Therefore, here a reverse loop is necessary
       for i in range (len(glines)-1, -1, -1):

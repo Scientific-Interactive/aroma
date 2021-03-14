@@ -7,6 +7,9 @@
 
 print("user config import")
 
+import os
+import glob
+
 ###########################################################################################################################################
 # Atom information
 AtmSym = {'A':-1,'X':0, 'H':1, 'HE':2, 'LI':3, 'BE':4, 'B':5, 'C':6, 'N':7, 'O':8, 'F':9, 'AL':13,'SI':14, 'P':15, 'S':16, 'CL':17, 'TI':22}
@@ -51,7 +54,8 @@ GaussianSettings = {
   "defaultNboKeyline": "$NBO NCS=0.1 <I MO XYZ> $END\n",
 
   # define construction of command to run Gaussian Files
-  "constructCmd": lambda flprfx: GaussianSettings["extCmd"] + GaussianSettings["inpdir"] + flprfx + GaussianSettings["inpExt"] + " " + GaussianSettings["outdir"] + flprfx + GaussianSettings["outExt"]  
+  "constructCmd": lambda flprfx: GaussianSettings["extCmd"] + GaussianSettings["inpdir"] + flprfx + GaussianSettings["inpExt"] + " " + GaussianSettings["outdir"] + flprfx + GaussianSettings["outExt"],
+  "cleanupCmd": lambda flprfx: print("clean " + flprfx)
 }
 
 # Constants, Paths for setting ORCA Runs
@@ -63,19 +67,20 @@ OrcaSettings = {
   "inpExt": ".in",
   "outExt": ".out",
 
-  "extCmd": "/usr/local/orca/orca ",
-  "chkCmd": "/usr/local/orca/orca ",
+  "extCmd": "/Users/ganesh/Library/Orca421/orca ",
+  "chkCmd": "/Users/ganesh/Library/Orca421/orca ",
 
   "extensions": { 'input': ['inp','in'], 'output': ['log', 'out'], 'checkpoint': ['chk'] }, # list of possibile extensions for ORCA Files
 
   # Aroma defaults for ORCA run
-  "defaultOptimizationKeyline": "! B3LYP/G 6-311G(d,p) nmr Grid6 rijk def2/jk \n%pal nprocs 12 end \n%maxcore 3000",
-  "defaultNicsKeyline": "! B3LYP/G 6-311G(d,p) nmr Grid6 rijk def2/jk \n%pal nprocs 12 end \n%maxcore 3000",
+  "defaultOptimizationKeyline": "! B3LYP/G sto-3g nmr Grid6 rijk def2/jk \n%pal nprocs 1 end \n%maxcore 3000",
+  "defaultNicsKeyline": "! B3LYP/G sto-3g nmr Grid6 rijk def2/jk \n%pal nprocs 1 end \n%maxcore 3000",
   "defaultNcsKeyline": "",
   "defaultNboKeyline": "",
 
   # define construction to run ORCA Files
-  "constructCmd": lambda flprfx: OrcaSettings["extCmd"] + OrcaSettings["inpdir"] + flprfx + OrcaSettings["inpExt"] + " " + OrcaSettings["outdir"] + flprfx + OrcaSettings["outExt"]  
+  "constructCmd": lambda flprfx: OrcaSettings["extCmd"] + OrcaSettings["inpdir"] + flprfx + OrcaSettings["inpExt"] + " >& " + OrcaSettings["outdir"] + flprfx + OrcaSettings["outExt"],  
+  "cleanupCmd": lambda flprfx: map(lambda f: os.remove(f), glob.glob(OrcaSettings["outdir"] + flprfx + "*.tmp*"))
 }
 
 # program to use - edit this with either GaussianSettings or OrcaSettings depending on your backend 
