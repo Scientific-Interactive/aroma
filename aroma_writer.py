@@ -37,7 +37,7 @@ class FileWriter:
    def genCheckpointLine(self, chkFile):
       pass
 
-   def genTerminator():
+   def genTerminator(self):
       pass
 
 class GaussianInputFileWriter(FileWriter):
@@ -65,7 +65,7 @@ class GaussianInputFileWriter(FileWriter):
    def genCheckpointLine(self, chkFile):
       return "%chk=" + chkFile + "\n"
 
-   def genTerminator():
+   def genTerminator(self):
       return ""
 
    def writeOptFile(self, flprfx, externalProgram, geom, hashLine, title, charge, mult):
