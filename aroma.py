@@ -943,7 +943,7 @@ def getNewRings(geom, sigma_geom, CenterOf, zmat_idx):
    return new_CenterOf
 
 
-def grepData():
+def grepData(geom):
 
       # global flags
       global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
@@ -974,14 +974,11 @@ def grepData():
       for ring in dict_cen:
          Plane = 'XY'
 
-         outlines = readFile(externalProgram["outdir"] + flprfx + "-center" + repr(ring) + externalProgram["outExt"])
+         outfl = externalProgram["outdir"] + flprfx + "-center" + repr(ring) + externalProgram["outExt"]
 
-         for i in range (0, len(outlines)):
-           if (outlines[i].upper().find("NAT=") >= 0 ): break;
-         nat = int(outlines[i].split()[2])
+         nat = len(geom) 
 
-         for i in range (0, len(outlines)):
-           if (outlines[i].find("Magnetic shielding tensor") >= 0 ): break;
+         bqTensors = externalProgram["readerFunctCall"].getMagneticTensorData(nat, nBQs, outfl)
 
          f_out = open(externalProgram["outdir"] + flprfx + "-center" + repr(ring) + ".armdat", "w")
          f_out.write("#       oop       in1        in2       inp       iso        x         y         z\n")
@@ -990,55 +987,38 @@ def grepData():
          if (not xy_flag): 
             dist = BQ_Range[0]
 
-         for j in range (i + 5*nat + 1, i + 5*nat + nBQs[ring-1]*5 + 1, 5 ):
+         for j in range (0, nBQs[ring-1]):
 
             BQ_data_string = ""
             if xy_flag: dist += xy_BQ_dist[idx]
 
-            words = outlines[j].strip().split()
-            if (words[1] == 'Bq'):
-               # This is commented as BQ no is not important, instead distance of that BQ from GM is added (further)
-               # BQ_data_string += words[0] + "   "
+            # This is commented as BQ no is not important, instead distance of that BQ from GM is added (further)
+            # BQ_data_string += words[0] + "   "
 
-               # The isotropic value is in the first line
-               iso = -float(words[4])
+            iso, xx, yy, xx, e1, e2, e3 = bqTensors[j]
 
-               # Then get the diagonal values for the tensor
-               xx = -float(outlines[j+1].strip().split()[1])
-               yy = -float(outlines[j+2].strip().split()[3])
-               zz = -float(outlines[j+3].strip().split()[5])
+            sorted_e = []
+            sorted_e.append(e1)
+            close = abs(e1 + zz)
+            if ( abs(e2 + zz) <= close): 
+               close = abs(e2 + zz)
+               sorted_e.insert(0, e2)
+            elif ( abs(e2 + zz) > close):
+               sorted_e.append(e2)
+            if ( abs(e3 + zz) <= close): 
+               sorted_e.insert(0, e3)
+            elif ( abs(e3 + zz) > close):
+               sorted_e.append(e3)
+            oup = -sorted_e[0]; inp1 = -sorted_e[1]; inp2 = -sorted_e[2]
+            # In-plane chemical shift is average of the two in-plane shifts
+            inp = 0.5*(inp1+inp2)
 
-               # Then get the three eigenvalues
-               # Out-of-Plane eigenvalue is the one closest to ZZ
-               e1, e2, e3 = list(map(float, outlines[j+4].split(":")[1].split()))
-               sorted_e = []
-               sorted_e.append(e1)
-               close = abs(e1 + zz)
-               if ( abs(e2 + zz) <= close): 
-                  close = abs(e2 + zz)
-                  sorted_e.insert(0, e2)
-               elif ( abs(e2 + zz) > close):
-                  sorted_e.append(e2)
-               if ( abs(e3 + zz) <= close): 
-                  sorted_e.insert(0, e3)
-               elif ( abs(e3 + zz) > close):
-                  sorted_e.append(e3)
-               oup = -sorted_e[0]; inp1 = -sorted_e[1]; inp2 = -sorted_e[2]
-               # In-plane chemical shift is average of the two in-plane shifts
-               inp = 0.5*(inp1+inp2)
-
-               BQ_data_string += fpformat.fix(dist,2) + "   " + fpformat.fix(oup, 4) + "   " + fpformat.fix(inp1, 4) + "   " + fpformat.fix(inp2, 4) + "   " + fpformat.fix(inp, 4) + "   " + fpformat.fix(iso, 4) + "   " + fpformat.fix(xx, 4) + "   " + fpformat.fix(yy, 4) + "   " + fpformat.fix(zz, 4) +  "\n"
-               f_out.write(BQ_data_string)
+            BQ_data_string += fpformat.fix(dist,2) + "   " + fpformat.fix(oup, 4) + "   " + fpformat.fix(inp1, 4) + "   " + fpformat.fix(inp2, 4) + "   " + fpformat.fix(inp, 4) + "   " + fpformat.fix(iso, 4) + "   " + fpformat.fix(xx, 4) + "   " + fpformat.fix(yy, 4) + "   " + fpformat.fix(zz, 4) +  "\n"
+            f_out.write(BQ_data_string)
                
-               if (not xy_flag): dist += BQ_Step
-               else : idx += 1
+            if (not xy_flag): dist += BQ_Step
+            else : idx += 1
 
-            else:
-               print(ring)
-               print("Number of Atoms and BQ number not matching .. \nTherefore, Skipping the Step Of Filtering and Storing the Data ..")
-               f_out.close()
-               return
-            
          f_out.close()
          
       # In case of XY-Scan, Merge all armdats to one
@@ -1091,7 +1071,7 @@ def Execute(geom, title, charge, mult, Conn):
    print("\nAll the jobs are over")
    print("\nStatus : Filtering Appropriate Data .. ")
 
-   grepData()
+   grepData(geom)
 
    if (ncs_flag):
       # pi-MOs are same in all the output files, so just identify them from the first file.
