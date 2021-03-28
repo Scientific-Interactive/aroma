@@ -978,7 +978,7 @@ def grepData(geom):
 
          nat = len(geom) 
 
-         theParser = externalProgram["readerFunctCall"][exttype](outfl)
+         theParser = externalProgram["readerFunctCall"]["output"](outfl)
          bqTensors = theParser.getMagneticTensorData(nat, nBQs, outfl)
 
          f_out = open(externalProgram["outdir"] + flprfx + "-center" + repr(ring) + ".armdat", "w")
