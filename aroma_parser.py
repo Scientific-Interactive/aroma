@@ -27,7 +27,7 @@ class FileParser:
    def getInpData(self):
       pass
 
-   def getMagneticTensorData(self, nat, nBQs, outfl):
+   def getMagneticTensorData(self, nat, nBQs, ring, outfl):
       pass
 
 class InputFileParser(FileParser):
@@ -146,7 +146,7 @@ class OutputFileParser(FileParser):
 
       return self.geom, self.hashLine, self.title, self.charge, self.mult
 
-   def getMagneticTensorData(self, nat, nBQs, outfl):
+   def getMagneticTensorData(self, nat, nBQs, ring, outfl):
       outlines = readFile(outfl)
 
       bqTensors = []
@@ -264,7 +264,7 @@ class OrcaOutputFileParser(FileParser):
 
       return self.geom, self.hashLine, self.title, self.charge, self.mult
 
-   def getMagneticTensorData(self, nat, nBQs, outfl):
+   def getMagneticTensorData(self, nat, nBQs, ring, outfl):
       pass
 
 # Reader Function to Be Called for each Type of Format
