@@ -996,8 +996,7 @@ def grepData(geom):
             # This is commented as BQ no is not important, instead distance of that BQ from GM is added (further)
             # BQ_data_string += words[0] + "   "
 
-            iso, xx, yy, xx, e1, e2, e3 = bqTensors[j]
-
+            iso, xx, yy, zz, e1, e2, e3 = bqTensors[j]
             sorted_e = []
             sorted_e.append(e1)
             close = abs(e1 + zz)
