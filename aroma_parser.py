@@ -61,6 +61,7 @@ class InputFileParser(FileParser):
             f.write(glines[j] )
          f.close()
          status = execCmd(aroma_constants.externalProgram["constructCmd"](self.newflprfx))
+         print("guess only run", self.newflprfx)
          if (status):
             print("WARNING: An error occured while running a Guess=Only job for converting Z-matrix to cartesian coordinates.\nConsequently, Aroma may terminate abnormally.")
          
@@ -151,12 +152,18 @@ class OutputFileParser(FileParser):
 
       bqTensors = []
 
+      i = 0
+
       for i in range (0, len(outlines)):
         if (outlines[i].find("Magnetic shielding tensor") >= 0 ): break;
 
+      print("getMagneticTensorData", i, nat, i + 5*nat + 1, i + 5*nat + nBQs[ring-1]*5 + 1)
+
+
       for j in range (i + 5*nat + 1, i + 5*nat + nBQs[ring-1]*5 + 1, 5 ):
         words = outlines[j].strip().split()
-        if (words[1] == 'Bq'):
+        print(words)
+        if (len(words) > 1 and words[1] == 'Bq'):
            # This is commented as BQ no is not important, instead distance of that BQ from GM is added (further)
            # BQ_data_string += words[0] + "   "
 
