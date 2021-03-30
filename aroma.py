@@ -976,7 +976,9 @@ def grepData(geom):
 
          outfl = externalProgram["outdir"] + flprfx + "-center" + repr(ring) + externalProgram["outExt"]
 
-         nat = len(geom) 
+         nat = 0
+         for at in geom:
+            if (geom[at][0] > 0): nat += 1
 
          theParser = externalProgram["readerFunctCall"]["output"](outfl)
          bqTensors = theParser.getMagneticTensorData(nat, nBQs, ring, outfl)
@@ -995,8 +997,6 @@ def grepData(geom):
 
             # This is commented as BQ no is not important, instead distance of that BQ from GM is added (further)
             # BQ_data_string += words[0] + "   "
-
-            print("bq len", j, len(bqTensors))
 
             iso, xx, yy, zz, e1, e2, e3 = bqTensors[j]
             sorted_e = []
@@ -1207,7 +1207,6 @@ def aroma(armfile):
       # Read the geometry and other data
       theParser = externalProgram["readerFunctCall"][exttype](geomfl)
       sigma_geom, hashLine, title, charge, mult = theParser.getInpData()
-      print("sigma execute - 1", len(sigma_geom), sigma_geom, geomfl)
 
       # Take out the normals from the geometry, if defined
       sigma_normals = {}
@@ -1237,8 +1236,6 @@ def aroma(armfile):
 
       if (s_mult_flag): smult = sigma_mult
       else: smult = mult
-
-      print("sigma execute", len(sigma_geom), sigma_geom)
 
       Execute(sigma_geom, title, scharge, smult, Conn)
 
