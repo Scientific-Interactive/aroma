@@ -46,14 +46,14 @@ from aroma_ringarea import *
 
 def init():
    # global flags
-   global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
+   global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag
    # global molecule-related
    global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide,points, normals, exocyclic
    # global technical 
    global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
 
    # Initializing some global variables
-   opt_flag = 0; ncs_flag = 0; sigma_flag = 0; opt_external = 0; xy_flag = 0; pointonly_flag = 0; integralnics_flag = 0; analyse_flag = 1; area_flag = 0
+   opt_flag = 0; ncs_flag = 0; sigma_flag = 0; opt_external = 0; xy_flag = 0; pointonly_flag = 0; integralnics_flag = 0; analyse_flag = 1; area_flag = 0; inponly_flag = 0
    CenterOf = {}; all_aromatic_rings = {}; exocyclic = {}; points = {}; normals = {}
    geomflext = ""; geomfl = ""; flprfx = ""; outfilename = ""
    sigma_direction = 'POSITIVE'
@@ -69,7 +69,7 @@ def init():
 def check(armfile):
 
    # global flags
-   global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
+   global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag
    # global molecule-related
    global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
    # global technical 
@@ -91,6 +91,7 @@ def check(armfile):
          if (runseq.count("XY") > 0): xy_flag = 1
          if (runseq.count("PTONLY") > 0): pointonly_flag = 1
          if (runseq.count("INTEGRALNICS") > 0): integralnics_flag = 1; sigma_flag = 1; BQ_Range = [2, 5]
+         if (runseq.count("INPONLY") > 0): inponly_flag = 1
 
    if (opt_flag):
       for i in range (0, len(armlines)):
@@ -295,7 +296,7 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
    global externalProgram
 
    # global flags
-   global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
+   global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag
    # global molecule-related
    global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide,points, normals
    # global technical 
@@ -444,7 +445,7 @@ def generateBQs_XY(geom, Conn):
    global externalProgram
 
    # global flags
-   global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
+   global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag
    # global molecule-related
    global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
    # global technical 
@@ -654,7 +655,7 @@ def run_Nics():
    global externalProgram
 
    # global flags
-   global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
+   global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag
    # global molecule-related
    global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
    # global technical 
@@ -946,7 +947,7 @@ def getNewRings(geom, sigma_geom, CenterOf, zmat_idx):
 def grepData(geom):
 
       # global flags
-      global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
+      global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag
       # global molecule-related
       global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
       # global technical 
@@ -1037,7 +1038,7 @@ def grepData(geom):
 def Execute(geom, title, charge, mult, Conn):
 
    # global flags
-   global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
+   global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag
    # global molecule-related
    global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
    # global technical 
@@ -1069,28 +1070,29 @@ def Execute(geom, title, charge, mult, Conn):
 
    print("\nStatus : NICS input for all the centers generated.")
 
-   run_Nics()
-   print("\nAll the jobs are over")
-   print("\nStatus : Filtering Appropriate Data .. ")
+   if not inponly_flag: 
+       run_Nics()
+       print("\nAll the jobs are over")
+       print("\nStatus : Filtering Appropriate Data .. ")
 
-   grepData(geom)
+       grepData(geom)
 
-   if (ncs_flag):
-      # pi-MOs are same in all the output files, so just identify them from the first file.
-      piMOs, nocc = identifyPiMOs(externalProgram["outdir"] + flprfx + "-center1" + externalProgram["outExt"])
-      for ring in CenterOf:
-         outfl = externalProgram["outdir"] + flprfx + "-center" + repr(ring)
-         grepPiCMO(len(geom), piMOs, nocc, BQ_No, BQ_Range, BQ_Step, outfl, externalProgram["outExt"])
+       if (ncs_flag):
+          # pi-MOs are same in all the output files, so just identify them from the first file.
+          piMOs, nocc = identifyPiMOs(externalProgram["outdir"] + flprfx + "-center1" + externalProgram["outExt"])
+          for ring in CenterOf:
+             outfl = externalProgram["outdir"] + flprfx + "-center" + repr(ring)
+             grepPiCMO(len(geom), piMOs, nocc, BQ_No, BQ_Range, BQ_Step, outfl, externalProgram["outExt"])
 
-   if (xy_flag):
-      outfl = open(outfilename, "a")
-      outfl.write("\n\nThe Centers for Rings/Bonds from the .arm file corresponds to following BQs\n")
-      outfl.write("Ring  Distance    X       Y       Z\n")
-      for i in range (1, len(BQGuide)+1):
-         if i == 1: dist = 0.0
-         else: dist += round(getDistance(BQGuide[i][1], BQGuide[i-1][1]),3)
-         outfl.write("  " + repr(i) + "     " + fpformat.fix(dist,1) + "   " + fpformat.fix(BQGuide[i][1][0],3) + "   " + fpformat.fix(BQGuide[i][1][1],3) + "   " + fpformat.fix(BQGuide[i][1][2],3) + "\n")
-      outfl.close()
+       if (xy_flag):
+          outfl = open(outfilename, "a")
+          outfl.write("\n\nThe Centers for Rings/Bonds from the .arm file corresponds to following BQs\n")
+          outfl.write("Ring  Distance    X       Y       Z\n")
+          for i in range (1, len(BQGuide)+1):
+             if i == 1: dist = 0.0
+             else: dist += round(getDistance(BQGuide[i][1], BQGuide[i-1][1]),3)
+             outfl.write("  " + repr(i) + "     " + fpformat.fix(dist,1) + "   " + fpformat.fix(BQGuide[i][1][0],3) + "   " + fpformat.fix(BQGuide[i][1][1],3) + "   " + fpformat.fix(BQGuide[i][1][2],3) + "\n")
+          outfl.close()
 
 def callAnalyse(flprfx, geom, CenterOf, all_aromatic_rings, analyse_dist, outfl):
 
@@ -1132,7 +1134,7 @@ def callAnalyse(flprfx, geom, CenterOf, all_aromatic_rings, analyse_dist, outfl)
 def aroma(armfile):
 
    # global flags
-   global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external
+   global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag
    # global molecule-related
    global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
    # global technical 
@@ -1247,24 +1249,25 @@ def aroma(armfile):
          removeFiles(externalProgram["outdir"] + flprfx + "-guessonly*")
 
    numpy_flag = checkNumPy()
-   if (integralnics_flag or analyse_flag):
-       if (sigma_flag and numpy_flag and not xy_flag):
-          outfl = open(outfilename, "a")
-          callAnalyse(org_flprfx, geom, org_CenterOf, all_aromatic_rings, analyse_dist, outfl)
-          outfl.close()
+   if not inponly_flag: 
+       if (integralnics_flag or analyse_flag):
+           if (sigma_flag and numpy_flag and not xy_flag):
+              outfl = open(outfilename, "a")
+              callAnalyse(org_flprfx, geom, org_CenterOf, all_aromatic_rings, analyse_dist, outfl)
+              outfl.close()
 
    # For XY-Scan with Sigma-Model, just keep the final output as .armlog with r, ZZ and del-ZZ
-   if (xy_flag and sigma_flag):
-      armlog = open(xarmlogfile, "w")
-      armlog.write("r       ZZ       Sigma-ZZ        Del-ZZ\n")
-      if (xy_flag, sigma_flag):
-          sarmdatlines = readFile(externalProgram["outdir"] + flprfx + "-allcenter" + ".armdat")
-          lineno = min(len(armdatlines), len(sarmdatlines))
-          for i in range (1, lineno):
-             awords = list(map(float, armdatlines[i].split()))
-             sawords = list(map(float, sarmdatlines[i].split()))
-             armlog.write(fpformat.fix(awords[0],2) + "   " + fpformat.fix(awords[8],4) + "   " + fpformat.fix(sawords[8],4) + "   " + fpformat.fix(awords[8]-sawords[8], 4) + "\n" )
-      armlog.close()
+       if (xy_flag and sigma_flag):
+          armlog = open(xarmlogfile, "w")
+          armlog.write("r       ZZ       Sigma-ZZ        Del-ZZ\n")
+          if (xy_flag, sigma_flag):
+              sarmdatlines = readFile(externalProgram["outdir"] + flprfx + "-allcenter" + ".armdat")
+              lineno = min(len(armdatlines), len(sarmdatlines))
+              for i in range (1, lineno):
+                 awords = list(map(float, armdatlines[i].split()))
+                 sawords = list(map(float, sarmdatlines[i].split()))
+                 armlog.write(fpformat.fix(awords[0],2) + "   " + fpformat.fix(awords[8],4) + "   " + fpformat.fix(sawords[8],4) + "   " + fpformat.fix(awords[8]-sawords[8], 4) + "\n" )
+          armlog.close()
        
 
    print("\n--------------------------------------------------------------------")
