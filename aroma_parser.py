@@ -268,7 +268,32 @@ class OrcaOutputFileParser(FileParser):
       return self.geom, self.hashLine, self.title, self.charge, self.mult
 
    def getMagneticTensorData(self, nat, nBQs, ring, outfl):
-      pass
+      outlines = readFile(outfl)
+
+      bqTensors = []
+
+      i = 0
+
+      for i in range(len(outlines)):
+         if (outlines[i].find("CHEMICAL SHIFTS") >= 0): break
+
+
+      i += 4
+      bl = 27
+      st = i + bl*nat
+      ed = st + nBQs[ring-1]*bl
+
+      print("CHEMICAL SHIFTS", "line", i, "st", st, "ed", ed, "nat", nat, "nBQ", nBQs[ring-1])
+
+      idx=0
+      for j in range(st, ed, bl):
+        print("==START== idx,j,bl ", idx, j, bl)
+        for k in range(j, j+bl):
+           print(outlines[k].strip())
+        print("==BLOCK==")
+        idx += 1
+
+      return bqTensors
 
 # Reader Function to Be Called for each Type of Format
 # (Ganesh: Moved this here to remove the cyclic dependency)
