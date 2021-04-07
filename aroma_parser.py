@@ -288,16 +288,47 @@ class OrcaOutputFileParser(FileParser):
       idx=0
       for j in range(st, ed, bl):
         print("==START== idx,j,bl ", idx, j, bl)
+        xx = yy = zz = e1 = e2 = e3 = iso = 0.0
         for k in range(j, j+bl):
-           print(outlines[k].strip())
+          pline = outlines[k].strip() 
+          print(outlines[k].strip())
+          if (pline.find("Total shielding tensor (ppm):") >= 0):
+             xx = list(map(lambda x: float(x.strip()), outlines[k+1].strip().split()))[0]
+             yy = list(map(lambda x: float(x.strip()), outlines[k+2].strip().split()))[1]
+             zz = list(map(lambda x: float(x.strip()), outlines[k+3].strip().split()))[2]
+             print("x, y, z", xx, yy, zz)
+          if (pline.find("Diagonalized sT*s matrix:") >= 0):
+             words = list(map(lambda x: x.strip(), outlines[k+5].split()))
+             print("words", words)
+             e1 = float(words[1])
+             e2 = float(words[2])
+             e3 = float(words[3])
+
+             iso = float(words[5])
+
+        bqt = [iso, xx, yy, zz, e1, e2, e3]
+        print(bqt)
+        bqTensors.append(bqt)
         print("==BLOCK==")
         idx += 1
 
       return bqTensors
 
+class OrcaInputFileParser(FileParser):
+   def __init__(self, geomfl):
+      FileParser.__init__(self, geomfl)
+
+   def getInpData(self):
+      glines = readFile(self.geomfl)
+      
+      for line in glines:
+         print(line.strip())
+
+      return self.geom, self.hashLine, self.title, self.charge, self.mult
+
 # Reader Function to Be Called for each Type of Format
 # (Ganesh: Moved this here to remove the cyclic dependency)
 GaussianSettings["readerFunctCall"] = {'input':InputFileParser, 'output':OutputFileParser, 'checkpoint':ChkFileParser}
-OrcaSettings["readerFunctCall"] = {'output':OrcaOutputFileParser}
+OrcaSettings["readerFunctCall"] = {'output':OrcaOutputFileParser, 'input':OrcaInputFileParser}
 
 
