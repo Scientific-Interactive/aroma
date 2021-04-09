@@ -924,13 +924,30 @@ def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
          sigma_charge = user_sigma_charge
    else: sigma_charge = aroma_sigma_charge
 
+   """
    sigma_flprfx = externalProgram["inpdir"] + flprfx + "-sigma" + externalProgram["inpExt"]
    f = open (sigma_flprfx, "w")
    f.write("# \n\n" + title + " sigma only model " + "\n\n" + repr(sigma_charge) + " " + repr(sigma_mult) + "\n")
    f.write(zmat_str + "\n") 
    f.close()
+   """
 
-   return sigma_flprfx, zmat_idx
+   newZmat = zmat_str.split("\n")
+   for idx in range(len(newZmat)):
+      words = newZmat[idx].split()
+
+      if (len(words) == 1):
+         newZmat[idx] = [int(words[0])]
+      elif (len(words) == 3):
+         newZmat[idx] = [int(words[0]), int(words[1]), float(words[2])]
+      elif (len(words) == 5):
+         newZmat[idx] = [int(words[0]), int(words[1]), float(words[2]), int(words[3]), float(words[4])]
+      elif (len(words) == 7):
+         newZmat[idx] = [int(words[0]), int(words[1]), float(words[2]), int(words[3]), float(words[4]), int(words[5]), float(words[6])]
+
+   sigma_geom = generateCartesianFromZmat(newZmat)
+
+   return sigma_geom, sigma_charge, sigma_mult, zmat_idx
 
 def getNewRings(geom, sigma_geom, CenterOf, zmat_idx):
    new_CenterOf = {}
@@ -1204,11 +1221,11 @@ def aroma(armfile):
       opt_flag = 0; ncs_flag = 0
       exttype = "input" 
       
-      geomfl, zmat_idx = genSigmaModel(flprfx, geom, Conn, title, charge, sigma_mult)
+      sigma_geom, charge, mult, zmat_idx = genSigmaModel(flprfx, geom, Conn, title, charge, sigma_mult)
 
       # Read the geometry and other data
-      theParser = externalProgram["readerFunctCall"][exttype](geomfl)
-      sigma_geom, hashLine, title, charge, mult = theParser.getInpData()
+      # theParser = externalProgram["readerFunctCall"][exttype](geomfl)
+      # sigma_geom, hashLine, title, charge, mult = theParser.getInpData()
 
       # Take out the normals from the geometry, if defined
       sigma_normals = {}

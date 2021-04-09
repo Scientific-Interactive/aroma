@@ -610,7 +610,7 @@ def generateCartesianFromZmat(zmat):
    for zItm in zmat:
      if (len(zItm) == 0): continue
 
-     print(zItm)
+     # print(zItm)
 
      if (len(zItm) == 1): coord.append([zItm[0], 0, 0, 0])
 
@@ -620,9 +620,14 @@ def generateCartesianFromZmat(zmat):
      if (len(zItm) > 3):
         coord.append(placeAngle(zItm))
 
+   # convert the coords in to 1 indexed dict
+   geom = {}
+   idx = 1
    for crd in coord:
-     print(' '.join(map(lambda x: repr(x) if type(x) != str else x, crd)))
+     # print(' '.join(map(lambda x: repr(x) if type(x) != str else x, crd)))
+     geom[idx] = crd
+     idx += 1
 
-   return coord
+   return geom
 
 

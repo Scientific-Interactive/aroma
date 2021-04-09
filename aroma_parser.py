@@ -283,23 +283,23 @@ class OrcaOutputFileParser(FileParser):
       st = i + bl*nat
       ed = st + nBQs[ring-1]*bl
 
-      print("CHEMICAL SHIFTS", "line", i, "st", st, "ed", ed, "nat", nat, "nBQ", nBQs[ring-1])
+      # print("CHEMICAL SHIFTS", "line", i, "st", st, "ed", ed, "nat", nat, "nBQ", nBQs[ring-1])
 
       idx=0
       for j in range(st, ed, bl):
-        print("==START== idx,j,bl ", idx, j, bl)
+        # print("==START== idx,j,bl ", idx, j, bl)
         xx = yy = zz = e1 = e2 = e3 = iso = 0.0
         for k in range(j, j+bl):
           pline = outlines[k].strip() 
-          print(outlines[k].strip())
+          # print(outlines[k].strip())
           if (pline.find("Total shielding tensor (ppm):") >= 0):
              xx = list(map(lambda x: float(x.strip()), outlines[k+1].strip().split()))[0]
              yy = list(map(lambda x: float(x.strip()), outlines[k+2].strip().split()))[1]
              zz = list(map(lambda x: float(x.strip()), outlines[k+3].strip().split()))[2]
-             print("x, y, z", xx, yy, zz)
+             # print("x, y, z", xx, yy, zz)
           if (pline.find("Diagonalized sT*s matrix:") >= 0):
              words = list(map(lambda x: x.strip(), outlines[k+5].split()))
-             print("words", words)
+             # print("words", words)
              e1 = float(words[1])
              e2 = float(words[2])
              e3 = float(words[3])
@@ -307,9 +307,9 @@ class OrcaOutputFileParser(FileParser):
              iso = float(words[5])
 
         bqt = [iso, xx, yy, zz, e1, e2, e3]
-        print(bqt)
+        # print(bqt)
         bqTensors.append(bqt)
-        print("==BLOCK==")
+        # print("==BLOCK==")
         idx += 1
 
       return bqTensors
@@ -319,10 +319,28 @@ class OrcaInputFileParser(FileParser):
       FileParser.__init__(self, geomfl)
 
    def getInpData(self):
+      print("OrcaInputFileParser", self.geomfl)
       glines = readFile(self.geomfl)
-      
+
+      idx = 0      
       for line in glines:
-         print(line.strip())
+         if (line.lower().find("*xyz") >= 0): break
+         idx += 1
+      adx = 1
+      words = glines[idx].split()
+      self.charge, self.mult = list(map(lambda x: int(x), words[1:]))
+      self.geom = {}
+      for jdx in range(idx+1, len(glines)):
+         line = glines[jdx]
+         words = line.strip().split()
+
+         if (len(words) < 3): continue
+
+         if (words[0] == "H:"):
+           self.geom[adx] = [0, float(words[1]), float(words[2]), float(words[3])]
+         else:
+           self.geom[adx] = [int(words[0]), float(words[1]), float(words[2]), float(words[3])]
+         adx += 1
 
       return self.geom, self.hashLine, self.title, self.charge, self.mult
 
