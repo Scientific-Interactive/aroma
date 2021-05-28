@@ -92,12 +92,14 @@ def check(armfile):
          if (runseq.count("PTONLY") > 0): pointonly_flag = 1
          if (runseq.count("INTEGRALNICS") > 0): integralnics_flag = 1; sigma_flag = 1; BQ_Range = [2, 5]
          if (runseq.count("INPONLY") > 0): inponly_flag = 1
+         break;
 
    if (opt_flag):
       for i in range (0, len(armlines)):
          if (armlines[i].upper().find("OPT_EXTERNAL") >= 0):
             opt_external = 1
             optfl_external = armlines[i].strip().split("=")[1]
+            break;
 
    # Check for input file for Geomtry
    if (not opt_external):
@@ -116,7 +118,7 @@ def check(armfile):
       valid_ext_flag = 1
       for extension in externalProgram["extensions"]:
          if (externalProgram["extensions"][extension].count(geomflext) > 0): valid_ext_flag = 1
-      if (not valid_ext_flag): print("Gaussian File with \"" + geomflext + "\" Extension Can Not be Read.\nTherefore, Aborting the Run .."); sys.exit(10)
+      if (not valid_ext_flag): print("File with \"" + geomflext + "\" Extension Can Not be Read.\nTherefore, Aborting the Run .."); sys.exit(10)
 
    if (xy_flag): 
        print("\nWARNING: You Have Requested XY-Scan. Make Sure That the Centers Are Defined in Proper Order.\n")
@@ -125,7 +127,7 @@ def check(armfile):
 
 
    for i in range (0, len(armlines)):
-      if (armlines[i].upper().find("OUTFILE") >= 0): outfilename = armlines[i].strip().split("=")[1]
+      if (armlines[i].upper().find("OUTFILE") >= 0): outfilename = armlines[i].strip().split("=")[1]; break;
 
    # Get The Ring/Bond Info
    r_count = 0
@@ -1080,6 +1082,7 @@ def Execute(geom, title, charge, mult, Conn):
    if (hashLine_ncs == "DEFAULT\n"): hashLine_ncs = externalProgram.defaultNcsKeyline 
    if (hashLine_nbo == "DEFAULT\n"): hashLine_nbo = externalProgram.defaultNboKeyline 
 
+   # Generate NICS input
    if (ncs_flag):
       genNicsInputs(geom, Conn, hashLine_ncs, title, charge, mult)
    else: 
@@ -1161,12 +1164,15 @@ def aroma(armfile):
    print("                        ** Aroma Run Begins. **")
    print("--------------------------------------------------------------------\n")
 
+   # init global flags
    init()
 
    flprfx = armfile[armfile.rindex("/")+1:len(armfile)]
+
+   # read aroma input file and set necessary flags and params
    check(armfile)
       
-   if (not opt_external):
+   if (not opt_external): # if asked not asked for optimization, read the geometry from the input geom file
       for extension in externalProgram["extensions"]:
          if (externalProgram["extensions"][extension].count(geomflext) == 1): exttype = extension
 
@@ -1175,7 +1181,7 @@ def aroma(armfile):
       geom, hashLine, title, charge, mult = theParser.getInpData() 
       conn_mat, Conn = genConnectivityMatrix(geom)
    else:
-      geom = {}; title = ""; charge=""; mult=""; Conn= []
+      geom = {}; title = ""; charge=""; mult=""; Conn= []   # if asked for optimization, Execute() below will optimize and read the geom
 
    print("The final output will be stored in " + outfilename)
    outfl = open(outfilename, "w")
