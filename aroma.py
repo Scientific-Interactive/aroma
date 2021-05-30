@@ -322,7 +322,7 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
       for ring in range (0, len(BQs_strings)): 
          writeNicsInputs(flprfx, ring+1, flag_chk, hashLine_rev, title, charge, mult, geom, BQs_strings[ring])
      
-   if (not xy_flag and not pointonly_flag):
+   elif (not xy_flag and not pointonly_flag):  # Z-scan or Integral NICS
       for ring in CenterOf:
          ring_atoms = CenterOf.get(ring)
 
@@ -353,7 +353,7 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
          elif (new_geom == []):
             print("Ring no. " + repr(n_count) + " is not Planar within the tolerence of " + repr(TORSION_ANGLE_TOLERANCE)  +" degrees. Therefore, ring could not be reoriented in XY plane and BQs could not be generated.")
 
-   elif (xy_flag):
+   elif (xy_flag):  # XY scan
       BQs_string, new_geom = generateBQs_XY(geom, Conn)
       BQs_strings = BQs_string.split("break")
       if (BQs_strings[len(BQs_strings)-1] == ""): n_fl = len(BQs_strings) - 1
@@ -1062,6 +1062,8 @@ def Execute(geom, title, charge, mult, Conn):
    global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
    # global technical 
    global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
+   # global geom length (number of atoms)
+   global nAtoms
 
    # Run optimization, if required
    if (hashLine_opt == "DEFAULT\n"): hashLine_opt = externalProgram.defaultOptimizationKeyline
@@ -1077,6 +1079,9 @@ def Execute(geom, title, charge, mult, Conn):
       theParser = externalProgram["readerFunctCall"]["output"](externalProgram["outdir"] + optfl + externalProgram["outExt"])
       geom, hashLine, title, charge, mult = theParser.getInpData()
       conn_mat, Conn = genConnectivityMatrix(geom)
+
+   # get the number of atoms
+   nAtoms = len(geom)
 
    if (hashLine_nics == "DEFAULT\n"): hashLine_nics = externalProgram.defaultNicsKeyline 
    if (hashLine_ncs == "DEFAULT\n"): hashLine_ncs = externalProgram.defaultNcsKeyline 
@@ -1150,58 +1155,27 @@ def callAnalyse(flprfx, geom, CenterOf, all_aromatic_rings, analyse_dist, outfl)
        
       outfl.write("\n\nThe total area is " + repr(tot_area) + " sq. ang.\n\n")
 
-
-def aroma(armfile):
-
+def runJobs():
    # global flags
    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag
    # global molecule-related
    global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
-   # global technical 
+   # global technical
    global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
 
-   print("\n--------------------------------------------------------------------")
-   print("                        ** Aroma Run Begins. **")
-   print("--------------------------------------------------------------------\n")
 
-   # init global flags
-   init()
-
-   flprfx = armfile[armfile.rindex("/")+1:len(armfile)]
-
-   # read aroma input file and set necessary flags and params
-   check(armfile)
-      
    if (not opt_external): # if asked not asked for optimization, read the geometry from the input geom file
-      for extension in externalProgram["extensions"]:
-         if (externalProgram["extensions"][extension].count(geomflext) == 1): exttype = extension
-
-      #  Read the geometry and other data
-      theParser = externalProgram["readerFunctCall"][exttype](geomfl)
-      geom, hashLine, title, charge, mult = theParser.getInpData() 
-      conn_mat, Conn = genConnectivityMatrix(geom)
+       for extension in externalProgram["extensions"]:
+          if (externalProgram["extensions"][extension].count(geomflext) == 1): exttype = extension
+ 
+       #  Read the geometry and other data
+       theParser = externalProgram["readerFunctCall"][exttype](geomfl)
+       geom, hashLine, title, charge, mult = theParser.getInpData()
+       conn_mat, Conn = genConnectivityMatrix(geom)
    else:
-      geom = {}; title = ""; charge=""; mult=""; Conn= []   # if asked for optimization, Execute() below will optimize and read the geom
-
-   print("The final output will be stored in " + outfilename)
-   outfl = open(outfilename, "w")
-   outfl.write("\n--------------------------------------------------------------------")
-   outfl.write("\n                        ** Aroma Run **")
-   outfl.write("\n                        ** " + aromaVersion() + " **")
-   outfl.write("\n--------------------------------------------------------------------\n")
-   outfl.write("\n --------- Input Dump ---------- \n\n")
-   armlines = readFile(armpath + flprfx + ".arm") 
-   for aline in armlines: outfl.write(aline)
-   outfl.write("\n --------- Input End ---------- \n")
-   outfl.close()
-
-   if (xy_flag):
-      outfl = open(outfilename, "a")
-      outfl.write("\nFor the Original Molecule:\n")
-      outfl.close()
+       geom = {}; title = ""; charge = ""; mult = ""; Conn = []  # if asked for optimization, Execute() below will optimize and read the geom
 
    Execute(geom, title, charge, mult, Conn)
-
 
    if (clear_flag):
       print("\nClearing up unnecessary files .. \n")
@@ -1279,7 +1253,7 @@ def aroma(armfile):
               callAnalyse(org_flprfx, geom, org_CenterOf, all_aromatic_rings, analyse_dist, outfl)
               outfl.close()
 
-   # For XY-Scan with Sigma-Model, just keep the final output as .armlog with r, ZZ and del-ZZ
+       # For XY-Scan with Sigma-Model, just keep the final output as .armlog with r, ZZ and del-ZZ
        if (xy_flag and sigma_flag):
           armlog = open(xarmlogfile, "w")
           armlog.write("r       ZZ       Sigma-ZZ        Del-ZZ\n")
@@ -1292,7 +1266,59 @@ def aroma(armfile):
                  armlog.write(fpformat.fix(awords[0],2) + "   " + fpformat.fix(awords[8],4) + "   " + fpformat.fix(sawords[8],4) + "   " + fpformat.fix(awords[8]-sawords[8], 4) + "\n" )
           armlog.close()
        
+def writeOutputHeader():
+   # global flags
+   global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag
+   # global molecule-related
+   global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
+   # global technical
+   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
 
+   outfl = open(outfilename, "w")
+   outfl.write("\n--------------------------------------------------------------------")
+   outfl.write("\n                        ** Aroma Run **")
+   outfl.write("\n                        ** " + aromaVersion() + " **")
+   outfl.write("\n--------------------------------------------------------------------\n")
+   outfl.write("\n --------- Input Dump ---------- \n\n")
+   armlines = readFile(armpath + flprfx + ".arm")
+   for aline in armlines: outfl.write(aline)
+   outfl.write("\n --------- Input End ---------- \n")
+   outfl.close()
+
+   if (xy_flag):
+      outfl = open(outfilename, "a")
+      outfl.write("\nFor the Original Molecule:\n")
+      outfl.close()
+
+def aroma(armfile):
+   # global flags
+   global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag
+   # global molecule-related
+   global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
+   # global technical 
+   global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
+
+   print("\n--------------------------------------------------------------------")
+   print("                        ** Aroma Run Begins. **")
+   print("--------------------------------------------------------------------\n")
+
+   # init global flags
+   init()
+
+   # set the file prefix
+   flprfx = armfile[armfile.rindex("/")+1:len(armfile)]
+
+   # read aroma input file and set necessary flags and params
+   check(armfile)
+     
+   # write the output header, the file where all aroma output will be spit out 
+   print("The final output will be stored in " + outfilename)
+   writeOutputHeader()
+
+   # run all the jobs - parent molecule and sigma model	
+   runJobs()
+
+   # all over
    print("\n--------------------------------------------------------------------")
    print("                        ** Aroma Run Over. **")
    print("--------------------------------------------------------------------\n")
