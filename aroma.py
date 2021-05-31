@@ -315,7 +315,7 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
    # POINT Keyword can add standaline points for the NICS calculation.
    if ((not xy_flag) and pointonly_flag):
 
-      BQs_string = generateBQs_Points(points)
+      BQs_string = addBreakPoints(generateBQs_Points(points))
 
       # Mostly there will not be occasion where user gives more than 40-50 points, but such situation is covered.
       BQs_strings = BQs_string.split("break")
@@ -330,7 +330,7 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
          new_geom, new_points, new_normal = reorient(geom, Conn, ring_atoms)
 
          if (new_geom != []):
-            BQs_string = generateBQs_Z(new_geom, Conn, ring_atoms)
+            BQs_string = addBreakPoints(generateBQs_Z(new_geom, Conn, ring_atoms))
     
             writeNicsInputs(flprfx, ring, flag_chk, hashLine_rev, title, charge, mult, new_geom, BQs_string)
 
@@ -346,7 +346,7 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
 
          if ((new_geom != []) and (new_normal != [])):
             ring_atoms = []
-            BQs_string = generateBQs_Z(new_geom, Conn, ring_atoms, new_normal)
+            BQs_string = addBreakPoints(generateBQs_Z(new_geom, Conn, ring_atoms, new_normal))
 
             writeNicsInputs(flprfx, n_count, flag_chk, hashLine_rev, title, charge, mult, new_geom, BQs_string)
    
@@ -365,6 +365,26 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
 
          writeNicsInputs(flprfx, c, flag_chk, hashLine_rev, title, charge, mult, new_geom, BQs_strings[c-1])
 
+def addBreakPoints(BQs_string): 
+   global externalProgram
+   # global geom length (number of atoms)
+   global nAtoms
+
+   bqs = BQs_string.split("\n")
+
+   atmCount = nAtoms
+   
+   newBQs_string = ""
+
+   for bq in bqs:
+     newBQs_string += bq
+     atmCount += 1
+     if (atmCount%MAX_BQS_IN_INPFL == 0): 
+       newBQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomSetBreak()
+       atmCount = nAtoms
+
+   return newBQs_string
+
 def generateBQs_Points(points):
    global externalProgram
 
@@ -376,7 +396,7 @@ def generateBQs_Points(points):
       BQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomLine(points[p_count, 0])
       p_count += 1
       bq_count += 1
-      if (bq_count%MAX_BQS_IN_INPFL == 0): BQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomSetBreak()
+      # if (bq_count%MAX_BQS_IN_INPFL == 0): BQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomSetBreak()
 
    return BQs_string
 
@@ -608,7 +628,7 @@ def generateBQs_XY(geom, Conn):
             BQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomLine(bq_coord)
             bq_count += 1
             bq_coord_prvs = bq_coord
-            if (bq_count%MAX_BQS_IN_INPFL == 0): BQs_string += "break"
+            # if (bq_count%MAX_BQS_IN_INPFL == 0): BQs_string += "break"
 
       a = BQGuide[seq_BQGuide[i]][1]
       b = BQGuide[seq_BQGuide[i+1]][1]
@@ -625,7 +645,7 @@ def generateBQs_XY(geom, Conn):
          BQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomLine(bq_coord)
          bq_count += 1
          bq_coord_prvs = bq_coord
-         if (bq_count%MAX_BQS_IN_INPFL == 0): BQs_string += "break"
+         # if (bq_count%MAX_BQS_IN_INPFL == 0): BQs_string += "break"
 
    # For the last BQ
    if (vectorMagnitude(getVector(bq_coord, b)) < BQ_Step):
@@ -647,7 +667,7 @@ def generateBQs_XY(geom, Conn):
       BQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomLine(bq_coord)
       bq_count += 1
       bq_coord_prvs = bq_coord
-      if (bq_count%MAX_BQS_IN_INPFL == 0): BQs_string += "break"
+      # if (bq_count%MAX_BQS_IN_INPFL == 0): BQs_string += "break"
 
    BQ_No = bq_count
    return BQs_string, new_geom
