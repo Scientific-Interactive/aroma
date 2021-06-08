@@ -355,6 +355,7 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
 
    elif (xy_flag):  # XY scan
       BQs_string, new_geom = generateBQs_XY(geom, Conn)
+      BQs_string = addBreakPoints(BQs_string)
       BQs_strings = BQs_string.split("break")
       if (BQs_strings[len(BQs_strings)-1] == ""): n_fl = len(BQs_strings) - 1
       else: n_fl = len(BQs_strings) 
@@ -372,17 +373,23 @@ def addBreakPoints(BQs_string):
 
    bqs = BQs_string.split("\n")
 
+   print("nBQ", len(bqs), "nAtm", nAtoms, "maxSys", MAX_BQS_IN_INPFL)
+   print(bqs)
+
    atmCount = nAtoms
    
    newBQs_string = ""
 
    for bq in bqs:
-     newBQs_string += bq
+     newBQs_string += bq + "\n"
      atmCount += 1
+     print("bq ", bq, atmCount, MAX_BQS_IN_INPFL, atmCount%MAX_BQS_IN_INPFL)
      if (atmCount%MAX_BQS_IN_INPFL == 0): 
-       newBQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomSetBreak()
+       newBQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomSetBreak() + "\n"
        atmCount = nAtoms
+       print(externalProgram["writerFunctCall"]["geomInput"].genGhostAtomSetBreak())
 
+   print(newBQs_string)
    return newBQs_string
 
 def generateBQs_Points(points):
