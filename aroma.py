@@ -276,10 +276,10 @@ def writeNicsInputs(flprfx, centerIdx, flag_chk, hashLine_rev, title, charge, mu
 
    externalProgram["cleanupCmd"](flprfx)
 
-   ringf = open(externalProgram["inpdir"] + flprfx + "-center" + repr(centerIdx) + externalProgram["inpExt"], "w")
-   if (flag_chk): ringf.write(externalProgram["writerFunctCall"]["geomInput"].genCheckpointLine(externalProgram["chkdir"] + flprfx + "-center" + repr(centerIdx) + ".chk"))
-   # ringf.write(hashLine_rev + title + " # Center " + repr(centerIdx) + "\n\n" + repr(charge) + " " + repr(mult) + "\n")
-   ringf.write(externalProgram["writerFunctCall"]["geomInput"].genHeader(hashLine_rev, title + " # Center " + repr(centerIdx), charge, mult))
+   ringf = open(externalProgram["inpdir"] + flprfx + "-center" + centerIdx + externalProgram["inpExt"], "w")
+   if (flag_chk): ringf.write(externalProgram["writerFunctCall"]["geomInput"].genCheckpointLine(externalProgram["chkdir"] + flprfx + "-center" + centerIdx + ".chk"))
+   # ringf.write(hashLine_rev + title + " # Center " + centerIdx + "\n\n" + repr(charge) + " " + repr(mult) + "\n")
+   ringf.write(externalProgram["writerFunctCall"]["geomInput"].genHeader(hashLine_rev, title + " # Center " + centerIdx, charge, mult))
    for i in range (1, len(geom)+1):
       # The dummy atoms are considered as BQs, therefore, remove them
       if (geom[i][0] != 0):
@@ -318,9 +318,9 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
       BQs_string = addBreakPoints(generateBQs_Points(points))
 
       # Mostly there will not be occasion where user gives more than 40-50 points, but such situation is covered.
-      BQs_strings = BQs_string.split("break")
+      BQs_strings = list(map(lambda x: x.strip(), BQs_string.split("break")))
       for ring in range (0, len(BQs_strings)): 
-         writeNicsInputs(flprfx, ring+1, flag_chk, hashLine_rev, title, charge, mult, geom, BQs_strings[ring])
+         writeNicsInputs(flprfx, repr(ring+1), flag_chk, hashLine_rev, title, charge, mult, geom, BQs_strings[ring])
      
    elif (not xy_flag and not pointonly_flag):  # Z-scan or Integral NICS
       for ring in CenterOf:
@@ -331,8 +331,10 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
 
          if (new_geom != []):
             BQs_string = addBreakPoints(generateBQs_Z(new_geom, Conn, ring_atoms))
-    
-            writeNicsInputs(flprfx, ring, flag_chk, hashLine_rev, title, charge, mult, new_geom, BQs_string)
+   
+            BQs_strings = list(map(lambda x: x.strip(), BQs_string.split("break")))
+            for setIdx in range (0, len(BQs_strings)): 
+               writeNicsInputs(flprfx, repr(ring) + "-set" + repr(setIdx+1) , flag_chk, hashLine_rev, title, charge, mult, new_geom, BQs_strings[setIdx])
 
          elif (new_geom == []):
             print("Ring no. " + repr(ring) + " is not Planar within the tolerence of " + repr(TORSION_ANGLE_TOLERANCE)  +" degrees. Therefore, ring could not be reoriented in XY plane and BQs could not be generated.")
@@ -348,7 +350,9 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
             ring_atoms = []
             BQs_string = addBreakPoints(generateBQs_Z(new_geom, Conn, ring_atoms, new_normal))
 
-            writeNicsInputs(flprfx, n_count, flag_chk, hashLine_rev, title, charge, mult, new_geom, BQs_string)
+            BQs_strings = list(map(lambda x: x.strip(), BQs_string.split("break")))
+            for setIdx in range (0, len(BQs_strings)): 
+               writeNicsInputs(flprfx, repr(n_count) + "-set" + repr(setIdx+1), flag_chk, hashLine_rev, title, charge, mult, new_geom, BQs_string[setIdx])
    
          elif (new_geom == []):
             print("Ring no. " + repr(n_count) + " is not Planar within the tolerence of " + repr(TORSION_ANGLE_TOLERANCE)  +" degrees. Therefore, ring could not be reoriented in XY plane and BQs could not be generated.")
@@ -365,8 +369,9 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
       for c in range (1, n_fl+1):
          if (c > 1): n_xy_center[c] = c
 
-         writeNicsInputs(flprfx, c, flag_chk, hashLine_rev, title, charge, mult, new_geom, BQs_strings[c-1])
+         writeNicsInputs(flprfx, repr(c), flag_chk, hashLine_rev, title, charge, mult, new_geom, BQs_strings[c-1])
 
+      """
       if (BQs_strings[len(BQs_strings)-1] == ""): n_fl = len(BQs_strings) - 1
       else: n_fl = len(BQs_strings) 
 
@@ -374,7 +379,8 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
       for c in range (1, n_fl+1):
          if (c > 1): n_xy_center[c] = c
 
-         writeNicsInputs(flprfx, c, flag_chk, hashLine_rev, title, charge, mult, new_geom, BQs_strings[c-1])
+         writeNicsInputs(flprfx, repr(c), flag_chk, hashLine_rev, title, charge, mult, new_geom, BQs_strings[c-1])
+      """
 
 def addBreakPoints(BQs_string): 
    global externalProgram
@@ -478,6 +484,7 @@ def generateBQs_Z(geom, Conn, ring_atoms, normal = []):
       BQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomLine(bqpt)
       zcoord += zinc
 
+   print("z bQ", BQs_string)
    return BQs_string
 
 def generateBQs_XY(geom, Conn):
