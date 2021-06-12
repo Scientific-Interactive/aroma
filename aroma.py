@@ -356,7 +356,17 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
    elif (xy_flag):  # XY scan
       BQs_string, new_geom = generateBQs_XY(geom, Conn)
       BQs_string = addBreakPoints(BQs_string)
-      BQs_strings = BQs_string.split("break")
+      BQs_strings = list(map(lambda x: x.strip(), BQs_string.split("break")))
+
+      if (BQs_strings[len(BQs_strings)-1] == ""): n_fl = len(BQs_strings) - 1
+      else: n_fl = len(BQs_strings) 
+
+      print(n_fl)
+      for c in range (1, n_fl+1):
+         if (c > 1): n_xy_center[c] = c
+
+         writeNicsInputs(flprfx, c, flag_chk, hashLine_rev, title, charge, mult, new_geom, BQs_strings[c-1])
+
       if (BQs_strings[len(BQs_strings)-1] == ""): n_fl = len(BQs_strings) - 1
       else: n_fl = len(BQs_strings) 
 
@@ -371,7 +381,7 @@ def addBreakPoints(BQs_string):
    # global geom length (number of atoms)
    global nAtoms
 
-   bqs = BQs_string.split("\n")
+   bqs = BQs_string.strip().split("\n")
 
    print("nBQ", len(bqs), "nAtm", nAtoms, "maxSys", MAX_BQS_IN_INPFL)
    print(bqs)
