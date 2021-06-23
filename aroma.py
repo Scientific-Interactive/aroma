@@ -90,7 +90,7 @@ def check(armfile):
          if (runseq.count("SIGMA") > 0): sigma_flag = 1
          if (runseq.count("XY") > 0): xy_flag = 1
          if (runseq.count("PTONLY") > 0): pointonly_flag = 1
-         if (runseq.count("INTEGRALNICS") > 0): integralnics_flag = 1; sigma_flag = 1; BQ_Range = [2, 5]
+         if (runseq.count("INTEGRALNICS") > 0): integralnics_flag = 1; sigma_flag = 1
          if (runseq.count("INPONLY") > 0): inponly_flag = 1
          break;
 
