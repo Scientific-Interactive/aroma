@@ -51,6 +51,8 @@ def init():
    global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide,points, normals, exocyclic
    # global technical 
    global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
+   # global file set - used for storing all input files generated
+   global inputFileSet
 
    # Initializing some global variables
    opt_flag = 0; ncs_flag = 0; sigma_flag = 0; opt_external = 0; xy_flag = 0; pointonly_flag = 0; integralnics_flag = 0; analyse_flag = 1; area_flag = 0; inponly_flag = 0
@@ -65,6 +67,8 @@ def init():
    analyse_dist = DEFAULT_DISTANCE_FOR_ANALYSIS 
    xy_extend = 0.0
    clear_flag = 0
+
+   inputFileSet = []
 
 def check(armfile):
 
@@ -273,10 +277,13 @@ def run_Optimization(optfl):
     
 def writeNicsInputs(flprfx, centerIdx, flag_chk, hashLine_rev, title, charge, mult, geom, BQs_strings):
    global externalProgram
+   global inputFileSet
 
    externalProgram["cleanupCmd"](flprfx)
 
    ringf = open(externalProgram["inpdir"] + flprfx + "-center" + centerIdx + externalProgram["inpExt"], "w")
+   inputFileSet.append({"filename": ringf, "flprfx": flprfx + "-center" + centerIdx, "ext": externalProgram["inpExt"]})
+
    if (flag_chk): ringf.write(externalProgram["writerFunctCall"]["geomInput"].genCheckpointLine(externalProgram["chkdir"] + flprfx + "-center" + centerIdx + ".chk"))
    # ringf.write(hashLine_rev + title + " # Center " + centerIdx + "\n\n" + repr(charge) + " " + repr(mult) + "\n")
    ringf.write(externalProgram["writerFunctCall"]["geomInput"].genHeader(hashLine_rev, title + " # Center " + centerIdx, charge, mult))
@@ -320,6 +327,7 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
       # Mostly there will not be occasion where user gives more than 40-50 points, but such situation is covered.
       BQs_strings = list(map(lambda x: x.strip(), BQs_string.split("break")))
       for ring in range (0, len(BQs_strings)): 
+         if (BQs_strings[ring].strip() == ""): continue
          writeNicsInputs(flprfx, repr(ring+1), flag_chk, hashLine_rev, title, charge, mult, geom, BQs_strings[ring])
      
    elif (not xy_flag and not pointonly_flag):  # Z-scan or Integral NICS
@@ -334,6 +342,7 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
    
             BQs_strings = list(map(lambda x: x.strip(), BQs_string.split("break")))
             for setIdx in range (0, len(BQs_strings)): 
+               if (BQs_strings[setIdx].strip() == ""): continue
                writeNicsInputs(flprfx, repr(ring) + "-set" + repr(setIdx+1) , flag_chk, hashLine_rev, title, charge, mult, new_geom, BQs_strings[setIdx])
 
          elif (new_geom == []):
@@ -352,7 +361,8 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
 
             BQs_strings = list(map(lambda x: x.strip(), BQs_string.split("break")))
             for setIdx in range (0, len(BQs_strings)): 
-               writeNicsInputs(flprfx, repr(n_count) + "-set" + repr(setIdx+1), flag_chk, hashLine_rev, title, charge, mult, new_geom, BQs_string[setIdx])
+               if (BQs_strings[setIdx].strip() == ""): continue
+               writeNicsInputs(flprfx, repr(n_count) + "-set" + repr(setIdx+1), flag_chk, hashLine_rev, title, charge, mult, new_geom, BQs_strings[setIdx])
    
          elif (new_geom == []):
             print("Ring no. " + repr(n_count) + " is not Planar within the tolerence of " + repr(TORSION_ANGLE_TOLERANCE)  +" degrees. Therefore, ring could not be reoriented in XY plane and BQs could not be generated.")
@@ -368,7 +378,7 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
       print(n_fl)
       for c in range (1, n_fl+1):
          if (c > 1): n_xy_center[c] = c
-
+         if (BQs_strings[c-1].strip() == ""): continue
          writeNicsInputs(flprfx, repr(c), flag_chk, hashLine_rev, title, charge, mult, new_geom, BQs_strings[c-1])
 
       """
@@ -1015,6 +1025,8 @@ def grepData(geom):
       global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
       # global technical 
       global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult,analyse_dist, clear_flag, xy_extend
+      # global inputFileSet
+      global inputFileSet
 
       nBQs = []
       if (not xy_flag): 

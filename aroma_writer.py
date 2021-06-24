@@ -66,7 +66,7 @@ class GaussianInputFileWriter(FileWriter):
       return "%chk=" + chkFile + "\n"
 
    def genTerminator(self):
-      return ""
+      return "\n"
 
    def writeOptFile(self, flprfx, externalProgram, geom, hashLine, title, charge, mult):
       # The chk file name for optimization can be same as given by the user.
