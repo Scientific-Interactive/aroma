@@ -282,7 +282,7 @@ def writeNicsInputs(flprfx, centerIdx, flag_chk, hashLine_rev, title, charge, mu
    externalProgram["cleanupCmd"](flprfx)
 
    ringf = open(externalProgram["inpdir"] + flprfx + "-center" + centerIdx + externalProgram["inpExt"], "w")
-   inputFileSet.append({"filename": ringf, "flprfx": flprfx + "-center" + centerIdx, "ext": externalProgram["inpExt"]})
+   inputFileSet.append({"filename": ringf, "flprfx": flprfx + "-center" + centerIdx, "ext": externalProgram["inpExt"], "nat": len(geom), "nBQ": len(BQs_strings)})
 
    if (flag_chk): ringf.write(externalProgram["writerFunctCall"]["geomInput"].genCheckpointLine(externalProgram["chkdir"] + flprfx + "-center" + centerIdx + ".chk"))
    # ringf.write(hashLine_rev + title + " # Center " + centerIdx + "\n\n" + repr(charge) + " " + repr(mult) + "\n")
@@ -379,7 +379,7 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
       for c in range (1, n_fl+1):
          if (c > 1): n_xy_center[c] = c
          if (BQs_strings[c-1].strip() == ""): continue
-         writeNicsInputs(flprfx, repr(c), flag_chk, hashLine_rev, title, charge, mult, new_geom, BQs_strings[c-1])
+         writeNicsInputs(flprfx, "1-set" + repr(c), flag_chk, hashLine_rev, title, charge, mult, new_geom, BQs_strings[c-1])
 
       """
       if (BQs_strings[len(BQs_strings)-1] == ""): n_fl = len(BQs_strings) - 1
@@ -1028,25 +1028,27 @@ def grepData(geom):
       # global inputFileSet
       global inputFileSet
 
-      nBQs = []
-      if (not xy_flag): 
-         dict_cen = CenterOf.copy()
-         if (len(normals) > 0):
-            n_count = len(CenterOf)
-            for i in normals:
-                dict_cen[n_count+i] = normals[i]
+#      # This is to set the index for the tensor data
+#      nBQs = []
+#      if (not xy_flag): 
+#         dict_cen = CenterOf.copy()
+#         if (len(normals) > 0):
+#            n_count = len(CenterOf)
+#            for i in normals:
+#                dict_cen[n_count+i] = normals[i]
+#
+#         for i in range (0, len(dict_cen)):
+#            nBQs.append(BQ_No)
+#
+#      elif (xy_flag): 
+#         dict_cen = n_xy_center
+#         idx = 0
+#         dist = 0.0
+#         for i in range (0, len(dict_cen)-1):
+#            nBQs.append(MAX_BQS_IN_INPFL)
+#         nBQs.append(BQ_No - MAX_BQS_IN_INPFL*(len(nBQs)))
 
-         for i in range (0, len(dict_cen)):
-            nBQs.append(BQ_No)
-
-      elif (xy_flag): 
-         dict_cen = n_xy_center
-         idx = 0
-         dist = 0.0
-         for i in range (0, len(dict_cen)-1):
-            nBQs.append(MAX_BQS_IN_INPFL)
-         nBQs.append(BQ_No - MAX_BQS_IN_INPFL*(len(nBQs)))
-
+      # This loop is over each output file to filter the required tensor data
       for ring in dict_cen:
          Plane = 'XY'
 
