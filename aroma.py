@@ -326,7 +326,11 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
 
       # Mostly there will not be occasion where user gives more than 40-50 points, but such situation is covered.
       BQs_strings = list(map(lambda x: x.strip(), BQs_string.split("break")))
-      for ring in range (0, len(BQs_strings)): 
+
+      if (BQs_strings[len(BQs_strings)-1] == ""): n_fl = len(BQs_strings) - 1
+      else: n_fl = len(BQs_strings) 
+
+      for ring in range (0, n_fl+1): 
          if (BQs_strings[ring].strip() == ""): continue
          writeNicsInputs(flprfx, repr(ring+1), flag_chk, hashLine_rev, title, charge, mult, geom, BQs_strings[ring])
      
@@ -341,7 +345,11 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
             BQs_string = addBreakPoints(generateBQs_Z(new_geom, Conn, ring_atoms))
    
             BQs_strings = list(map(lambda x: x.strip(), BQs_string.split("break")))
-            for setIdx in range (0, len(BQs_strings)): 
+
+            if (BQs_strings[len(BQs_strings)-1] == ""): n_fl = len(BQs_strings) - 1
+            else: n_fl = len(BQs_strings) 
+
+            for setIdx in range (0, n_fl+1): 
                if (BQs_strings[setIdx].strip() == ""): continue
                writeNicsInputs(flprfx, repr(ring) + "-set" + repr(setIdx+1) , flag_chk, hashLine_rev, title, charge, mult, new_geom, BQs_strings[setIdx])
 
@@ -360,7 +368,11 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
             BQs_string = addBreakPoints(generateBQs_Z(new_geom, Conn, ring_atoms, new_normal))
 
             BQs_strings = list(map(lambda x: x.strip(), BQs_string.split("break")))
-            for setIdx in range (0, len(BQs_strings)): 
+
+            if (BQs_strings[len(BQs_strings)-1] == ""): n_fl = len(BQs_strings) - 1
+            else: n_fl = len(BQs_strings) 
+
+            for setIdx in range (0, n_fl+1): 
                if (BQs_strings[setIdx].strip() == ""): continue
                writeNicsInputs(flprfx, repr(n_count) + "-set" + repr(setIdx+1), flag_chk, hashLine_rev, title, charge, mult, new_geom, BQs_strings[setIdx])
    
@@ -375,22 +387,10 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
       if (BQs_strings[len(BQs_strings)-1] == ""): n_fl = len(BQs_strings) - 1
       else: n_fl = len(BQs_strings) 
 
-      print(n_fl)
       for c in range (1, n_fl+1):
          if (c > 1): n_xy_center[c] = c
          if (BQs_strings[c-1].strip() == ""): continue
          writeNicsInputs(flprfx, "1-set" + repr(c), flag_chk, hashLine_rev, title, charge, mult, new_geom, BQs_strings[c-1])
-
-      """
-      if (BQs_strings[len(BQs_strings)-1] == ""): n_fl = len(BQs_strings) - 1
-      else: n_fl = len(BQs_strings) 
-
-      print(n_fl)
-      for c in range (1, n_fl+1):
-         if (c > 1): n_xy_center[c] = c
-
-         writeNicsInputs(flprfx, repr(c), flag_chk, hashLine_rev, title, charge, mult, new_geom, BQs_strings[c-1])
-      """
 
 def addBreakPoints(BQs_string): 
    global externalProgram
@@ -399,8 +399,8 @@ def addBreakPoints(BQs_string):
 
    bqs = BQs_string.strip().split("\n")
 
-   print("nBQ", len(bqs), "nAtm", nAtoms, "maxSys", MAX_BQS_IN_INPFL)
-   print(bqs)
+   # print("nBQ", len(bqs), "nAtm", nAtoms, "maxSys", MAX_BQS_IN_INPFL)
+   # print(bqs)
 
    atmCount = nAtoms
    
@@ -409,13 +409,13 @@ def addBreakPoints(BQs_string):
    for bq in bqs:
      newBQs_string += bq + "\n"
      atmCount += 1
-     print("bq ", bq, atmCount, MAX_BQS_IN_INPFL, atmCount%MAX_BQS_IN_INPFL)
+     # print("bq ", bq, atmCount, MAX_BQS_IN_INPFL, atmCount%MAX_BQS_IN_INPFL)
      if (atmCount%MAX_BQS_IN_INPFL == 0): 
        newBQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomSetBreak() + "\n"
        atmCount = nAtoms
-       print(externalProgram["writerFunctCall"]["geomInput"].genGhostAtomSetBreak())
+       # print(externalProgram["writerFunctCall"]["geomInput"].genGhostAtomSetBreak())
 
-   print(newBQs_string)
+   # print(newBQs_string)
    return newBQs_string
 
 def generateBQs_Points(points):
@@ -1028,47 +1028,25 @@ def grepData(geom):
       # global inputFileSet
       global inputFileSet
 
-#      # This is to set the index for the tensor data
-#      nBQs = []
-#      if (not xy_flag): 
-#         dict_cen = CenterOf.copy()
-#         if (len(normals) > 0):
-#            n_count = len(CenterOf)
-#            for i in normals:
-#                dict_cen[n_count+i] = normals[i]
-#
-#         for i in range (0, len(dict_cen)):
-#            nBQs.append(BQ_No)
-#
-#      elif (xy_flag): 
-#         dict_cen = n_xy_center
-#         idx = 0
-#         dist = 0.0
-#         for i in range (0, len(dict_cen)-1):
-#            nBQs.append(MAX_BQS_IN_INPFL)
-#         nBQs.append(BQ_No - MAX_BQS_IN_INPFL*(len(nBQs)))
 
       # This loop is over each output file to filter the required tensor data
-      for ring in dict_cen:
-         Plane = 'XY'
+      for inpFil in inputFileSet:
+         outfl = externalProgram["outdir"] + inpFil["flprfx"] + externalProgram["outExt"]
 
-         outfl = externalProgram["outdir"] + flprfx + "-center" + repr(ring) + externalProgram["outExt"]
-
-         nat = 0
-         for at in geom:
-            if (geom[at][0] > 0): nat += 1
+         nat = inpFil["nat"]
+         nBQ = inpFil["nBq"]
 
          theParser = externalProgram["readerFunctCall"]["output"](outfl)
-         bqTensors = theParser.getMagneticTensorData(nat, nBQs, ring, outfl)
+         bqTensors = theParser.getMagneticTensorData(nat, nBQ, outfl)
 
-         f_out = open(externalProgram["outdir"] + flprfx + "-center" + repr(ring) + ".armdat", "w")
+         f_out = open(externalProgram["outdir"] + inpFil["flprfx"] + ".armdat", "w")
          f_out.write("#       oop       in1        in2       inp       iso        x         y         z\n")
 
          # i + 5*nat + 1, i + 5*nat + BQ_No*nat + 1 are start and end line numbers in the output file for the data for BQs
          if (not xy_flag): 
             dist = BQ_Range[0]
 
-         for j in range (0, nBQs[ring-1]):
+         for j in range (0, nBQ):
 
             BQ_data_string = ""
             if xy_flag: dist += xy_BQ_dist[idx]

@@ -27,7 +27,7 @@ class FileParser:
    def getInpData(self):
       pass
 
-   def getMagneticTensorData(self, nat, nBQs, ring, outfl):
+   def getMagneticTensorData(self, nat, nBQ, outfl):
       pass
 
 class InputFileParser(FileParser):
@@ -146,7 +146,7 @@ class OutputFileParser(FileParser):
 
       return self.geom, self.hashLine, self.title, self.charge, self.mult
 
-   def getMagneticTensorData(self, nat, nBQs, ring, outfl):
+   def getMagneticTensorData(self, nat, nBQ, outfl):
       outlines = readFile(outfl)
 
       bqTensors = []
@@ -157,7 +157,7 @@ class OutputFileParser(FileParser):
         if (outlines[i].find("Magnetic shielding tensor") >= 0 ): break;
 
 
-      for j in range (i + 5*nat + 1, i + 5*nat + nBQs[ring-1]*5 + 1, 5 ):
+      for j in range (i + 5*nat + 1, i + 5*nat + nBQ*5 + 1, 5 ):
         words = outlines[j].strip().split()
         if (len(words) > 1 and words[1] == 'Bq'):
            # This is commented as BQ no is not important, instead distance of that BQ from GM is added (further)
@@ -267,7 +267,7 @@ class OrcaOutputFileParser(FileParser):
 
       return self.geom, self.hashLine, self.title, self.charge, self.mult
 
-   def getMagneticTensorData(self, nat, nBQs, ring, outfl):
+   def getMagneticTensorData(self, nat, nBQ, outfl):
       outlines = readFile(outfl)
 
       bqTensors = []
@@ -281,9 +281,9 @@ class OrcaOutputFileParser(FileParser):
       i += 4
       bl = 27
       st = i + bl*nat
-      ed = st + nBQs[ring-1]*bl
+      ed = st + nBQ*bl
 
-      # print("CHEMICAL SHIFTS", "line", i, "st", st, "ed", ed, "nat", nat, "nBQ", nBQs[ring-1])
+      # print("CHEMICAL SHIFTS", "line", i, "st", st, "ed", ed, "nat", nat, "nBQ", nBQ)
 
       idx=0
       for j in range(st, ed, bl):
