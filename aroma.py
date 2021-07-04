@@ -327,10 +327,7 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
       # Mostly there will not be occasion where user gives more than 40-50 points, but such situation is covered.
       BQs_strings = list(map(lambda x: x.strip(), BQs_string.split("break")))
 
-      if (BQs_strings[len(BQs_strings)-1] == ""): n_fl = len(BQs_strings) - 1
-      else: n_fl = len(BQs_strings) 
-
-      for ring in range (0, n_fl+1): 
+      for ring in range (0, len(BQs_strings)): 
          if (BQs_strings[ring].strip() == ""): continue
          writeNicsInputs(flprfx, repr(ring+1), flag_chk, hashLine_rev, title, charge, mult, geom, BQs_strings[ring])
      
@@ -346,10 +343,7 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
    
             BQs_strings = list(map(lambda x: x.strip(), BQs_string.split("break")))
 
-            if (BQs_strings[len(BQs_strings)-1] == ""): n_fl = len(BQs_strings) - 1
-            else: n_fl = len(BQs_strings) 
-
-            for setIdx in range (0, n_fl+1): 
+            for setIdx in range (0, len(BQs_strings)): 
                if (BQs_strings[setIdx].strip() == ""): continue
                writeNicsInputs(flprfx, repr(ring) + "-set" + repr(setIdx+1) , flag_chk, hashLine_rev, title, charge, mult, new_geom, BQs_strings[setIdx])
 
@@ -369,10 +363,7 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
 
             BQs_strings = list(map(lambda x: x.strip(), BQs_string.split("break")))
 
-            if (BQs_strings[len(BQs_strings)-1] == ""): n_fl = len(BQs_strings) - 1
-            else: n_fl = len(BQs_strings) 
-
-            for setIdx in range (0, n_fl+1): 
+            for setIdx in range (0, len(BQs_strings)): 
                if (BQs_strings[setIdx].strip() == ""): continue
                writeNicsInputs(flprfx, repr(n_count) + "-set" + repr(setIdx+1), flag_chk, hashLine_rev, title, charge, mult, new_geom, BQs_strings[setIdx])
    
