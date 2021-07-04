@@ -1079,11 +1079,12 @@ def grepData(geom):
 
          f_out.close()
          
+      # TODO: the following codes need to be evaluated
       # In case of XY-Scan, Merge all armdats to one
-      if ((xy_flag or pointonly_flag) and (len(dict_cen) > 1)):
+      if ((xy_flag or pointonly_flag) and (len(inputFileSet) > 1)):
          final_armdat = open(externalProgram["outdir"] + flprfx + "-center1" + ".armdat", "a")
-         for ring in range (1, len(dict_cen)):
-            lines = readFile(externalProgram["outdir"] + flprfx + "-center" + repr(ring+1) + ".armdat")
+         for inpFil in inputFileSet:
+            lines = readFile(externalProgram["outdir"] + inpFil["flprfx"] + ".armdat")
             for i in range (1, len(lines)):
                final_armdat.write(lines[i])
          final_armdat.close()
