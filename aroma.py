@@ -282,7 +282,7 @@ def writeNicsInputs(flprfx, centerIdx, flag_chk, hashLine_rev, title, charge, mu
    externalProgram["cleanupCmd"](flprfx)
 
    ringf = open(externalProgram["inpdir"] + flprfx + "-center" + centerIdx + externalProgram["inpExt"], "w")
-   inputFileSet.append({"filename": ringf, "flprfx": flprfx + "-center" + centerIdx, "ext": externalProgram["inpExt"], "nat": len(geom), "nBQ": len(BQs_strings)})
+   inputFileSet.append({"filename": ringf, "flprfx": flprfx + "-center" + centerIdx, "ext": externalProgram["inpExt"], "nat": len(geom), "nBq": len(BQs_strings)})
 
    if (flag_chk): ringf.write(externalProgram["writerFunctCall"]["geomInput"].genCheckpointLine(externalProgram["chkdir"] + flprfx + "-center" + centerIdx + ".chk"))
    # ringf.write(hashLine_rev + title + " # Center " + centerIdx + "\n\n" + repr(charge) + " " + repr(mult) + "\n")
