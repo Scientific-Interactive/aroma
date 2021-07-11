@@ -346,9 +346,10 @@ def writeNicsInputs(flprfx, centerIdx, flag_chk, hashLine_rev, title, charge, mu
 
     externalProgram["cleanupCmd"](flprfx)
 
-    ringf = open(externalProgram["inpdir"] + flprfx +
-                 "-center" + centerIdx + externalProgram["inpExt"], "w")
-    inputFileSet.append({"filename": ringf, "flprfx": flprfx + "-center" + centerIdx,
+    ringflName = externalProgram["inpdir"] + flprfx + \
+                 "-center" + centerIdx + externalProgram["inpExt"]
+    ringf = open(ringflName, "w")
+    inputFileSet.append({"filename": ringflName, "flprfx": flprfx + "-center" + centerIdx,
                         "ext": externalProgram["inpExt"], "nat": len(geom), "nBq": len(BQs_strings)})
 
     if (flag_chk):
@@ -874,14 +875,15 @@ def run_Nics():
     if not pointonly_flag:
         for inpfl in inputFileSet:
             flname = inpfl["filename"]
+            print(flname)
             print("Job " + externalProgram["extCmd"] +
                   flname + " " + flname + " running ..")
             status = execCmd(externalProgram["constructCmd"](flname))
             if (not status):
                 print("Job Over.")
             else:
-                print("It seems that the NICS SCAN run for ring/bond number " +
-                      repr(ring) + " did not terminated normally.\n")
+                print("It seems that the NICS SCAN run for ring/bond [" +
+                      flname + "] did not terminated normally.\n")
 
     if (pointonly_flag):
         rcount = int((len(points)/MAX_BQS_IN_INPFL))+1
