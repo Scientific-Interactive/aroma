@@ -859,6 +859,8 @@ def run_Nics():
     global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
     # global technical
     global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
+    # global inputFileSet
+    global inputFileSet
 
     if (not xy_flag):
         dict_cen = CenterOf.copy()
@@ -870,8 +872,8 @@ def run_Nics():
     elif (xy_flag):
         dict_cen = n_xy_center
     if not pointonly_flag:
-        for ring in dict_cen:
-            flname = flprfx + "-center" + repr(ring)
+        for inpfl in inputFileSet:
+            flname = inpfl["filename"]
             print("Job " + externalProgram["extCmd"] +
                   flname + " " + flname + " running ..")
             status = execCmd(externalProgram["constructCmd"](flname))
@@ -883,8 +885,8 @@ def run_Nics():
 
     if (pointonly_flag):
         rcount = int((len(points)/MAX_BQS_IN_INPFL))+1
-        for ring in range(1, rcount+1):
-            flname = flprfx + "-center" + repr(ring)
+        for inpfl in inputFileSet:
+            flname = inpfl["filename"]
             print("Job " + externalProgram["extCmd"] +
                   flname + " " + flname + " running ..")
             status = execCmd(externalProgram["constructCmd"](flname))
@@ -1236,7 +1238,7 @@ def getNewRings(geom, sigma_geom, CenterOf, zmat_idx):
     return new_CenterOf
 
 
-def grepData(geom):
+def grepData():
 
     # global flags
     global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag
@@ -1322,8 +1324,7 @@ def grepData(geom):
                     externalProgram["outdir"] + flprfx + "-allcenter" + ".armdat")
 
 
-def Execute(geom, title, charge, mult, Conn):
-
+def generateAllInputs(geom, title, charge, mult, Conn):
     # global flags
     global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag
     # global molecule-related
@@ -1370,21 +1371,36 @@ def Execute(geom, title, charge, mult, Conn):
 
     print("\nStatus : NICS input for all the centers generated.")
 
+
+def Execute():
+
+    # global flags
+    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag
+    # global molecule-related
+    global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
+    # global technical
+    global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
+    # global geom length (number of atoms)
+    global nAtoms
+
     if not inponly_flag:
         run_Nics()
         print("\nAll the jobs are over")
         print("\nStatus : Filtering Appropriate Data .. ")
 
-        grepData(geom)
+        grepData()
 
         if (ncs_flag):
             # pi-MOs are same in all the output files, so just identify them from the first file.
             piMOs, nocc = identifyPiMOs(
                 externalProgram["outdir"] + flprfx + "-center1" + externalProgram["outExt"])
-            for ring in CenterOf:
+            for inpFil in inputFileSet:
                 outfl = externalProgram["outdir"] + \
-                    flprfx + "-center" + repr(ring)
-                grepPiCMO(len(geom), piMOs, nocc, BQ_No, BQ_Range,
+                        inpFil["flprfx"] + externalProgram["outExt"]
+
+                nat = inpFil["nat"]
+
+                grepPiCMO(nat, piMOs, nocc, BQ_No, BQ_Range,
                           BQ_Step, outfl, externalProgram["outExt"])
 
         if (xy_flag):
@@ -1403,7 +1419,7 @@ def Execute(geom, title, charge, mult, Conn):
             outfl.close()
 
 
-def callAnalyse(flprfx, geom, CenterOf, all_aromatic_rings, analyse_dist, outfl):
+def callAnalyse(flprfx, CenterOf, all_aromatic_rings, analyse_dist, outfl):
 
     #   conn_mat, Conn = genConnectivityMatrix(geom)
     global analyse_flag, integralnics_flag
@@ -1469,7 +1485,8 @@ def runJobs():
         mult = ""
         Conn = []  # if asked for optimization, Execute() below will optimize and read the geom
 
-    Execute(geom, title, charge, mult, Conn)
+    # generate inputs for primary run
+    generateAllInputs(geom, title, charge, mult, Conn)
 
     if (clear_flag):
         print("\nClearing up unnecessary files .. \n")
@@ -1541,7 +1558,8 @@ def runJobs():
         else:
             smult = mult
 
-        Execute(sigma_geom, title, scharge, smult, Conn)
+        # generate inputs for sigma run
+        generateAllInputs(sigma_geom, title, scharge, smult, Conn)
 
         if (clear_flag):
             print("\nClearing up unnecessary files .. \n")
@@ -1550,12 +1568,15 @@ def runJobs():
             removeFiles(externalProgram["inpdir"] + flprfx + "-guessonly*")
             removeFiles(externalProgram["outdir"] + flprfx + "-guessonly*")
 
+    # execute all jobs
+    Execute()
+
     numpy_flag = checkNumPy()
     if not inponly_flag:
         if (integralnics_flag or analyse_flag):
             if (sigma_flag and numpy_flag and not xy_flag):
                 outfl = open(outfilename, "a")
-                callAnalyse(org_flprfx, geom, org_CenterOf,
+                callAnalyse(org_flprfx, org_CenterOf,
                             all_aromatic_rings, analyse_dist, outfl)
                 outfl.close()
 
