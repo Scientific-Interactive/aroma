@@ -5,6 +5,23 @@
 
 # Main Driver scipt for automation of NICS-Scan in Z and XY Directions, Sigma-Only Model and CMO-NICS
 
+import os
+import re
+import sys
+import glob
+import shutil
+import string
+import fpformat
+
+from aroma_constants import *
+import aroma_constants
+
+import aroma_user_constants
+aroma_user_constants.loadUserConstants(sys.argv[0])
+from aroma_constants import *
+import aroma_constants
+print(os.getcwd())
+
 from aroma_ringarea import *
 import aroma_ringarea
 from aroma_analysis import *
@@ -19,20 +36,6 @@ from aroma_parser import *
 import aroma_parser
 from aroma_util import *
 import aroma_util
-from aroma_constants import *
-import aroma_constants
-import fpformat
-import string
-import re
-import glob
-import shutil
-import os
-import sys
-import aroma_user_constants
-
-aroma_user_constants.loadUserConstants(sys.argv[0])
-
-print(os.getcwd())
 
 
 def init():

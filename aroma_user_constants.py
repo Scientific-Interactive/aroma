@@ -22,11 +22,11 @@ def loadUserConstants(loadDir):
   try:
     del sys.modules['aroma_constants']
   except: 
-    pass
+    print("unable to delete existing module")
 
   sys.path.append(loadDir)
   sys.modules['aroma_constants'] = importlib.import_module(userConstantsModule)
-       
+  print("loaded new user mobile")
 
 if __name__=="__main__":
   loadUserConstants(sys.argv[0])
