@@ -166,6 +166,8 @@ class OutputFileParser(FileParser):
            # The isotropic value is in the first line
            iso = -float(words[4])
 
+           # print(outlines[j+1]); print(outlines[j+2]); print(outlines[j+3]);
+
            # Then get the diagonal values for the tensor
            xx = -float(outlines[j+1].strip().split()[1])
            yy = -float(outlines[j+2].strip().split()[3])

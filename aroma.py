@@ -874,7 +874,7 @@ def run_Nics():
         dict_cen = n_xy_center
     if not pointonly_flag:
         for inpfl in inputFileSet:
-            flname = inpfl["filename"]
+            flname = inpfl["flprfx"]
             print(flname)
             print("Job " + externalProgram["extCmd"] +
                   flname + " " + flname + " running ..")

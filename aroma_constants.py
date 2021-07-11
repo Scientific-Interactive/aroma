@@ -42,7 +42,7 @@ GaussianSettings = {
   "inpExt": ".in",
   "outExt": ".out",
 
-  "extCmd": "C:/Users/user/Documents/2.0Aroma/G09W/G09W/g09 ",
+  "extCmd": "/root/g09/g09 ",
   "chkCmd": "/usr/local/g09/formchk ",
 
   "extensions": { 'input': ['com','gjf','inp','in'], 'output': ['log', 'out'], 'checkpoint': ['chk'] }, # list of possibile extensions for Gaussian Files
