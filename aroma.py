@@ -349,8 +349,10 @@ def writeNicsInputs(flprfx, centerIdx, flag_chk, hashLine_rev, title, charge, mu
     ringflName = externalProgram["inpdir"] + flprfx + \
                  "-center" + centerIdx + externalProgram["inpExt"]
     ringf = open(ringflName, "w")
+    nBQs = len(BQs_strings.strip().split("\n"))
+    print("THE BQS >>>", BQs_strings, "<<<", nBQs)
     inputFileSet.append({"filename": ringflName, "flprfx": flprfx + "-center" + centerIdx,
-                        "ext": externalProgram["inpExt"], "nat": len(geom), "nBq": len(BQs_strings)})
+                        "ext": externalProgram["inpExt"], "nat": len(geom), "nBq": nBQs})
 
     if (flag_chk):
         ringf.write(externalProgram["writerFunctCall"]["geomInput"].genCheckpointLine(
@@ -1271,6 +1273,8 @@ def grepData():
         if (not xy_flag):
             dist = BQ_Range[0]
 
+        print(nBQ, len(bqTensors))
+
         for j in range(0, nBQ):
 
             BQ_data_string = ""
@@ -1279,6 +1283,7 @@ def grepData():
 
             # This is commented as BQ no is not important, instead distance of that BQ from GM is added (further)
             # BQ_data_string += words[0] + "   "
+
 
             iso, xx, yy, zz, e1, e2, e3 = bqTensors[j]
             sorted_e = []

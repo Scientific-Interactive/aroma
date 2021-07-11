@@ -156,17 +156,16 @@ class OutputFileParser(FileParser):
       for i in range (0, len(outlines)):
         if (outlines[i].find("Magnetic shielding tensor") >= 0 ): break;
 
-
       for j in range (i + 5*nat + 1, i + 5*nat + nBQ*5 + 1, 5 ):
         words = outlines[j].strip().split()
         if (len(words) > 1 and words[1] == 'Bq'):
            # This is commented as BQ no is not important, instead distance of that BQ from GM is added (further)
            # BQ_data_string += words[0] + "   "
+         
+           # print(outlines[j+1]); print(outlines[j+2]); print(outlines[j+3]);
 
            # The isotropic value is in the first line
            iso = -float(words[4])
-
-           # print(outlines[j+1]); print(outlines[j+2]); print(outlines[j+3]);
 
            # Then get the diagonal values for the tensor
            xx = -float(outlines[j+1].strip().split()[1])
@@ -178,6 +177,8 @@ class OutputFileParser(FileParser):
            e1, e2, e3 = list(map(float, outlines[j+4].split(":")[1].split()))
 
            bqTensors.append([iso, xx, yy, zz, e1, e2, e3])
+
+      print("nat", nat, "nbq", nBQ, len(bqTensors))
       
       return bqTensors 
 
