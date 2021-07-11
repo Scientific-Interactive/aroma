@@ -353,7 +353,7 @@ def writeNicsInputs(flprfx, centerIdx, flag_chk, hashLine_rev, title, charge, mu
                  "-center" + centerIdx + externalProgram["inpExt"]
     ringf = open(ringflName, "w")
     nBQs = len(BQs_strings.strip().split("\n"))
-    print("THE BQS >>>", BQs_strings, "<<<", nBQs)
+    print("THE BQS >>>", BQs_strings.strip().split("\n"), nBQs, "<<<", nBQs)
     inputFileSet.append({"filename": ringflName, "flprfx": flprfx + "-center" + centerIdx,
                         "ext": externalProgram["inpExt"], "nat": len(geom), "nBq": nBQs})
 
@@ -468,18 +468,11 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
         BQs_string = addBreakPoints(BQs_string)
         BQs_strings = list(map(lambda x: x.strip(), BQs_string.split("break")))
 
-        if (BQs_strings[len(BQs_strings)-1] == ""):
-            n_fl = len(BQs_strings) - 1
-        else:
-            n_fl = len(BQs_strings)
-
-        for c in range(1, n_fl+1):
-            if (c > 1):
-                n_xy_center[c] = c
-            if (BQs_strings[c-1].strip() == ""):
+        for cnt in range(0, len(BQs_strings)):
+            if (BQs_strings[cnt].strip() == ""):
                 continue
-            writeNicsInputs(flprfx, "1-set" + repr(c), flag_chk, hashLine_rev,
-                            title, charge, mult, new_geom, BQs_strings[c-1])
+            writeNicsInputs(flprfx, "1-set" + repr(cnt), flag_chk, hashLine_rev,
+                            title, charge, mult, new_geom, BQs_strings[cnt])
 
 
 def addBreakPoints(BQs_string):
@@ -1278,7 +1271,7 @@ def grepData():
 
         print(nBQ, len(bqTensors))
 
-        for j in range(0, nBQ):
+        for j in range(0, len(bqTensors)):  # TODO: check correctness, nBQ is replaced with len(bqTensors)
 
             BQ_data_string = ""
             if xy_flag:
@@ -1498,16 +1491,6 @@ def runJobs():
     # generate inputs for primary run
     generateAllInputs(geom, title, charge, mult, Conn)
 
-    if (clear_flag):
-        print("\nClearing up unnecessary files .. \n")
-
-        removeFiles(externalProgram["inpdir"] + flprfx + "-center*")
-        removeFiles(externalProgram["inpdir"] + flprfx + "-guessonly*")
-        removeFiles(externalProgram["outdir"] + flprfx + "-guessonly*")
-
-        if (opt_flag):
-            removeFiles(externalProgram["inpdir"] + flprfx + "-opt* ")
-
     # Read For: For XY-Scan with Sigma-Model, just keep the final output as .armlog with r, ZZ and del-ZZ
     if (xy_flag and sigma_flag):
         xarmlogfile = externalProgram["outdir"] + flprfx + "-alldiff.armlog"
@@ -1571,15 +1554,19 @@ def runJobs():
         # generate inputs for sigma run
         generateAllInputs(sigma_geom, title, scharge, smult, Conn)
 
-        if (clear_flag):
-            print("\nClearing up unnecessary files .. \n")
-
-            removeFiles(externalProgram["inpdir"] + flprfx + "-center*")
-            removeFiles(externalProgram["inpdir"] + flprfx + "-guessonly*")
-            removeFiles(externalProgram["outdir"] + flprfx + "-guessonly*")
-
     # execute all jobs
     Execute()
+
+    # clean up
+    if (clear_flag):
+        print("\nClearing up unnecessary files .. \n")
+
+        removeFiles(externalProgram["inpdir"] + flprfx + "-center*")
+        removeFiles(externalProgram["inpdir"] + flprfx + "-guessonly*")
+        removeFiles(externalProgram["outdir"] + flprfx + "-guessonly*")
+
+        if (opt_flag):
+            removeFiles(externalProgram["inpdir"] + flprfx + "-opt* ")
 
     numpy_flag = checkNumPy()
     if not inponly_flag:
