@@ -1357,7 +1357,10 @@ def generateAllInputs(geom, title, charge, mult, Conn):
         conn_mat, Conn = genConnectivityMatrix(geom)
 
     # get the number of atoms
-    nAtoms = len(geom)
+    nAtoms = 0
+    for g in geom:
+       if (geom[g][0] != 0): nAtoms += 1
+
 
     if (hashLine_nics == "DEFAULT\n"):
         hashLine_nics = externalProgram.defaultNicsKeyline
