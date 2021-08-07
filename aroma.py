@@ -364,9 +364,14 @@ def writeNicsInputs(flprfx, centerIdx, flag_chk, hashLine_rev, title, charge, mu
     ringf = open(ringflName, "w")
     nBQs = len(BQs_strings.strip().split("\n"))
     print("THE BQS >>>", BQs_strings.strip().split("\n"), nBQs, "<<<", nBQs)
+    print("THE GEOM >>>", geom, "<<<<")
+    nat = 0 
+    for at in geom:
+       if (geom[at][0] != 0): nat += 1
+
     inputFileSet.append({"filename": ringflName, "flprfx": flprfx + "-center" + centerIdx,
                         "baseprfx": flprfx,
-                        "ext": externalProgram["inpExt"], "nat": len(geom), "nBq": nBQs, 
+                        "ext": externalProgram["inpExt"], "nat": nat, "nBq": nBQs, 
                         "setIdx": savedSetIdx, "centerIdx": savedCenterIdx, "jobType": jobType})
 
     if (flag_chk):
@@ -1284,7 +1289,7 @@ def grepData():
         if (not xy_flag):
             dist = BQ_Range[0]
 
-        print(nBQ, len(bqTensors))
+        print("nBQ, nTensors", nBQ, len(bqTensors))
 
         for j in range(0, len(bqTensors)):  # TODO: check correctness, nBQ is replaced with len(bqTensors)
 

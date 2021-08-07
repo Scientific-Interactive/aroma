@@ -158,7 +158,7 @@ class OutputFileParser(FileParser):
 
       for j in range (i + 5*nat + 1, i + 5*nat + nBQ*5 + 1, 5 ):
         words = outlines[j].strip().split()
-        if (len(words) > 1 and words[1] == 'Bq'):
+        if (len(words) > 1 and (words[1] == 'Bq' or words[1] == 'bq')):
            # This is commented as BQ no is not important, instead distance of that BQ from GM is added (further)
            # BQ_data_string += words[0] + "   "
          
