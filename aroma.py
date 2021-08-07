@@ -496,7 +496,7 @@ def addBreakPoints(BQs_string):
 
     bqs = BQs_string.strip().split("\n")
 
-    # print("nBQ", len(bqs), "nAtm", nAtoms, "maxSys", MAX_BQS_IN_INPFL)
+    print("nBQ", len(bqs), "nAtm", nAtoms, "maxSys", MAX_BQS_IN_INPFL)
     # print(bqs)
 
     atmCount = nAtoms
@@ -506,10 +506,11 @@ def addBreakPoints(BQs_string):
     for bq in bqs:
         newBQs_string += bq + "\n"
         atmCount += 1
-        # print("bq ", bq, atmCount, MAX_BQS_IN_INPFL, atmCount%MAX_BQS_IN_INPFL)
+        print("bq ", bq, atmCount, MAX_BQS_IN_INPFL, atmCount%MAX_BQS_IN_INPFL)
         if (atmCount % MAX_BQS_IN_INPFL == 0):
             newBQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomSetBreak(
             ) + "\n"
+            print(externalProgram["writerFunctCall"]["geomInput"].genGhostAtomSetBreak())
             atmCount = nAtoms
             # print(externalProgram["writerFunctCall"]["geomInput"].genGhostAtomSetBreak())
 
