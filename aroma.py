@@ -46,7 +46,7 @@ def init():
     # global technical
     global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
     # global file set - used for storing all input files generated
-    global inputFileSet
+    global inputFileSet, collatedFileSet
 
     # Initializing some global variables
     opt_flag = 0
@@ -89,6 +89,7 @@ def init():
     clear_flag = 0
 
     inputFileSet = []
+    collatedFileSet = []
 
 
 def check(armfile):
@@ -343,11 +344,20 @@ def run_Optimization(optfl):
         print("Aroma Will Continue with the Last Geometry for NICS Calculation.\n")
 
 
-def writeNicsInputs(flprfx, centerIdx, flag_chk, hashLine_rev, title, charge, mult, geom, BQs_strings):
+def writeNicsInputs(flprfx, centerIdx, flag_chk, hashLine_rev, title, charge, mult, geom, BQs_strings, jobType):
     global externalProgram
     global inputFileSet
 
     externalProgram["cleanupCmd"](flprfx)
+
+    savedCenterIdx = "1"
+    savedSetIdx = "-1"
+
+    if (centerIdx.find("-set") >= 1):
+       savedSetIdx = centerIdx.split("-set")[1]
+       savedCenterIdx = centerIdx.split("-set")[0].split("center")[0]
+    else:
+       savedCenterIdx = centerIdx
 
     ringflName = externalProgram["inpdir"] + flprfx + \
                  "-center" + centerIdx + externalProgram["inpExt"]
@@ -355,7 +365,9 @@ def writeNicsInputs(flprfx, centerIdx, flag_chk, hashLine_rev, title, charge, mu
     nBQs = len(BQs_strings.strip().split("\n"))
     print("THE BQS >>>", BQs_strings.strip().split("\n"), nBQs, "<<<", nBQs)
     inputFileSet.append({"filename": ringflName, "flprfx": flprfx + "-center" + centerIdx,
-                        "ext": externalProgram["inpExt"], "nat": len(geom), "nBq": nBQs})
+                        "baseprfx": flprfx,
+                        "ext": externalProgram["inpExt"], "nat": len(geom), "nBq": nBQs, 
+                        "setIdx": savedSetIdx, "centerIdx": savedCenterIdx, "jobType": jobType})
 
     if (flag_chk):
         ringf.write(externalProgram["writerFunctCall"]["geomInput"].genCheckpointLine(
@@ -380,7 +392,7 @@ def writeNicsInputs(flprfx, centerIdx, flag_chk, hashLine_rev, title, charge, mu
     ringf.close()
 
 
-def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
+def genNicsInputs(geom, Conn, hashLine, title, charge, mult, jobType):
     global externalProgram
 
     # global flags
@@ -411,7 +423,7 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
             if (BQs_strings[ring].strip() == ""):
                 continue
             writeNicsInputs(flprfx, repr(ring+1), flag_chk, hashLine_rev,
-                            title, charge, mult, geom, BQs_strings[ring])
+                            title, charge, mult, geom, BQs_strings[ring], jobType)
 
     elif (not xy_flag and not pointonly_flag):  # Z-scan or Integral NICS
         for ring in CenterOf:
@@ -431,7 +443,8 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
                     if (BQs_strings[setIdx].strip() == ""):
                         continue
                     writeNicsInputs(flprfx, repr(ring) + "-set" + repr(setIdx+1), flag_chk,
-                                    hashLine_rev, title, charge, mult, new_geom, BQs_strings[setIdx])
+                                    hashLine_rev, title, charge, mult, new_geom, 
+                                    BQs_strings[setIdx], jobType)
 
             elif (new_geom == []):
                 print("Ring no. " + repr(ring) + " is not Planar within the tolerence of " + repr(TORSION_ANGLE_TOLERANCE) +
@@ -457,7 +470,8 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
                     if (BQs_strings[setIdx].strip() == ""):
                         continue
                     writeNicsInputs(flprfx, repr(n_count) + "-set" + repr(setIdx+1), flag_chk,
-                                    hashLine_rev, title, charge, mult, new_geom, BQs_strings[setIdx])
+                                    hashLine_rev, title, charge, mult, new_geom, 
+                                    BQs_strings[setIdx], jobType)
 
             elif (new_geom == []):
                 print("Ring no. " + repr(n_count) + " is not Planar within the tolerence of " + repr(TORSION_ANGLE_TOLERANCE) +
@@ -472,7 +486,7 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult):
             if (BQs_strings[cnt].strip() == ""):
                 continue
             writeNicsInputs(flprfx, "1-set" + repr(cnt), flag_chk, hashLine_rev,
-                            title, charge, mult, new_geom, BQs_strings[cnt])
+                            title, charge, mult, new_geom, BQs_strings[cnt], jobType)
 
 
 def addBreakPoints(BQs_string):
@@ -1311,23 +1325,51 @@ def grepData():
 
         f_out.close()
 
-    # TODO: the following codes need to be evaluated
-    # In case of XY-Scan, Merge all armdats to one
-    if ((xy_flag or pointonly_flag) and (len(inputFileSet) > 1)):
-        final_armdat = open(
-            externalProgram["outdir"] + flprfx + "-center1" + ".armdat", "a")
-        for inpFil in inputFileSet:
-            lines = readFile(
-                externalProgram["outdir"] + inpFil["flprfx"] + ".armdat")
-            for i in range(1, len(lines)):
-                final_armdat.write(lines[i])
-        final_armdat.close()
+    # write collated set of files
+    if ((len(inputFileSet) > 1)):
+        writeCollatedFiles("main")
+        writeCollatedFiles("sigma")
+
     if (xy_flag):
         shutil.move(externalProgram["outdir"] + flprfx + "-center1" + ".armdat",
                     externalProgram["outdir"] + flprfx + "-allcenter" + ".armdat")
 
+def writeCollatedFiles(jobType):
+    global inputFileSet, collatedFileSet
 
-def generateAllInputs(geom, title, charge, mult, Conn):
+    # get all files in the "main" run
+    mainFiles = list(filter(lambda x: x["jobType"] == jobType and x["setIdx"] != "-1", inputFileSet))
+
+    print("mainfiles", mainFiles)
+
+    # get list of all centers
+    centerList = list(set(list(map(lambda x: x["centerIdx"], mainFiles))))
+
+    print("centerlist", centerList)
+
+    for centerIdx in centerList:
+      idx = 0
+      centerFileSet = list(filter(lambda x: x["centerIdx"] == centerIdx and x["jobType"] == jobType, mainFiles))
+
+      baseprfx = centerFileSet[0]["baseprfx"] + "-center" + centerIdx
+
+      final_armdat = open(externalProgram["outdir"] + baseprfx + ".armdat", "w")
+
+      print("centerfileset", len(centerFileSet), centerFileSet)
+
+      collatedFileSet.append({"fileName": final_armdat, "flprfx": baseprfx, "jobType": jobType})
+
+      for inpFil in centerFileSet:
+        lines = readFile(externalProgram["outdir"] + inpFil["flprfx"] + ".armdat")
+        print(inpFil["flprfx"], len(lines))
+        for i in range(idx, len(lines)):
+            final_armdat.write(lines[i])
+        idx = 1
+
+      final_armdat.close()
+
+
+def generateAllInputs(geom, title, charge, mult, Conn, jobType):
     # global flags
     global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag
     # global molecule-related
@@ -1371,9 +1413,9 @@ def generateAllInputs(geom, title, charge, mult, Conn):
 
     # Generate NICS input
     if (ncs_flag):
-        genNicsInputs(geom, Conn, hashLine_ncs, title, charge, mult)
+        genNicsInputs(geom, Conn, hashLine_ncs, title, charge, mult, jobType)
     else:
-        genNicsInputs(geom, Conn, hashLine_nics, title, charge, mult)
+        genNicsInputs(geom, Conn, hashLine_nics, title, charge, mult, jobType)
 
     print("\nStatus : NICS input for all the centers generated.")
 
@@ -1492,7 +1534,7 @@ def runJobs():
         Conn = []  # if asked for optimization, Execute() below will optimize and read the geom
 
     # generate inputs for primary run
-    generateAllInputs(geom, title, charge, mult, Conn)
+    generateAllInputs(geom, title, charge, mult, Conn, "main")
 
     # Read For: For XY-Scan with Sigma-Model, just keep the final output as .armlog with r, ZZ and del-ZZ
     if (xy_flag and sigma_flag):
@@ -1555,7 +1597,7 @@ def runJobs():
             smult = mult
 
         # generate inputs for sigma run
-        generateAllInputs(sigma_geom, title, scharge, smult, Conn)
+        generateAllInputs(sigma_geom, title, scharge, smult, Conn, "sigma")
 
     # execute all jobs
     Execute()
