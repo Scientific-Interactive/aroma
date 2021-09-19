@@ -1269,6 +1269,10 @@ def grepData():
     # global inputFileSet
     global inputFileSet
 
+    # this needs to be inited outside the input set loop to avoid re-initialisation
+    if (not xy_flag):
+       dist = BQ_Range[0]
+
     # This loop is over each output file to filter the required tensor data
     for inpFil in inputFileSet:
         outfl = externalProgram["outdir"] + \
@@ -1286,8 +1290,6 @@ def grepData():
             "#       oop       in1        in2       inp       iso        x         y         z\n")
 
         # i + 5*nat + 1, i + 5*nat + BQ_No*nat + 1 are start and end line numbers in the output file for the data for BQs
-        if (not xy_flag):
-            dist = BQ_Range[0]
 
         print("nBQ, nTensors", nBQ, len(bqTensors))
 
