@@ -887,9 +887,9 @@ def run_Nics():
             n_count = len(CenterOf)
             for i in normals:
                 dict_cen[n_count+i] = normals[i]
-
     elif (xy_flag):
         dict_cen = n_xy_center
+
     if not pointonly_flag:
         for inpfl in inputFileSet:
             flname = inpfl["flprfx"]
@@ -1273,6 +1273,8 @@ def grepData():
     if (not xy_flag):
        dist = BQ_Range[0]
 
+    idx = 0
+
     # This loop is over each output file to filter the required tensor data
     for inpFil in inputFileSet:
         outfl = externalProgram["outdir"] + \
@@ -1544,12 +1546,6 @@ def runJobs():
     # generate inputs for primary run
     generateAllInputs(geom, title, charge, mult, Conn, "main")
 
-    # Read For: For XY-Scan with Sigma-Model, just keep the final output as .armlog with r, ZZ and del-ZZ
-    if (xy_flag and sigma_flag):
-        xarmlogfile = externalProgram["outdir"] + flprfx + "-alldiff.armlog"
-        armdatlines = readFile(
-            externalProgram["outdir"] + flprfx + "-allcenter" + ".armdat")
-
     if (sigma_flag):
         if (opt_flag or opt_external):
             theParser = externalProgram["readerFunctCall"]["output"](
@@ -1609,6 +1605,11 @@ def runJobs():
 
     # execute all jobs
     Execute()
+
+    # Read For: For XY-Scan with Sigma-Model, just keep the final output as .armlog with r, ZZ and del-ZZ
+    if (xy_flag and sigma_flag):
+       xarmlogfile = externalProgram["outdir"] + flprfx + "-alldiff.armlog"
+       armdatlines = readFile(externalProgram["outdir"] + flprfx + "-allcenter" + ".armdat")
 
     # clean up
     if (clear_flag):
