@@ -9,6 +9,7 @@ import os
 import re
 import sys
 import glob
+import json
 import shutil
 import string
 import fpformat
@@ -40,7 +41,7 @@ import aroma_util
 
 def init():
     # global flags
-    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag
+    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag
     # global molecule-related
     global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals, exocyclic
     # global technical
@@ -59,6 +60,7 @@ def init():
     analyse_flag = 1
     area_flag = 0
     inponly_flag = 0
+    outonly_flag = 0
     CenterOf = {}
     all_aromatic_rings = {}
     exocyclic = {}
@@ -95,7 +97,7 @@ def init():
 def check(armfile):
 
     # global flags
-    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag
+    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag
     # global molecule-related
     global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
     # global technical
@@ -127,6 +129,8 @@ def check(armfile):
                 sigma_flag = 1
             if (runseq.count("INPONLY") > 0):
                 inponly_flag = 1
+            if (runseq.count("OUTONLY") > 0):
+                outonly_flag = 1
             break
 
     if (opt_flag):
@@ -1526,6 +1530,8 @@ def runJobs():
     global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
     # global technical
     global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
+    # input file set
+    global inputFileSet
 
     if (not opt_external):  # if asked not asked for optimization, read the geometry from the input geom file
         for extension in externalProgram["extensions"]:
@@ -1603,6 +1609,11 @@ def runJobs():
         # generate inputs for sigma run
         generateAllInputs(sigma_geom, title, scharge, smult, Conn, "sigma")
 
+    # all inputs are generated at this point, dump the json
+    inpf = open("inputFileSet.json", "w")
+    inpf.write(json.dumps(inputFileSet))
+    inpf.close()
+
     # execute all jobs
     Execute()
 
@@ -1677,7 +1688,7 @@ def writeOutputHeader():
 
 def aroma(armfile):
     # global flags
-    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag
+    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag
     # global molecule-related
     global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
     # global technical
