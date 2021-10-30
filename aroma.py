@@ -1437,7 +1437,7 @@ def generateAllInputs(geom, title, charge, mult, Conn, jobType):
 def Execute():
 
     # global flags
-    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag
+    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag
     # global molecule-related
     global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
     # global technical
@@ -1446,8 +1446,10 @@ def Execute():
     global nAtoms
 
     if not inponly_flag:
-        run_Nics()
-        print("\nAll the jobs are over")
+        if (not outonly_flag): 
+            run_Nics()
+            print("\nAll the jobs are over")
+            
         print("\nStatus : Filtering Appropriate Data .. ")
 
         grepData()
@@ -1525,7 +1527,7 @@ def callAnalyse(flprfx, CenterOf, all_aromatic_rings, analyse_dist, outfl):
 
 def runJobs():
     # global flags
-    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag
+    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag
     # global molecule-related
     global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
     # global technical
@@ -1549,70 +1551,76 @@ def runJobs():
         mult = ""
         Conn = []  # if asked for optimization, Execute() below will optimize and read the geom
 
-    # generate inputs for primary run
-    generateAllInputs(geom, title, charge, mult, Conn, "main")
+    if (not outonly_flag):
 
-    if (sigma_flag):
-        if (opt_flag or opt_external):
-            theParser = externalProgram["readerFunctCall"]["output"](
-                externalProgram["outdir"] + flprfx + "-opt" + externalProgram["outExt"])
-            geom, hashLine, title, charge, mult = theParser.getInpData()
-            conn_mat, Conn = genConnectivityMatrix(geom)
+        # generate inputs for primary run
+        generateAllInputs(geom, title, charge, mult, Conn, "main")
 
-        opt_flag = 0
-        ncs_flag = 0
-        exttype = "input"
+        if (sigma_flag):
+            if (opt_flag or opt_external):
+                theParser = externalProgram["readerFunctCall"]["output"](
+                    externalProgram["outdir"] + flprfx + "-opt" + externalProgram["outExt"])
+                geom, hashLine, title, charge, mult = theParser.getInpData()
+                conn_mat, Conn = genConnectivityMatrix(geom)
 
-        sigma_geom, charge, mult, zmat_idx = genSigmaModel(
-            flprfx, geom, Conn, title, charge, sigma_mult)
+            opt_flag = 0
+            ncs_flag = 0
+            exttype = "input"
 
-        # Read the geometry and other data
-        # theParser = externalProgram["readerFunctCall"][exttype](geomfl)
-        # sigma_geom, hashLine, title, charge, mult = theParser.getInpData()
+            sigma_geom, charge, mult, zmat_idx = genSigmaModel(
+                flprfx, geom, Conn, title, charge, sigma_mult)
 
-        # Take out the normals from the geometry, if defined
-        sigma_normals = {}
-        n_count = 1
-        for i in range(len(sigma_geom)-(2*len(normals))+1, len(sigma_geom)+1, 2):
-            sigma_normals[n_count] = sigma_geom[i][1:4] + sigma_geom[i+1][1:4]
-            n_count += 1
-            del sigma_geom[i]
-            del sigma_geom[i+1]
-        org_normals = normals
-        normals = sigma_normals
+            # Read the geometry and other data
+            # theParser = externalProgram["readerFunctCall"][exttype](geomfl)
+            # sigma_geom, hashLine, title, charge, mult = theParser.getInpData()
 
-        conn_mat, Conn = genConnectivityMatrix(sigma_geom)
+            # Take out the normals from the geometry, if defined
+            sigma_normals = {}
+            n_count = 1
+            for i in range(len(sigma_geom)-(2*len(normals))+1, len(sigma_geom)+1, 2):
+                sigma_normals[n_count] = sigma_geom[i][1:4] + sigma_geom[i+1][1:4]
+                n_count += 1
+                del sigma_geom[i]
+                del sigma_geom[i+1]
+            org_normals = normals
+            normals = sigma_normals
 
-        new_CenterOf = getNewRings(geom, sigma_geom, CenterOf, zmat_idx)
-        org_flprfx = flprfx
-        org_CenterOf = CenterOf
-        flprfx = flprfx + "-sigma"
-        CenterOf = new_CenterOf
+            conn_mat, Conn = genConnectivityMatrix(sigma_geom)
 
-        if (xy_flag):
-            outfl = open(outfilename, "a")
-            outfl.write(
-                "\n--------------------------------------------------------------------\n")
-            outfl.write("\nFor the Sigma Model:\n")
-            outfl.close()
+            new_CenterOf = getNewRings(geom, sigma_geom, CenterOf, zmat_idx)
+            org_flprfx = flprfx
+            org_CenterOf = CenterOf
+            flprfx = flprfx + "-sigma"
+            CenterOf = new_CenterOf
 
-        if (s_charge_flag):
-            scharge = sigma_charge
-        else:
-            scharge = charge
+            if (xy_flag):
+                outfl = open(outfilename, "a")
+                outfl.write(
+                    "\n--------------------------------------------------------------------\n")
+                outfl.write("\nFor the Sigma Model:\n")
+                outfl.close()
 
-        if (s_mult_flag):
-            smult = sigma_mult
-        else:
-            smult = mult
+            if (s_charge_flag):
+                scharge = sigma_charge
+            else:
+                scharge = charge
 
-        # generate inputs for sigma run
-        generateAllInputs(sigma_geom, title, scharge, smult, Conn, "sigma")
+            if (s_mult_flag):
+                smult = sigma_mult
+            else:
+                smult = mult
 
-    # all inputs are generated at this point, dump the json
-    inpf = open("inputFileSet.json", "w")
-    inpf.write(json.dumps(inputFileSet))
-    inpf.close()
+            # generate inputs for sigma run
+            generateAllInputs(sigma_geom, title, scharge, smult, Conn, "sigma")
+
+        # all inputs are generated at this point, dump the json
+        inpf = open("inputFileSet.json", "w")  # TODO: this file name needs to change, based on input
+        inpf.write(json.dumps(inputFileSet))
+        inpf.close()
+    else:
+        outf = open("inputFileSet.json", "r") # TOOD: this file name needs to change, based on input
+        inputFileSet = json.loads(outf.read())
+        outf.close()
 
     # execute all jobs
     Execute()
