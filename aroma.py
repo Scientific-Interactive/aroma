@@ -1457,7 +1457,7 @@ def Execute():
         if (ncs_flag):
             # pi-MOs are same in all the output files, so just identify them from the first file.
             piMOs, nocc = identifyPiMOs(
-                externalProgram["outdir"] + flprfx + "-center1" + externalProgram["outExt"])
+                externalProgram["outdir"] + flprfx + "-center1-set1" + externalProgram["outExt"])
             for inpFil in inputFileSet:
                 outfl = externalProgram["outdir"] + \
                         inpFil["flprfx"] + externalProgram["outExt"]
