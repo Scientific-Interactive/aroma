@@ -1614,11 +1614,11 @@ def runJobs():
             generateAllInputs(sigma_geom, title, scharge, smult, Conn, "sigma")
 
         # all inputs are generated at this point, dump the json
-        inpf = open("inputFileSet.json", "w")  # TODO: this file name needs to change, based on input
+        inpf = open(externalProgram["outdir"] + flprfx + "-inputFileSet.json", "w")  # this file name needs to change, based on input
         inpf.write(json.dumps(inputFileSet))
         inpf.close()
     else:
-        outf = open("inputFileSet.json", "r") # TOOD: this file name needs to change, based on input
+        outf = open(externalProgram["outdir"] + flprfx + "-inputFileSet.json", "r") # this file name needs to change, based on input
         inputFileSet = json.loads(outf.read())
         outf.close()
 
