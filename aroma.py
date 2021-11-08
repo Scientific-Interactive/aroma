@@ -1460,7 +1460,7 @@ def Execute():
                 externalProgram["outdir"] + flprfx + "-center1-set1" + externalProgram["outExt"])
             for inpFil in inputFileSet:
                 outfl = externalProgram["outdir"] + \
-                        inpFil["flprfx"] + externalProgram["outExt"]
+                        inpFil["flprfx"] # + externalProgram["outExt"]  (TODO: probable fix, need to check other flows)
 
                 nat = inpFil["nat"]
 
