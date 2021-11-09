@@ -367,8 +367,6 @@ def writeNicsInputs(flprfx, centerIdx, flag_chk, hashLine_rev, title, charge, mu
                  "-center" + centerIdx + externalProgram["inpExt"]
     ringf = open(ringflName, "w")
     nBQs = len(BQs_strings.strip().split("\n"))
-    print("THE BQS >>>", BQs_strings.strip().split("\n"), nBQs, "<<<", nBQs)
-    print("THE GEOM >>>", geom, "<<<<")
     nat = 0 
     for at in geom:
        if (geom[at][0] != 0): nat += 1
@@ -505,9 +503,6 @@ def addBreakPoints(BQs_string):
 
     bqs = BQs_string.strip().split("\n")
 
-    print("nBQ", len(bqs), "nAtm", nAtoms, "maxSys", MAX_BQS_IN_INPFL)
-    # print(bqs)
-
     atmCount = nAtoms
 
     newBQs_string = ""
@@ -515,15 +510,11 @@ def addBreakPoints(BQs_string):
     for bq in bqs:
         newBQs_string += bq + "\n"
         atmCount += 1
-        print("bq ", bq, atmCount, MAX_BQS_IN_INPFL, atmCount%MAX_BQS_IN_INPFL)
         if (atmCount % MAX_BQS_IN_INPFL == 0):
             newBQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomSetBreak(
             ) + "\n"
-            print(externalProgram["writerFunctCall"]["geomInput"].genGhostAtomSetBreak())
             atmCount = nAtoms
-            # print(externalProgram["writerFunctCall"]["geomInput"].genGhostAtomSetBreak())
 
-    # print(newBQs_string)
     return newBQs_string
 
 
@@ -612,7 +603,6 @@ def generateBQs_Z(geom, Conn, ring_atoms, normal=[]):
             bqpt)
         zcoord += zinc
 
-    print("z bQ", BQs_string)
     return BQs_string
 
 
@@ -1297,8 +1287,6 @@ def grepData():
 
         # i + 5*nat + 1, i + 5*nat + BQ_No*nat + 1 are start and end line numbers in the output file for the data for BQs
 
-        print("nBQ, nTensors", nBQ, len(bqTensors))
-
         for j in range(0, len(bqTensors)):  # TODO: check correctness, nBQ is replaced with len(bqTensors)
 
             BQ_data_string = ""
@@ -1354,12 +1342,8 @@ def writeCollatedFiles(jobType):
     # get all files in the "main" run
     mainFiles = list(filter(lambda x: x["jobType"] == jobType and x["setIdx"] != "-1", inputFileSet))
 
-    print("mainfiles", mainFiles)
-
     # get list of all centers
     centerList = list(set(list(map(lambda x: x["centerIdx"], mainFiles))))
-
-    print("centerlist", centerList)
 
     for centerIdx in centerList:
       idx = 0
@@ -1369,13 +1353,10 @@ def writeCollatedFiles(jobType):
 
       final_armdat = open(externalProgram["outdir"] + baseprfx + ".armdat", "w")
 
-      print("centerfileset", len(centerFileSet), centerFileSet)
-
       collatedFileSet.append({"fileName": final_armdat, "flprfx": baseprfx, "jobType": jobType})
 
       for inpFil in centerFileSet:
         lines = readFile(externalProgram["outdir"] + inpFil["flprfx"] + ".armdat")
-        print(inpFil["flprfx"], len(lines))
         for i in range(idx, len(lines)):
             final_armdat.write(lines[i])
         idx = 1
@@ -1517,7 +1498,7 @@ def callAnalyse(flprfx, CenterOf, all_aromatic_rings, analyse_dist, outfl):
         for ring in all_aromatic_rings:
             ring_atoms = all_aromatic_rings.get(ring)
             area[ring] = ring_area(
-                externalProgram["inpdir"] + flprfx + "-center1.in", ring_atoms)
+                externalProgram["inpdir"] + flprfx + "-center1-set1" + externalProgram["inpExt"], ring_atoms)
             outfl.write("\n" + repr(ring) + " : " + repr(area[ring]))
             tot_area += area[ring]
 
