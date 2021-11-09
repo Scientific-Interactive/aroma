@@ -71,10 +71,13 @@ def identifyPiMOs(outfl):
 
 # Life was so simple, if Gaussian did not have formatted write!
 #         coeff_words = list(map(float, line.split()))
-         format = ""
-         for t in range (0, len(line)/10): format += "10s"
+         strFormat = ""
+         for t in range (0, int(len(line)/10)): strFormat += "10s"
 
-         coeff_words = list(map(float, struct.unpack(format, line)))
+         # print("life line", line, strFormat)
+         # print(struct.unpack(strFormat, bytes(line, 'utf8')))
+
+         coeff_words = list(map(float, list(struct.unpack(strFormat, bytes(line, 'utf8')))))
 
          for j in range (0, len(words)):
             orb[words[j]].append(coeff_words[j])
