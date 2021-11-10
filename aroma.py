@@ -1445,7 +1445,7 @@ def Execute():
 
                 nat = inpFil["nat"]
 
-                grepPiCMO(nat, piMOs, nocc, BQ_No, BQ_Range,
+                grepPiCMO(nat, piMOs, nocc, inpFil["nBq"], BQ_Range,
                           BQ_Step, outfl, externalProgram["outExt"])
 
         if (xy_flag):
