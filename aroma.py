@@ -1426,6 +1426,8 @@ def Execute():
     # global geom length (number of atoms)
     global nAtoms
 
+
+    print("HERE4",ncs_flag)
     if not inponly_flag:
         if (not outonly_flag): 
             run_Nics()
@@ -1440,13 +1442,14 @@ def Execute():
             piMOs, nocc = identifyPiMOs(
                 externalProgram["outdir"] + flprfx + "-center1-set1" + externalProgram["outExt"])
             for inpFil in inputFileSet:
-                outfl = externalProgram["outdir"] + \
-                        inpFil["flprfx"] # + externalProgram["outExt"]  (TODO: probable fix, need to check other flows)
+                if (inpFil["jobType"] != "sigma"):
+                   outfl = externalProgram["outdir"] + \
+                           inpFil["flprfx"] # + externalProgram["outExt"]  (TODO: probable fix, need to check other flows)
 
-                nat = inpFil["nat"]
+                   nat = inpFil["nat"]
 
-                grepPiCMO(nat, piMOs, nocc, inpFil["nBq"], BQ_Range,
-                          BQ_Step, outfl, externalProgram["outExt"])
+                   grepPiCMO(nat, piMOs, nocc, inpFil["nBq"], BQ_Range,
+                             BQ_Step, outfl, externalProgram["outExt"])
 
         if (xy_flag):
             outfl = open(outfilename, "a")
@@ -1624,6 +1627,8 @@ def runJobs():
 
     numpy_flag = checkNumPy()
     if not inponly_flag:
+        org_flprfx = flprfx
+        org_CenterOf = CenterOf
         if (integralnics_flag or analyse_flag):
             if (sigma_flag and numpy_flag and not xy_flag):
                 outfl = open(outfilename, "a")
