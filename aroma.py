@@ -1265,7 +1265,6 @@ def grepData():
     # global inputFileSet
     global inputFileSet
 
-    dist = 0.0
 
     jobList = list(set(list(map(lambda x: x["jobType"], inputFileSet))))
 
@@ -1274,6 +1273,7 @@ def grepData():
       centerList = list(set(list(map(lambda x: x["centerIdx"], list(filter(lambda x: x["jobType"] == jobType, inputFileSet))))))
       centerList.sort()
 
+      dist = 0.0
       idx = 0
 
       # iterate over each center for the job type
@@ -1346,9 +1346,6 @@ def grepData():
         writeCollatedFiles("main")
         writeCollatedFiles("sigma")
 
-    if (xy_flag):
-        shutil.move(externalProgram["outdir"] + flprfx + "-center1" + ".armdat",
-                    externalProgram["outdir"] + flprfx + "-allcenter" + ".armdat")
 
 def writeCollatedFiles(jobType, fileExt="armdat"):
     global inputFileSet, collatedFileSet
@@ -1653,11 +1650,6 @@ def runJobs():
     # execute all jobs
     Execute()
 
-    # Read For: For XY-Scan with Sigma-Model, just keep the final output as .armlog with r, ZZ and del-ZZ
-    if (xy_flag and sigma_flag):
-       xarmlogfile = externalProgram["outdir"] + flprfx + "-alldiff.armlog"
-       armdatlines = readFile(externalProgram["outdir"] + flprfx + "-allcenter" + ".armdat")
-
     # clean up
     if (clear_flag):
         print("\nClearing up unnecessary files .. \n")
@@ -1680,17 +1672,18 @@ def runJobs():
 
         # For XY-Scan with Sigma-Model, just keep the final output as .armlog with r, ZZ and del-ZZ
         if (xy_flag and sigma_flag):
+            xarmlogfile = externalProgram["outdir"] + org_flprfx + "-alldiff.armlog"
             armlog = open(xarmlogfile, "w")
             armlog.write("r       ZZ       Sigma-ZZ        Del-ZZ\n")
-            if (xy_flag, sigma_flag):
-                sarmdatlines = readFile(
-                    externalProgram["outdir"] + flprfx + "-allcenter" + ".armdat")
-                lineno = min(len(armdatlines), len(sarmdatlines))
-                for i in range(1, lineno):
-                    awords = list(map(float, armdatlines[i].split()))
-                    sawords = list(map(float, sarmdatlines[i].split()))
-                    armlog.write(fpformat.fix(awords[0], 2) + "   " + fpformat.fix(awords[8], 4) + "   " + fpformat.fix(
-                        sawords[8], 4) + "   " + fpformat.fix(awords[8]-sawords[8], 4) + "\n")
+#            if (xy_flag, sigma_flag):
+            armdatlines = readFile((externalProgram["outdir"] + org_flprfx + "-center1.armdat"))
+            sarmdatlines = readFile((externalProgram["outdir"] + flprfx + "-center1.armdat"))
+            lineno = min(len(armdatlines), len(sarmdatlines))
+            for i in range(1, lineno):
+                awords = list(map(float, armdatlines[i].split()))
+                sawords = list(map(float, sarmdatlines[i].split()))
+                armlog.write(fpformat.fix(awords[0], 2) + "   " + fpformat.fix(awords[8], 4) + "   " + fpformat.fix(
+                             sawords[8], 4) + "   " + fpformat.fix(awords[8]-sawords[8], 4) + "\n")
             armlog.close()
 
 

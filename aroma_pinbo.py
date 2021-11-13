@@ -141,7 +141,6 @@ def grepPiCMO(nat, piMOs, nocc, nghost, BQ_Range, BQ_Step, outfl, outExt, distId
       prvs = j+5+k  
       f.write(data_string + "  " + repr(-round(sumval,2)) + "\n")
 
-   f.write("\n")
    f.close()
 
 
