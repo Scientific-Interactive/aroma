@@ -1270,14 +1270,14 @@ def grepData():
 
     # iterate over all job types
     for jobType in jobList:
-      centerList = list(set(list(map(lambda x: x["centerIdx"], list(filter(lambda x: x["centerIdx"] == centerIdx, inputFileSet))))))
+      centerList = list(set(list(map(lambda x: x["centerIdx"], list(filter(lambda x: x["jobType"] == jobType, inputFileSet))))))
       centerList.sort()
 
       idx = 0
 
       # iterate over each center for the job type
       for centerIdx in centerList:
-         theSetList = list(set(list(filter(lambda x: x["centerIdx"] == centerIdx and x["jobType"] == jobType, inputFileSet))))
+         theSetList = list(filter(lambda x: x["centerIdx"] == centerIdx and x["jobType"] == jobType, inputFileSet))
 
          # this needs to be inited outside the input set loop to avoid re-initialisation
          if (not xy_flag):
