@@ -41,7 +41,7 @@ import aroma_util
 
 def init():
     # global flags
-    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag
+    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag, picmo_flag
     # global molecule-related
     global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals, exocyclic
     # global technical
@@ -89,6 +89,7 @@ def init():
     analyse_dist = DEFAULT_DISTANCE_FOR_ANALYSIS
     xy_extend = 0.0
     clear_flag = 0
+    picmo_flag = 0
 
     inputFileSet = []
     collatedFileSet = []
