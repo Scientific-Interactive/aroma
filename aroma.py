@@ -1438,7 +1438,6 @@ def Execute():
     global nAtoms
 
 
-    print("HERE4",ncs_flag)
     if not inponly_flag:
         if (not outonly_flag): 
             run_Nics()
@@ -1474,16 +1473,10 @@ def Execute():
 
                   nat = inpFil["nat"]
 
-                  if xy_flag:
-                     dist += xy_BQ_dist[idx]
 
-                  grepPiCMO(nat, piMOs, nocc, inpFil["nBq"], BQ_Range,
+                  dist = grepPiCMO(nat, piMOs, nocc, inpFil["nBq"], BQ_Range,
                              BQ_Step, outfl, externalProgram["outExt"], dist)
 
-                  if (not xy_flag):
-                     dist += BQ_Step
-                  else:
-                     idx += 1
 
             # write collated files for picmo
             writeCollatedFiles("main", "picmo")
@@ -1688,7 +1681,7 @@ def runJobs():
             armlog.write("r       ZZ       Sigma-ZZ        Del-ZZ\n")
 #            if (xy_flag, sigma_flag):
             armdatlines = readFile((externalProgram["outdir"] + org_flprfx + "-center1.armdat"))
-            sarmdatlines = readFile((externalProgram["outdir"] + flprfx + "-center1.armdat"))
+            sarmdatlines = readFile((externalProgram["outdir"] + flprfx + "-sigma-center1.armdat"))
             lineno = min(len(armdatlines), len(sarmdatlines))
             for i in range(1, lineno):
                 awords = list(map(float, armdatlines[i].split()))
