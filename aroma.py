@@ -493,7 +493,7 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult, jobType):
         for cnt in range(0, len(BQs_strings)):
             if (BQs_strings[cnt].strip() == ""):
                 continue
-            writeNicsInputs(flprfx, "1-set" + repr(cnt), flag_chk, hashLine_rev,
+            writeNicsInputs(flprfx, "1-set" + repr(cnt+1), flag_chk, hashLine_rev,
                             title, charge, mult, new_geom, BQs_strings[cnt], jobType)
 
 
@@ -1264,69 +1264,81 @@ def grepData():
     # global inputFileSet
     global inputFileSet
 
-    # this needs to be inited outside the input set loop to avoid re-initialisation
-    if (not xy_flag):
-       dist = BQ_Range[0]
+    dist = 0.0
 
-    idx = 0
+    jobList = list(set(list(map(lambda x: x["jobType"], inputFileSet))))
 
-    # This loop is over each output file to filter the required tensor data
-    for inpFil in inputFileSet:
-        outfl = externalProgram["outdir"] + \
-            inpFil["flprfx"] + externalProgram["outExt"]
+    # iterate over all job types
+    for jobType in jobList:
+      centerList = list(set(list(map(lambda x: x["centerIdx"], list(filter(lambda x: x["centerIdx"] == centerIdx, inputFileSet))))))
+      centerList.sort()
 
-        nat = inpFil["nat"]
-        nBQ = inpFil["nBq"]
+      idx = 0
 
-        theParser = externalProgram["readerFunctCall"]["output"](outfl)
-        bqTensors = theParser.getMagneticTensorData(nat, nBQ, outfl)
+      # iterate over each center for the job type
+      for centerIdx in centerList:
+         theSetList = list(set(list(filter(lambda x: x["centerIdx"] == centerIdx and x["jobType"] == jobType, inputFileSet))))
 
-        f_out = open(externalProgram["outdir"] +
-                     inpFil["flprfx"] + ".armdat", "w")
-        f_out.write(
-            "#       oop       in1        in2       inp       iso        x         y         z\n")
+         # this needs to be inited outside the input set loop to avoid re-initialisation
+         if (not xy_flag):
+            dist = BQ_Range[0]
 
-        # i + 5*nat + 1, i + 5*nat + BQ_No*nat + 1 are start and end line numbers in the output file for the data for BQs
+         # iterate over each set of the center
+         for inpFil in theSetList:
+            outfl = externalProgram["outdir"] + inpFil["flprfx"] + externalProgram["outExt"]
 
-        for j in range(0, len(bqTensors)):  # TODO: check correctness, nBQ is replaced with len(bqTensors)
+            # for each output file to filter the required tensor data
 
-            BQ_data_string = ""
-            if xy_flag:
-                dist += xy_BQ_dist[idx]
+            nat = inpFil["nat"]
+            nBQ = inpFil["nBq"]
 
-            # This is commented as BQ no is not important, instead distance of that BQ from GM is added (further)
-            # BQ_data_string += words[0] + "   "
+            theParser = externalProgram["readerFunctCall"]["output"](outfl)
+            bqTensors = theParser.getMagneticTensorData(nat, nBQ, outfl)
+
+            f_out = open(externalProgram["outdir"] + inpFil["flprfx"] + ".armdat", "w")
+            f_out.write("#       oop       in1        in2       inp       iso        x         y         z\n")
+
+            # i + 5*nat + 1, i + 5*nat + BQ_No*nat + 1 are start and end line numbers in the output file for the data for BQs
+
+            for j in range(0, len(bqTensors)):  # TODO: check correctness, nBQ is replaced with len(bqTensors)
+
+                BQ_data_string = ""
+                if xy_flag:
+                   dist += xy_BQ_dist[idx]
+
+                # This is commented as BQ no is not important, instead distance of that BQ from GM is added (further)
+                # BQ_data_string += words[0] + "   "
 
 
-            iso, xx, yy, zz, e1, e2, e3 = bqTensors[j]
-            sorted_e = []
-            sorted_e.append(e1)
-            close = abs(e1 + zz)
-            if (abs(e2 + zz) <= close):
-                close = abs(e2 + zz)
-                sorted_e.insert(0, e2)
-            elif (abs(e2 + zz) > close):
-                sorted_e.append(e2)
-            if (abs(e3 + zz) <= close):
-                sorted_e.insert(0, e3)
-            elif (abs(e3 + zz) > close):
-                sorted_e.append(e3)
-            oup = -sorted_e[0]
-            inp1 = -sorted_e[1]
-            inp2 = -sorted_e[2]
-            # In-plane chemical shift is average of the two in-plane shifts
-            inp = 0.5*(inp1+inp2)
+                iso, xx, yy, zz, e1, e2, e3 = bqTensors[j]
+                sorted_e = []
+                sorted_e.append(e1)
+                close = abs(e1 + zz)
+                if (abs(e2 + zz) <= close):
+                   close = abs(e2 + zz)
+                   sorted_e.insert(0, e2)
+                elif (abs(e2 + zz) > close):
+                   sorted_e.append(e2)
+                if (abs(e3 + zz) <= close):
+                   sorted_e.insert(0, e3)
+                elif (abs(e3 + zz) > close):
+                   sorted_e.append(e3)
+                oup = -sorted_e[0]
+                inp1 = -sorted_e[1]
+                inp2 = -sorted_e[2]
+                # In-plane chemical shift is average of the two in-plane shifts
+                inp = 0.5*(inp1+inp2)
 
-            BQ_data_string += fpformat.fix(dist, 2) + "   " + fpformat.fix(oup, 4) + "   " + fpformat.fix(inp1, 4) + "   " + fpformat.fix(inp2, 4) + "   " + fpformat.fix(
-                inp, 4) + "   " + fpformat.fix(iso, 4) + "   " + fpformat.fix(xx, 4) + "   " + fpformat.fix(yy, 4) + "   " + fpformat.fix(zz, 4) + "\n"
-            f_out.write(BQ_data_string)
+                BQ_data_string += fpformat.fix(dist, 2) + "   " + fpformat.fix(oup, 4) + "   " + fpformat.fix(inp1, 4) + "   " + fpformat.fix(inp2, 4) + "   " + fpformat.fix(
+                    inp, 4) + "   " + fpformat.fix(iso, 4) + "   " + fpformat.fix(xx, 4) + "   " + fpformat.fix(yy, 4) + "   " + fpformat.fix(zz, 4) + "\n"
+                f_out.write(BQ_data_string)
 
-            if (not xy_flag):
-                dist += BQ_Step
-            else:
-                idx += 1
+                if (not xy_flag):
+                    dist += BQ_Step
+                else:
+                    idx += 1
 
-        f_out.close()
+            f_out.close()
 
     # write collated set of files
     if ((len(inputFileSet) > 1)):
@@ -1441,7 +1453,7 @@ def Execute():
         if (picmo_flag):
             # pi-MOs are same in all the output files, so just identify them from the first file.
             piMOs, nocc = identifyPiMOs(
-                externalProgram["outdir"] + flprfx + "-center1-set1" + externalProgram["outExt"])
+                externalProgram["outdir"] + inputFileSet[0]["flprfx"] + externalProgram["outExt"])
             for inpFil in inputFileSet:
                 if (inpFil["jobType"] != "sigma"):
                    outfl = externalProgram["outdir"] + \
@@ -1535,6 +1547,9 @@ def runJobs():
         charge = ""
         mult = ""
         Conn = []  # if asked for optimization, Execute() below will optimize and read the geom
+
+    org_flprfx = flprfx
+    org_CenterOf = CenterOf
 
     if (not outonly_flag):
 
@@ -1630,8 +1645,6 @@ def runJobs():
 
     numpy_flag = checkNumPy()
     if not inponly_flag:
-        org_flprfx = flprfx
-        org_CenterOf = CenterOf
         if (integralnics_flag or analyse_flag):
             if (sigma_flag and numpy_flag and not xy_flag):
                 outfl = open(outfilename, "a")
