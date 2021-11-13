@@ -97,7 +97,7 @@ def init():
 def check(armfile):
 
     # global flags
-    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag
+    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag, picmo_flag
     # global molecule-related
     global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
     # global technical
@@ -118,6 +118,7 @@ def check(armfile):
                 opt_flag = 1
             if (runseq.count("NCS") > 0):
                 ncs_flag = 1
+                picmo_flag = 1
             if (runseq.count("SIGMA") > 0):
                 sigma_flag = 1
             if (runseq.count("XY") > 0):
@@ -1418,7 +1419,7 @@ def generateAllInputs(geom, title, charge, mult, Conn, jobType):
 def Execute():
 
     # global flags
-    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag
+    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag, picmo_flag
     # global molecule-related
     global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
     # global technical
@@ -1437,7 +1438,7 @@ def Execute():
 
         grepData()
 
-        if (ncs_flag):
+        if (picmo_flag):
             # pi-MOs are same in all the output files, so just identify them from the first file.
             piMOs, nocc = identifyPiMOs(
                 externalProgram["outdir"] + flprfx + "-center1-set1" + externalProgram["outExt"])
@@ -1540,6 +1541,8 @@ def runJobs():
         # generate inputs for primary run
         generateAllInputs(geom, title, charge, mult, Conn, "main")
 
+        jsonInputSetFile = externalProgram["outdir"] + flprfx + "-inputFileSet.json"
+
         if (sigma_flag):
             if (opt_flag or opt_external):
                 theParser = externalProgram["readerFunctCall"]["output"](
@@ -1598,7 +1601,7 @@ def runJobs():
             generateAllInputs(sigma_geom, title, scharge, smult, Conn, "sigma")
 
         # all inputs are generated at this point, dump the json
-        inpf = open(externalProgram["outdir"] + flprfx + "-inputFileSet.json", "w")  # this file name needs to change, based on input
+        inpf = open(jsonInputSetFile, "w")  # this file name needs to change, based on input
         inpf.write(json.dumps(inputFileSet))
         inpf.close()
     else:
