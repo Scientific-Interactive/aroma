@@ -100,7 +100,7 @@ def identifyPiMOs(outfl):
    return piMOs, nocc
 
 
-def grepPiCMO(nat, piMOs, nocc, nghost, BQ_Range, BQ_Step, outfl, outExt):
+def grepPiCMO(nat, piMOs, nocc, nghost, BQ_Range, BQ_Step, outfl, outExt, distIdx):
 
 #  Now plane is always 'XY'
    Plane = 'XY'
@@ -112,7 +112,7 @@ def grepPiCMO(nat, piMOs, nocc, nghost, BQ_Range, BQ_Step, outfl, outExt):
    f = open(outfl + ".picmo", "w")
    
    f.write(lable_string + "   " + "-Sum \n")
-   dist = BQ_Range[0]
+   dist = distIdx # BQ_Range[0]
    for i in range (nat+1, nat+nghost+1):
       for j in range (0, len(olines)):
          if ((olines[j].find("Full Cartesian NMR shielding tensor (ppm) for atom gh(" + repr(i).rjust(2) + ")") >= 0) and (olines[j+1].find("Canonical MO contributions") >= 0)): 

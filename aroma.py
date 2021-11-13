@@ -1350,7 +1350,7 @@ def grepData():
         shutil.move(externalProgram["outdir"] + flprfx + "-center1" + ".armdat",
                     externalProgram["outdir"] + flprfx + "-allcenter" + ".armdat")
 
-def writeCollatedFiles(jobType):
+def writeCollatedFiles(jobType, fileExt="armdat"):
     global inputFileSet, collatedFileSet
 
     # get all files in the "main" run
@@ -1365,18 +1365,17 @@ def writeCollatedFiles(jobType):
 
       baseprfx = centerFileSet[0]["baseprfx"] + "-center" + centerIdx
 
-      final_armdat = open(externalProgram["outdir"] + baseprfx + ".armdat", "w")
+      final_file = open(externalProgram["outdir"] + baseprfx + "." + fileExt, "w")
 
-      collatedFileSet.append({"fileName": final_armdat, "flprfx": baseprfx, "jobType": jobType})
+      collatedFileSet.append({"fileName": final_file, "flprfx": baseprfx, "jobType": jobType})
 
       for inpFil in centerFileSet:
-        lines = readFile(externalProgram["outdir"] + inpFil["flprfx"] + ".armdat")
+        lines = readFile(externalProgram["outdir"] + inpFil["flprfx"] + "." + fileExt)
         for i in range(idx, len(lines)):
-            final_armdat.write(lines[i])
+            final_file.write(lines[i])
         idx = 1
 
-      final_armdat.close()
-
+      final_file.close()
 
 def generateAllInputs(geom, title, charge, mult, Conn, jobType):
     # global flags
@@ -1455,15 +1454,41 @@ def Execute():
             # pi-MOs are same in all the output files, so just identify them from the first file.
             piMOs, nocc = identifyPiMOs(
                 externalProgram["outdir"] + inputFileSet[0]["flprfx"] + externalProgram["outExt"])
-            for inpFil in inputFileSet:
-                if (inpFil["jobType"] != "sigma"):
-                   outfl = externalProgram["outdir"] + \
-                           inpFil["flprfx"] # + externalProgram["outExt"]  (TODO: probable fix, need to check other flows)
 
-                   nat = inpFil["nat"]
+            # iterate over all job types, which are not sigma
+            centerList = list(set(list(map(lambda x: x["centerIdx"], list(filter(lambda x: x["jobType"] != "sigma", inputFileSet))))))
+            centerList.sort()
 
-                   grepPiCMO(nat, piMOs, nocc, inpFil["nBq"], BQ_Range,
-                             BQ_Step, outfl, externalProgram["outExt"])
+            idx = 0
+            dist = 0.0
+
+            # iterate over each center for the job type
+            for centerIdx in centerList:
+               theSetList = list(filter(lambda x: x["centerIdx"] == centerIdx and x["jobType"] != "sigma", inputFileSet))
+
+               # this needs to be inited outside the input set loop to avoid re-initialisation
+               if (not xy_flag):
+                  dist = BQ_Range[0]
+
+               # iterate over each set of the center
+               for inpFil in theSetList:
+                  outfl = externalProgram["outdir"] + inpFil["flprfx"]
+
+                  nat = inpFil["nat"]
+
+                  if xy_flag:
+                     dist += xy_BQ_dist[idx]
+
+                  grepPiCMO(nat, piMOs, nocc, inpFil["nBq"], BQ_Range,
+                             BQ_Step, outfl, externalProgram["outExt"], dist)
+
+                  if (not xy_flag):
+                     dist += BQ_Step
+                  else:
+                     idx += 1
+
+            # write collated files for picmo
+            writeCollatedFiles("main", "picmo")
 
         if (xy_flag):
             outfl = open(outfilename, "a")
