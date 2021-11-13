@@ -353,6 +353,7 @@ def run_Optimization(optfl):
 def writeNicsInputs(flprfx, centerIdx, flag_chk, hashLine_rev, title, charge, mult, geom, BQs_strings, jobType):
     global externalProgram
     global inputFileSet
+    global xy_BQ_dist 
 
     externalProgram["cleanupCmd"](flprfx)
 
@@ -1580,6 +1581,7 @@ def runJobs():
         generateAllInputs(geom, title, charge, mult, Conn, "main")
 
         jsonInputSetFile = externalProgram["outdir"] + flprfx + "-inputFileSet.json"
+        jsonXYDistFile   = externalProgram["outdir"] + flprfx + "-xyBQDist.json"
 
         if (sigma_flag):
             if (opt_flag or opt_external):
@@ -1642,9 +1644,18 @@ def runJobs():
         inpf = open(jsonInputSetFile, "w")  # this file name needs to change, based on input
         inpf.write(json.dumps(inputFileSet))
         inpf.close()
+
+        # also write XY dist file
+        inpf = open(jsonXYDistFile, "w")
+        inpf.write(json.dumps(xy_BQ_dist))
+        inpf.close()
     else:
         outf = open(externalProgram["outdir"] + flprfx + "-inputFileSet.json", "r") # this file name needs to change, based on input
         inputFileSet = json.loads(outf.read())
+        outf.close()
+
+        outf = open(externalProgram["outdir"] + flprfx + "-xyBQDist.json", "r")
+        xy_BQ_dist = json.loads(outf.read())
         outf.close()
 
     # execute all jobs
