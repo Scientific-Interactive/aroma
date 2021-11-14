@@ -178,8 +178,6 @@ class OutputFileParser(FileParser):
 
            bqTensors.append([iso, xx, yy, zz, e1, e2, e3])
 
-      print("nat", nat, "nbq", nBQ, len(bqTensors))
-      
       return bqTensors 
 
 class ChkFileParser(FileParser):
