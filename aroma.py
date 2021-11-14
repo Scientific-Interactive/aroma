@@ -1683,7 +1683,7 @@ def runJobs():
             armlog.write("r       ZZ       Sigma-ZZ        Del-ZZ\n")
 #            if (xy_flag, sigma_flag):
             armdatlines = readFile((externalProgram["outdir"] + org_flprfx + "-center1.armdat"))
-            sarmdatlines = readFile((externalProgram["outdir"] + flprfx + "-sigma-center1.armdat"))
+            sarmdatlines = readFile((externalProgram["outdir"] + org_flprfx + "-sigma-center1.armdat"))
             lineno = min(len(armdatlines), len(sarmdatlines))
             for i in range(1, lineno):
                 awords = list(map(float, armdatlines[i].split()))
