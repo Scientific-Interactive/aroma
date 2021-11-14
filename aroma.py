@@ -903,7 +903,7 @@ def run_Nics():
     if (pointonly_flag):
         rcount = int((len(points)/MAX_BQS_IN_INPFL))+1
         for inpfl in inputFileSet:
-            flname = inpfl["filename"]
+            flname = inpfl["flprfx"]
             print("Job " + externalProgram["extCmd"] +
                   flname + " " + flname + " running ..")
             status = execCmd(externalProgram["constructCmd"](flname))
@@ -1668,7 +1668,7 @@ def runJobs():
     numpy_flag = checkNumPy()
     if not inponly_flag:
         if (integralnics_flag or analyse_flag):
-            if (sigma_flag and numpy_flag and not xy_flag):
+            if (sigma_flag and numpy_flag and not xy_flag and not pointonly_flag):
                 outfl = open(outfilename, "a")
                 callAnalyse(org_flprfx, org_CenterOf,
                             all_aromatic_rings, analyse_dist, outfl)
