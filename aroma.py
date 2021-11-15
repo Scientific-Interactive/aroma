@@ -325,6 +325,8 @@ def check(armfile):
                 s_mult_flag = 1
                 sigma_mult = int(armlines[i].split("=")[1])
 
+        if (integralnics_flag): BQ_Range = DEFAULT_INTEGRALNICS_RANGE
+
 
 def generate_Opt_Input(geom, hashLine, title, charge, mult):
     global flprfx, externalProgram
@@ -513,7 +515,7 @@ def addBreakPoints(BQs_string):
     for bq in bqs:
         newBQs_string += bq + "\n"
         atmCount += 1
-        if (atmCount % MAX_BQS_IN_INPFL == 0):
+        if (atmCount % externalProgram["maxAtomsInInputFile"] == 0):
             newBQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomSetBreak(
             ) + "\n"
             atmCount = nAtoms
@@ -901,7 +903,7 @@ def run_Nics():
                       flname + "] did not terminated normally.\n")
 
     if (pointonly_flag):
-        rcount = int((len(points)/MAX_BQS_IN_INPFL))+1
+        rcount = int((len(points)/externalProgram["maxAtomsInInputFile"]))+1
         for inpfl in inputFileSet:
             flname = inpfl["flprfx"]
             print("Job " + externalProgram["extCmd"] +

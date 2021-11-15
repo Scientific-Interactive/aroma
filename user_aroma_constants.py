@@ -42,10 +42,13 @@ GaussianSettings = {
   "inpExt": ".in",
   "outExt": ".out",
 
-  "extCmd": "/root/g09/g09 ",
+  "extCmd": "/user/local/g09/g09 ",
   "chkCmd": "/usr/local/g09/formchk ",
 
   "extensions": { 'input': ['com','gjf','inp','in'], 'output': ['log', 'out'], 'checkpoint': ['chk'] }, # list of possibile extensions for Gaussian Files
+
+  # maximum number of atoms and ghost atoms/Bqs that your system can handle
+  "maxAtomsInInputFile": 50,
 
   # Aroma defaults for Gaussian run
   "defaultOptimizationKeyline": "%nproc=1\n%mem=1024MB\n# HF/STO-3G OPT \n",
@@ -72,6 +75,9 @@ OrcaSettings = {
 
   "extensions": { 'input': ['inp','in'], 'output': ['log', 'out'], 'checkpoint': ['chk'] }, # list of possibile extensions for ORCA Files
 
+  # maximum number of atoms and ghost atoms/Bqs that your system can handle
+  "maxAtomsInInputFile": 500,
+
   # Aroma defaults for ORCA run
   "defaultOptimizationKeyline": "! B3LYP/G sto-3g nmr Grid6 rijk def2/jk \n%pal nprocs 1 end \n%maxcore 3000",
   "defaultNicsKeyline": "! B3LYP/G sto-3g nmr Grid6 rijk def2/jk \n%pal nprocs 1 end \n%maxcore 3000",
@@ -91,12 +97,12 @@ externalProgram = GaussianSettings
 # Defaults for NICS
 DEFAULT_BQ_STEP = 0.1 # in angstrom
 DEFAULT_BQ_RANGE = [0, 4]
+DEFAULT_INTEGRALNICS_RANGE = [2,5]
 # Default for distance from molecular plane in case of XY-Scan
 DEFAULT_XY_DISTANCE = 1.7
 # For fitting polynomials, the BQs from distance defined by following parameter onwards are considered
 DEFAULT_DISTANCE_FOR_ANALYSIS = 1.1
 
-MAX_BQS_IN_INPFL = 50
 ###########################################################################################################################################
 
 
