@@ -34,7 +34,15 @@ def processData(lines):
        
    return data_dict 
 
-def analyse(mfile, sfile, dist_start = DEFAULT_DISTANCE_FOR_ANALYSIS, outfl = sys.stdout):
+def processPData(lines):
+   data_dict = []
+   for i in range (1, len(lines)):
+       words = list(map(float, lines[i].split()))
+       data_dict.append(words)
+       
+   return data_dict 
+
+def analyse(mfile, sfile, dist_start = DEFAULT_DISTANCE_FOR_ANALYSIS, outfl = sys.stdout, ncs_flag = 0, pfile):
 
    numpy_flag = checkNumPy()
    if (not numpy_flag): sys.exit(10)
@@ -45,7 +53,13 @@ def analyse(mfile, sfile, dist_start = DEFAULT_DISTANCE_FOR_ANALYSIS, outfl = sy
    slines = readAndCheck(sfile)
 
    m_dict = processData(mlines) 
-   s_dict = processData(slines) 
+   s_dict = processData(slines)
+
+   plines = []
+   p_dict = []
+   if (ncs_flag):
+      plines = readAndCheck(pfile)
+      p_dict = processPData(plines)
 
    for i in range (0, len(m_dict)):
       if (float(m_dict[i][0]) >= float(dist_start)):
@@ -57,13 +71,16 @@ def analyse(mfile, sfile, dist_start = DEFAULT_DISTANCE_FOR_ANALYSIS, outfl = sy
       outfl.write("There are no BQs beyond that for this job. Therefore, Aroma can not perform analysis.\n\n")
       return
 
-   dist = []; del_oup = []; del_inp = []; del_3iso = []; del_zz = []
+   dist = []; del_oup = []; del_inp = []; del_3iso = []; del_zz = [], p_inp = []
    for i in range (dist_start, len(m_dict)):
        dist.append(m_dict[i][0])
        del_oup.append(m_dict[i][1] - s_dict[i][1])
        del_inp.append(m_dict[i][2] - s_dict[i][2])
        del_3iso.append(3*(m_dict[i][3] - s_dict[i][3]))
        del_zz.append(m_dict[i][4] - s_dict[i][4])
+
+       if (ncs_flag):
+           p_inp.append(p_dict[i][len(p_dict[i])-1]  # take the sum column
   
    for i in range (0, len(del_inp)):
        if (del_inp[i] > 5.0):
@@ -74,6 +91,9 @@ def analyse(mfile, sfile, dist_start = DEFAULT_DISTANCE_FOR_ANALYSIS, outfl = sy
    p_3iso = numpy.poly1d(numpy.polyfit(dist, del_3iso, 3))
    p_zz = numpy.poly1d(numpy.polyfit(dist, del_zz, 3))
 
+   if (ncs_flag):
+      p_pinp = numpy.poly1d(numpy.polyfit(dist, p_inp, 3))
+
    nics = (p_oup(1) + p_3iso(1))/2
    err = abs(nics - p_oup(1))
 
@@ -81,6 +101,11 @@ def analyse(mfile, sfile, dist_start = DEFAULT_DISTANCE_FOR_ANALYSIS, outfl = sy
    outfl.write("Polynomials for Doop and 3Diso are :\n")
    outfl.write("\n" + str(p_oup) + "\n" + str(p_3iso) + "\n")
    outfl.write("\nThe mean NICS value is " + repr(round(nics,3)) + " with error " + repr(round(err,3)))
+   
+   if (ncs_flag):
+      outfl.write("Picmo polynomial fits are:\n")
+      outfl.write("\n" + str(p_pinp) + "\n")
+
    outfl.write("\n--------------------------------------------------------------------\n")
 
 def integralnics_analyse(mfile, sfile, dist_start = 2.0, outfl = sys.stdout):

@@ -1502,14 +1502,16 @@ def Execute():
 def callAnalyse(flprfx, CenterOf, all_aromatic_rings, analyse_dist, outfl):
 
     #   conn_mat, Conn = genConnectivityMatrix(geom)
-    global analyse_flag, integralnics_flag
+    global analyse_flag, integralnics_flag, ncs_flag
 
     for ring in CenterOf:
         m_fl = flprfx + "-center" + repr(ring) + ".armdat"
         s_fl = flprfx + "-sigma-center" + repr(ring) + ".armdat"
+        p_fl = flprfx + "-center" + repr(ring) + ".picmo"
+
         outfl.write("\n\nFor Center " + repr(ring))
         if analyse_flag:
-            analyse(m_fl, s_fl, analyse_dist, outfl)
+            analyse(m_fl, s_fl, analyse_dist, outfl, ncs_flag, p_fl)
         elif integralnics_flag:
             integralnics_analyse(m_fl, s_fl, BQ_Range[0], outfl)
 
