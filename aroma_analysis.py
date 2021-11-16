@@ -42,7 +42,7 @@ def processPData(lines):
        
    return data_dict 
 
-def analyse(mfile, sfile, dist_start = DEFAULT_DISTANCE_FOR_ANALYSIS, outfl = sys.stdout, ncs_flag = 0, pfile):
+def analyse(mfile, sfile, dist_start = DEFAULT_DISTANCE_FOR_ANALYSIS, outfl = sys.stdout, ncs_flag = 0, pfile = ""):
 
    numpy_flag = checkNumPy()
    if (not numpy_flag): sys.exit(10)
@@ -71,7 +71,7 @@ def analyse(mfile, sfile, dist_start = DEFAULT_DISTANCE_FOR_ANALYSIS, outfl = sy
       outfl.write("There are no BQs beyond that for this job. Therefore, Aroma can not perform analysis.\n\n")
       return
 
-   dist = []; del_oup = []; del_inp = []; del_3iso = []; del_zz = [], p_inp = []
+   dist = []; del_oup = []; del_inp = []; del_3iso = []; del_zz = []; p_inp = []
    for i in range (dist_start, len(m_dict)):
        dist.append(m_dict[i][0])
        del_oup.append(m_dict[i][1] - s_dict[i][1])
@@ -80,7 +80,7 @@ def analyse(mfile, sfile, dist_start = DEFAULT_DISTANCE_FOR_ANALYSIS, outfl = sy
        del_zz.append(m_dict[i][4] - s_dict[i][4])
 
        if (ncs_flag):
-           p_inp.append(p_dict[i][len(p_dict[i])-1]  # take the sum column
+           p_inp.append(p_dict[i][len(p_dict[i])-1])  # take the sum column
   
    for i in range (0, len(del_inp)):
        if (del_inp[i] > 5.0):
@@ -103,8 +103,9 @@ def analyse(mfile, sfile, dist_start = DEFAULT_DISTANCE_FOR_ANALYSIS, outfl = sy
    outfl.write("\nThe mean NICS value is " + repr(round(nics,3)) + " with error " + repr(round(err,3)))
    
    if (ncs_flag):
-      outfl.write("Picmo polynomial fits are:\n")
+      outfl.write("\n\nPicmo polynomial fits are:\n")
       outfl.write("\n" + str(p_pinp) + "\n")
+      outfl.write("\nThe NICS value using CMO analysis is " + repr(round(p_pinp(1),3)) )
 
    outfl.write("\n--------------------------------------------------------------------\n")
 

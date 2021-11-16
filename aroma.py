@@ -1521,9 +1521,10 @@ def callAnalyse(flprfx, CenterOf, all_aromatic_rings, analyse_dist, outfl):
             n_count += 1
             m_fl = flprfx + "-center" + repr(n_count) + ".armdat"
             s_fl = flprfx + "-sigma-center" + repr(n_count) + ".armdat"
+            p_fl = flprfx + "-center" + repr(ring) + ".picmo"
             outfl.write("\n\nFor Center " + repr(n_count))
             if analyse_flag:
-                analyse(m_fl, s_fl, analyse_dist, outfl)
+                analyse(m_fl, s_fl, analyse_dist, outfl, pfl)
             elif integralnics_flag:
                 integralnics_analyse(m_fl, s_fl, BQ_Range[0], outfl)
 
