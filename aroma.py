@@ -98,7 +98,7 @@ def init():
 def check(armfile):
 
     # global flags
-    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag, picmo_flag
+    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag, forceorder_flag, picmo_flag
     # global molecule-related
     global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
     # global technical
@@ -133,6 +133,8 @@ def check(armfile):
                 inponly_flag = 1
             if (runseq.count("OUTONLY") > 0):
                 outonly_flag = 1
+            if (runseq.count("FORCEORDER") > 0):
+                forceorder_flag = 1
             break
 
     if (opt_flag):
@@ -918,6 +920,7 @@ def run_Nics():
 
 def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
     global sigma_charge, sigma_mult, xy_flag, xy_ref_ring_info, normals, points, exocyclic
+    global forceorder_flag
 
     count = len(geom)+1
     sigma_geom = {}
@@ -994,8 +997,11 @@ def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
     for ring in all_aromatic_rings_local:
         ring_count += 1
         if (ring_count < indicator_for_fused_3):
-            ring_atoms = getOrderedRing(
-                Conn, all_aromatic_rings_local.get(ring))
+            if (not forceorder_flag):
+                ring_atoms = getOrderedRing(
+                    Conn, all_aromatic_rings_local.get(ring))
+            else:
+                ring_atoms = all_aromatic_rings_local.get(ring)
         else:
             ring_atoms = all_aromatic_rings_local.get(ring)
         cmx, cmy, cmz = getGMOfRing(geom, ring_atoms)
@@ -1157,8 +1163,11 @@ def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
 
     for ring in all_aromatic_rings_local:
         if (ring_count < indicator_for_fused_3):
-            ring_atoms = getOrderedRing(
-                Conn, all_aromatic_rings_local.get(ring))
+            if (not forceorder_flag):
+                ring_atoms = getOrderedRing(
+                    Conn, all_aromatic_rings_local.get(ring))
+            else:
+                ring_atoms = all_aromatic_rings_local.get(ring)
         else:
             ring_atoms = all_aromatic_rings_local.get(ring)
 
