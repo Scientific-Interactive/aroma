@@ -41,7 +41,7 @@ import aroma_util
 
 def init():
     # global flags
-    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag, picmo_flag
+    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag, forceorder_flag, picmo_flag
     # global molecule-related
     global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals, exocyclic
     # global technical
@@ -89,6 +89,7 @@ def init():
     analyse_dist = DEFAULT_DISTANCE_FOR_ANALYSIS
     xy_extend = 0.0
     clear_flag = 0
+    forceorder_flag = 0
     picmo_flag = 0
 
     inputFileSet = []
@@ -311,11 +312,11 @@ def check(armfile):
             exocyclic[ec_count] = list(
                 map(int, armlines[j].strip().split(",")))
 
-        for i in range(0, len(armlines)):
-            if (armlines[i].upper().find("DIRECTION") >= 0):
-                words = armlines[i].upper().split()
-                if ((words[2] == 'POSITIVE') or (words[2] == 'NEGATIVE')):
-                    sigma_direction = words[2]
+#        for i in range(0, len(armlines)):
+#            if (armlines[i].upper().find("DIRECTION") >= 0):
+#                words = armlines[i].upper().split()
+#                if ((words[2] == 'POSITIVE') or (words[2] == 'NEGATIVE')):
+#                    sigma_direction = words[2]
 
         for i in range(0, len(armlines)):
             if (armlines[i].upper().find("SONLY CHARGE") >= 0):
@@ -446,9 +447,17 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult, jobType):
             # The Plane is always fixed to be XY and the molecule is oriented in such a way.
             new_geom, new_points, new_normal = reorient(geom, Conn, ring_atoms)
 
+            # Advanced option: If FORCEORDER, then use the user-specified order of ring-atoms to determine the direction of Z-scan as per right hand rule
+            if forceorder_flag:
+                cmxt, cmyt, cmzt = getCMOfRing(new_geom, ring_atoms)
+                normx, normy, normz = getAverageNormaltoTheRing(new_geom, ring_atoms, [cmxt, cmyt, cmzt])
+#                normz = -normz
+                if (normz > 0.0): sigma_direction = 'POSITIVE'
+                else : sigma_direction = 'NEGATIVE'
+
             if (new_geom != []):
                 BQs_string = addBreakPoints(
-                    generateBQs_Z(new_geom, Conn, ring_atoms))
+                    generateBQs_Z(new_geom, Conn, ring_atoms, sigma_direction))
 
                 BQs_strings = list(
                     map(lambda x: x.strip(), BQs_string.split("break")))
@@ -475,7 +484,7 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult, jobType):
             if ((new_geom != []) and (new_normal != [])):
                 ring_atoms = []
                 BQs_string = addBreakPoints(generateBQs_Z(
-                    new_geom, Conn, ring_atoms, new_normal))
+                    new_geom, Conn, ring_atoms, sigma_direction, new_normal))
 
                 BQs_strings = list(
                     map(lambda x: x.strip(), BQs_string.split("break")))
@@ -545,13 +554,17 @@ def generateBQs_Points(points):
 # Now, the plane is always XY plane
 
 
-def generateBQs_Z(geom, Conn, ring_atoms, normal=[]):
+def generateBQs_Z(geom, Conn, ring_atoms, sigma_direction, normal=[]):
     global externalProgram
 
     sigma_model = 0
-    direction_bq = 'POSITIVE'
+#    direction_bq = 'POSITIVE'
     direction = 0
     H_count = 0
+
+    direction_bq = sigma_direction
+#    if (sigma_direction == 'POSITIVE'): direction_bq = 'NEGATIVE'
+#    elif (sigma_direction == 'NEGATIVE'): direction_bq = 'POSITIVE'
 
     for i in range(0, len(ring_atoms)):
         atm_idx = ring_atoms[i]
@@ -997,11 +1010,8 @@ def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
     for ring in all_aromatic_rings_local:
         ring_count += 1
         if (ring_count < indicator_for_fused_3):
-            if (not forceorder_flag):
-                ring_atoms = getOrderedRing(
+            ring_atoms = getOrderedRing(
                     Conn, all_aromatic_rings_local.get(ring))
-            else:
-                ring_atoms = all_aromatic_rings_local.get(ring)
         else:
             ring_atoms = all_aromatic_rings_local.get(ring)
         cmx, cmy, cmz = getGMOfRing(geom, ring_atoms)
@@ -1251,6 +1261,7 @@ def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
 
     sigma_geom = generateCartesianFromZmat(newZmat)
 
+    print("HERE", zmat_idx)
     return sigma_geom, sigma_charge, sigma_mult, zmat_idx
 
 
