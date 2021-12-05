@@ -10,6 +10,13 @@ import sys
 import math
 import glob
 import string
+import scipy 
+
+from scipy.optimize import curve_fit
+import matplotlib.pyplot as plt
+
+import smtplib
+from email.message import EmailMessage
 
 import aroma_constants
 from aroma_constants import *
@@ -193,7 +200,6 @@ def aromaVersion():
 
 # nics integral fit
 def nicsIntegralFit(xdata, ydata):
-  from scipy.optimize import curve_fit
 
   def func(x, a, b, c):
     return a*(b**x)
@@ -201,4 +207,25 @@ def nicsIntegralFit(xdata, ydata):
   popt, pcov = curve_fit(func, xdata, ydata)
 
   return popt
+
+# scatter plot
+def scatterPlot(xdata, ydata, xLabel, yLabel, outputFile):
+  plt.scatter(xdata, ydata) 
+  plt.xlabel(xLabel)
+  plt.ylabel(yLabel)
+  plt.legend()
+  plt.savefig(outputFile)
+
+# send email if SMTP is configured
+def sendEmail(fromEmail, toEmail, subject, content, smtpServer='localhost'):
+   msg = EmailMessage()
+   msg.set_content(content)
+   msg['Subject'] = subject
+   msg['From'] = fromEmail
+   msg['To'] = toEmail
+ 
+   # Send the message via our own SMTP server.
+   s = smtplib.SMTP(smtpServer)
+   s.send_message(msg)
+   s.quit()
 
