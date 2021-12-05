@@ -218,14 +218,16 @@ def scatterPlot(xdata, ydata, xLabel, yLabel, outputFile):
 
 # send email if SMTP is configured
 def sendEmail(fromEmail, toEmail, subject, content, smtpServer='localhost'):
-   msg = EmailMessage()
-   msg.set_content(content)
-   msg['Subject'] = subject
-   msg['From'] = fromEmail
-   msg['To'] = toEmail
+  try:  
+    msg = EmailMessage()
+    msg.set_content(content)
+    msg['Subject'] = subject
+    msg['From'] = fromEmail
+    msg['To'] = toEmail
  
-   # Send the message via our own SMTP server.
-   s = smtplib.SMTP(smtpServer)
-   s.send_message(msg)
-   s.quit()
-
+    # Send the message via our own SMTP server.
+    s = smtplib.SMTP(smtpServer)
+    s.send_message(msg)
+    s.quit()
+  except:
+    print("[sendEmail] - unable to send email") 
