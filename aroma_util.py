@@ -217,13 +217,13 @@ def scatterPlot(xdata, ydata, xLabel, yLabel, outputFile):
   plt.savefig(outputFile)
 
 # send email if SMTP is configured
-def sendEmail(fromEmail, toEmail, subject, content, smtpServer='localhost'):
+def sendEmail(toEmail, subject, content, smtpServer='localhost'):
   try:  
     msg = EmailMessage()
     msg.set_content(content)
     msg['Subject'] = subject
-    msg['From'] = fromEmail
     msg['To'] = toEmail
+    # From assumed to be what ever is set by system
  
     # Send the message via our own SMTP server.
     s = smtplib.SMTP(smtpServer)

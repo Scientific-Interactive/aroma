@@ -38,7 +38,6 @@ import aroma_parser
 from aroma_util import *
 import aroma_util
 
-
 def init():
     # global flags
     global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag, forceorder_flag, picmo_flag
@@ -1400,6 +1399,9 @@ def writeCollatedFiles(jobType, fileExt="armdat"):
 
       final_file.close()
 
+      plotData(externalProgram["outdir"] + baseprfx, fileExt)
+
+
 def generateAllInputs(geom, title, charge, mult, Conn, jobType):
     # global flags
     global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag
@@ -1746,6 +1748,10 @@ def writeOutputHeader():
         outfl.write("\nFor the Original Molecule:\n")
         outfl.close()
 
+def plotData(baseFile, baseFileExt):
+    print("Plotting data for: " + baseFile + "." + baseFileExt)
+
+    # TODO
 
 def aroma(armfile):
     # global flags
@@ -1780,6 +1786,8 @@ def aroma(armfile):
     print("                        ** Aroma Run Over. **")
     print("--------------------------------------------------------------------\n")
 
+    # send email notification
+    sendEmail(emailSettings.to_user, "[AROMA]" + armfile, "Dear User, \n\nAROMA job [" + armfile + "] seems over. \n\n- AROMABOT" , smtpServer=emailSettings.smtp_host) 
 
 if __name__ == "__main__":
     aroma(sys.argv[1])
