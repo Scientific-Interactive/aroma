@@ -64,7 +64,7 @@ def analyse(mfile, sfile, dist_start = DEFAULT_DISTANCE_FOR_ANALYSIS, outfl = sy
    for i in range (0, len(m_dict)):
       if (float(m_dict[i][0]) >= float(dist_start)):
           dist_start = i
-          break;
+          break
 
    if (dist_start == DEFAULT_DISTANCE_FOR_ANALYSIS):
       outfl.write("\n\nWarning: Analysis for sigma-only model is performed for BQs beyond " + repr(DEFAULT_DISTANCE_FOR_ANALYSIS) + " angstrom.\n") 
@@ -85,7 +85,7 @@ def analyse(mfile, sfile, dist_start = DEFAULT_DISTANCE_FOR_ANALYSIS, outfl = sy
    for i in range (0, len(del_inp)):
        if (del_inp[i] > 5.0):
            print("Warning: For some points chosen for fitting the Doop and 3Diso data, the del-inp values exceeds 5.0")
-           break;
+           break
 
    p_oup = numpy.poly1d(numpy.polyfit(dist, del_oup, 3))
    p_3iso = numpy.poly1d(numpy.polyfit(dist, del_3iso, 3))
@@ -125,7 +125,7 @@ def integralnics_analyse(mfile, sfile, dist_start = 2.0, outfl = sys.stdout):
    for i in range (0, len(m_dict)):
       if (float(m_dict[i][0]) >= float(dist_start)):
           dist_start = i
-          break;
+          break
 
    dist = []; del_oup = []; del_inp = []; del_3iso = []; del_zz = []
    for i in range (dist_start, len(m_dict)):
@@ -138,7 +138,7 @@ def integralnics_analyse(mfile, sfile, dist_start = 2.0, outfl = sys.stdout):
    for i in range (0, len(del_inp)):
        if (del_inp[i] > 5.0):
            print("Warning: For some points chosen for fitting the Doop and 3Diso data, the del-inp values exceeds 5.0")
-           break;
+           break
 
    p_3iso = nicsIntegralFit(dist, del_3iso)
    p_zz = nicsIntegralFit(dist, del_zz) 
