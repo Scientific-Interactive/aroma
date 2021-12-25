@@ -1399,9 +1399,6 @@ def writeCollatedFiles(jobType, fileExt="armdat"):
 
       final_file.close()
 
-      plotData(externalProgram["outdir"] + baseprfx, fileExt)
-
-
 def generateAllInputs(geom, title, charge, mult, Conn, jobType):
     # global flags
     global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag
@@ -1748,10 +1745,32 @@ def writeOutputHeader():
         outfl.write("\nFor the Original Molecule:\n")
         outfl.close()
 
-def plotData(baseFile, baseFileExt):
-    print("Plotting data for: " + baseFile + "." + baseFileExt)
+def plotData(flprfx):
+    flToPlot = flprfx + "-center1.armdat"
+    print("Plotting data for: " + flToPlot)
 
-    # TODO
+    fl = open(flToPlot, "r")
+    lines = fl.readlines()
+    fl.close()
+
+    data = map(lambda x: data[x] = [], lines[0].split())
+
+    for lidx in range(1, len(lines[1:])):
+      row = map(lambda x: float(x), lines[lidx].split())
+      """ #       oop       in1        in2       inp       iso        x         y         z """
+      data["#"].append(row[0])
+      data["oop"].append(row[1])
+      data["in1"].append(row[2])
+      data["in2"].append(row[3])
+      data["inp"].append(row[4])
+      data["iso"].append(row[5])
+      data["x"].append(row[6])
+      data["y"].append(row[7])
+      data["z"].append(row[8])
+
+    # TODO: different plots for different run types
+    scatterPlot(data["#"], data["z"], "r", "NICSzz", flprfx + "-plot1.png")
+
 
 def aroma(armfile):
     # global flags
@@ -1786,8 +1805,12 @@ def aroma(armfile):
     print("                        ** Aroma Run Over. **")
     print("--------------------------------------------------------------------\n")
 
-    # send email notification
-    sendEmail(emailSettings.to_user, "[AROMA]" + armfile, "Dear User, \n\nAROMA job [" + armfile + "] seems over. \n\n- AROMABOT" , smtpServer=emailSettings.smtp_host) 
+    if not inponly_flag:
+       # plot the data
+       plotData(flprfx)
+
+       # send email notification
+       sendEmail(emailSettings.to_user, "[AROMA]" + armfile, "Dear User, \n\nAROMA job [" + armfile + "] seems over. \n\n- AROMABOT" , smtpServer=emailSettings.smtp_host) 
 
 if __name__ == "__main__":
     aroma(sys.argv[1])
