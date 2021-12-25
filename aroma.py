@@ -1753,7 +1753,11 @@ def plotData(flprfx):
     lines = fl.readlines()
     fl.close()
 
-    data = map(lambda x: data[x] = [], lines[0].split())
+    def initData(data, x):
+        data[x] = []
+        return 
+
+    map(lambda x: initData(data, x), lines[0].split())
 
     for lidx in range(1, len(lines[1:])):
       row = map(lambda x: float(x), lines[lidx].split())
