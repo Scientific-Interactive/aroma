@@ -207,6 +207,8 @@ def check(armfile):
                 points[(p_count, 0)] = list(
                     map(float, re.split("[:|=]", armlines[i].strip())[1].split(",")))
                 p_count += 1
+               
+ # TODO: Identify the ring in dict of CenterOf, more than 3 atoms and record the ring as reference for direction
 
     for i in range(0, len(armlines)):
         if (armlines[i].upper().find("BQSTEP") >= 0):
@@ -446,14 +448,6 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult, jobType):
             # The Plane is always fixed to be XY and the molecule is oriented in such a way.
             new_geom, new_points, new_normal = reorient(geom, Conn, ring_atoms)
 
-            # Advanced option: If FORCEORDER, then use the user-specified order of ring-atoms to determine the direction of Z-scan as per right hand rule
-            if forceorder_flag:
-                cmxt, cmyt, cmzt = getCMOfRing(new_geom, ring_atoms)
-                normx, normy, normz = getAverageNormaltoTheRing(new_geom, ring_atoms, [cmxt, cmyt, cmzt])
-#                normz = -normz
-                if (normz > 0.0): sigma_direction = 'POSITIVE'
-                else : sigma_direction = 'NEGATIVE'
-
             if (new_geom != []):
                 BQs_string = addBreakPoints(
                     generateBQs_Z(new_geom, Conn, ring_atoms, sigma_direction))
@@ -601,6 +595,8 @@ def generateBQs_Z(geom, Conn, ring_atoms, sigma_direction, normal=[]):
     if (direction > 0):
         direction_bq = 'NEGATIVE'
 
+#TODO: Calculate the CM of the ring, calculate the normal to the global reference ring
+
     if (len(ring_atoms) != 0):
         cmx, cmy, cmz = getGMOfRing(geom, ring_atoms)
     else:
@@ -609,6 +605,7 @@ def generateBQs_Z(geom, Conn, ring_atoms, sigma_direction, normal=[]):
     if (sigma_model):
         print("\nSigma-Only Model detected. \nTherefore, the BQs will be generated on the opposite side of the s-only H-atoms.")
 
+#TODO: If the z coordinate of the ref normal is -tive, then zinc=-zinc
     zinc = BQ_Step
     if (direction_bq == 'NEGATIVE'):
         zinc = -zinc
@@ -1021,9 +1018,6 @@ def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
         # Another dummy atom is added from 1 angstrom distance from the CM of the ring in the user-specified direction perpendicular to the ring
         unit_normal_to_Ring = getUnitVector(
             getAverageNormaltoTheRing(geom, ring_atoms, [cmx, cmy, cmz]))
-        if (forceorder_flag):
-            if (unit_normal_to_Ring[2] > 0.0 and sigma_direction == "NEGATIVE"): unit_normal_to_Ring[2] = -unit_normal_to_Ring[2]
-            elif (unit_normal_to_Ring[2] < 0.0 and sigma_direction == "POSITIVE"): unit_normal_to_Ring[2] = -unit_normal_to_Ring[2]
 
         if (ring_count <= indicator_for_fused_2):
             if (unit_normal_to_Ring == [0.0, 0.0, 0.0]):
@@ -1175,11 +1169,7 @@ def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
 
     for ring in all_aromatic_rings_local:
         if (ring_count < indicator_for_fused_3):
-            if (not forceorder_flag):
-                ring_atoms = getOrderedRing(
-                    Conn, all_aromatic_rings_local.get(ring))
-            else:
-                ring_atoms = all_aromatic_rings_local.get(ring)
+            ring_atoms = all_aromatic_rings_local.get(ring)
         else:
             ring_atoms = all_aromatic_rings_local.get(ring)
 
