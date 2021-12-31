@@ -42,7 +42,7 @@ def init():
     # global flags
     global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag, forceorder_flag, picmo_flag
     # global molecule-related
-    global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals, exocyclic
+    global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals, exocyclic, referenceForDirection
     # global technical
     global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
     # global file set - used for storing all input files generated
@@ -94,13 +94,15 @@ def init():
     inputFileSet = []
     collatedFileSet = []
 
+    referenceForDirection = []
+
 
 def check(armfile):
 
     # global flags
     global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag, forceorder_flag, picmo_flag
     # global molecule-related
-    global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
+    global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals, referenceForDirection
     # global technical
     global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
 
@@ -209,6 +211,9 @@ def check(armfile):
                 p_count += 1
                
  # TODO: Identify the ring in dict of CenterOf, more than 3 atoms and record the ring as reference for direction
+    for p in range(1, len(CenterOf)+1):
+        if (len(CenterOf[p]) > 3): # we simply take the first bunch of more than 3 atoms as reference
+            referenceForDirection = CenterOf[p]
 
     for i in range(0, len(armlines)):
         if (armlines[i].upper().find("BQSTEP") >= 0):
@@ -549,6 +554,7 @@ def generateBQs_Points(points):
 
 def generateBQs_Z(geom, Conn, ring_atoms, sigma_direction, normal=[]):
     global externalProgram
+    global referenceForDirection
 
     sigma_model = 0
 #    direction_bq = 'POSITIVE'
@@ -596,6 +602,8 @@ def generateBQs_Z(geom, Conn, ring_atoms, sigma_direction, normal=[]):
         direction_bq = 'NEGATIVE'
 
 #TODO: Calculate the CM of the ring, calculate the normal to the global reference ring
+    rCM = getCMOfRing(geom, referenceForDirection)
+    norm = getAverageNormaltoTheRing(geom, referenceForDirection, rCM)
 
     if (len(ring_atoms) != 0):
         cmx, cmy, cmz = getGMOfRing(geom, ring_atoms)
@@ -607,7 +615,8 @@ def generateBQs_Z(geom, Conn, ring_atoms, sigma_direction, normal=[]):
 
 #TODO: If the z coordinate of the ref normal is -tive, then zinc=-zinc
     zinc = BQ_Step
-    if (direction_bq == 'NEGATIVE'):
+    # if (direction_bq == 'NEGATIVE'):
+    if (norm[2] < 0):
         zinc = -zinc
 
     coord_format = "{0:.5f}"
