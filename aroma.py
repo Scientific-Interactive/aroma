@@ -210,7 +210,7 @@ def check(armfile):
                     map(float, re.split("[:|=]", armlines[i].strip())[1].split(",")))
                 p_count += 1
                
- # TODO: Identify the ring in dict of CenterOf, more than 3 atoms and record the ring as reference for direction
+ # Identify the ring in dict of CenterOf, more than 3 atoms and record the ring as reference for direction
     for p in range(1, len(CenterOf)+1):
         if (len(CenterOf[p]) > 3): # we simply take the first bunch of more than 3 atoms as reference
             referenceForDirection = CenterOf[p]
@@ -548,75 +548,44 @@ def generateBQs_Points(points):
 
     return BQs_string
 
+def getReferenceVecForDirection(geom)
+    global referenceForDirection
+
+    if (len(referenceForDirection) == 0):
+        return [0, 0, 1]
+
+    rCM = getCMOfRing(geom, referenceForDirection)
+    norm = getAverageNormaltoTheRing(geom, referenceForDirection, rCM)
+
+    return norm
+
 # Here, the geom refers to the re-oriented geometry
 # Now, the plane is always XY plane
-
-
 def generateBQs_Z(geom, Conn, ring_atoms, sigma_direction, normal=[]):
     global externalProgram
     global referenceForDirection
 
-    sigma_model = 0
-#    direction_bq = 'POSITIVE'
-    direction = 0
-    H_count = 0
+# Calculate the CM of the ring, calculate the normal to the global reference ring
+    norm = getReferenceVecForDirection(geom)
 
-    direction_bq = sigma_direction
-#    if (sigma_direction == 'POSITIVE'): direction_bq = 'NEGATIVE'
-#    elif (sigma_direction == 'NEGATIVE'): direction_bq = 'POSITIVE'
+    # if (len(ring_atoms) != 0):
+    #    cmx, cmy, cmz = getGMOfRing(geom, ring_atoms)
+    # else:
+    #    cmx, cmy, cmz = 0.0, 0.0, 0.0
 
-    for i in range(0, len(ring_atoms)):
-        atm_idx = ring_atoms[i]
+    cmx, cmy, cmz = 0.0, 0.0, 0.0
 
-        if (not sigma_model):
-            for j in range(0, len(Conn[atm_idx])):
-                if (geom[Conn[atm_idx][j]][0] != 1):
-                    continue
-                else:
-                    if ((geom[Conn[atm_idx][j]][3]) > 0.5):
-                        H_count += 1
-                        direction += 1
-                    elif ((geom[Conn[atm_idx][j]][3]) < -0.5):
-                        H_count += 1
-                        direction -= 1
+# get normal to the current ring
+    unit_normal_to_Ring = getUnitVector(getAverageNormaltoTheRing(geom, ring_atoms, [cmx, cmy, cmz]))
 
-    # For Normal, the detection of Sigma-only Model is under Trial
-    if ((len(ring_atoms) < 1) and (normal != [])):
-        for i in range(0, len(geom)):
-            atm_idx = i+1
-            if (not sigma_model):
-                for j in range(0, len(Conn[atm_idx])):
-                    if (geom[Conn[atm_idx][j]][0] != 1):
-                        continue
-                    else:
-                        if ((geom[Conn[atm_idx][j]][3]) > 0.5):
-                            H_count += 1
-                            direction += 1
-                        elif ((geom[Conn[atm_idx][j]][3]) < -0.5):
-                            H_count += 1
-                            direction -= 1
+# check its orientation with reference
+    theta = getAngleBetweenVec(unit_normal_to_Ring, norm)
+    if (theta < 90): # if < 90, reverse the vector
+       unit_normal_to_Ring = list(map(lambda x: -x, unit_normal_to_Ring))
 
-    if (H_count > 2):
-        sigma_model = 1
-    if (direction > 0):
-        direction_bq = 'NEGATIVE'
-
-#TODO: Calculate the CM of the ring, calculate the normal to the global reference ring
-    rCM = getCMOfRing(geom, referenceForDirection)
-    norm = getAverageNormaltoTheRing(geom, referenceForDirection, rCM)
-
-    if (len(ring_atoms) != 0):
-        cmx, cmy, cmz = getGMOfRing(geom, ring_atoms)
-    else:
-        cmx, cmy, cmz = 0.0, 0.0, 0.0
-
-    if (sigma_model):
-        print("\nSigma-Only Model detected. \nTherefore, the BQs will be generated on the opposite side of the s-only H-atoms.")
-
-#TODO: If the z coordinate of the ref normal is -tive, then zinc=-zinc
+# If the z coordinate of the ref normal is -tive, then zinc=-zinc
     zinc = BQ_Step
-    # if (direction_bq == 'NEGATIVE'):
-    if (norm[2] < 0):
+    if (unit_normal_to_Ring[2] < 0):
         zinc = -zinc
 
     coord_format = "{0:.5f}"
@@ -1029,9 +998,10 @@ def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
         unit_normal_to_Ring = getUnitVector(
             getAverageNormaltoTheRing(geom, ring_atoms, [cmx, cmy, cmz]))
 
-        # unit_normal_to_Ring . referenceForDirection 
+        # unit_normal_to_Ring . norm(referenceForDirection)
         # theta = cos-1(v1.v2) 
-        theta = getAngleBetweenVec(unit_normal_to_Ring, referenceForDirection)
+        norm = getReferenceVecForDirection(sigma_geom)
+        theta = getAngleBetweenVec(unit_normal_to_Ring, norm)
         if (theta < 90): # if < 90, reverse the vector
             unit_normal_to_Ring = list(map(lambda x: -x, unit_normal_to_Ring))
 
@@ -1270,6 +1240,10 @@ def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
     sigma_geom = generateCartesianFromZmat(newZmat)
 
     print("HERE", zmat_idx)
+
+    # update referenceForDirection
+    referenceForDirection = list(map(lambda x: zmat_idx[x], referenceForDirection))
+
     return sigma_geom, sigma_charge, sigma_mult, zmat_idx
 
 
