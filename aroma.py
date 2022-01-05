@@ -939,6 +939,7 @@ def run_Nics():
 def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
     global sigma_charge, sigma_mult, xy_flag, xy_ref_ring_info, normals, points, exocyclic
     global forceorder_flag, sigma_direction
+    global referenceForDirection
 
     count = len(geom)+1
     sigma_geom = {}
@@ -1027,6 +1028,12 @@ def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
         # Another dummy atom is added from 1 angstrom distance from the CM of the ring in the user-specified direction perpendicular to the ring
         unit_normal_to_Ring = getUnitVector(
             getAverageNormaltoTheRing(geom, ring_atoms, [cmx, cmy, cmz]))
+
+        # unit_normal_to_Ring . referenceForDirection 
+        # theta = cos-1(v1.v2) 
+        theta = getAngleBetweenVec(unit_normal_to_Ring, referenceForDirection)
+        if (theta < 90): # if < 90, reverse the vector
+            unit_normal_to_Ring = list(map(lambda x: -x, unit_normal_to_Ring))
 
         if (ring_count <= indicator_for_fused_2):
             if (unit_normal_to_Ring == [0.0, 0.0, 0.0]):
