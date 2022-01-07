@@ -548,7 +548,7 @@ def generateBQs_Points(points):
 
     return BQs_string
 
-def getReferenceVecForDirection(geom)
+def getReferenceVecForDirection(geom):
     global referenceForDirection
 
     if (len(referenceForDirection) == 0):
@@ -568,24 +568,16 @@ def generateBQs_Z(geom, Conn, ring_atoms, sigma_direction, normal=[]):
 # Calculate the CM of the ring, calculate the normal to the global reference ring
     norm = getReferenceVecForDirection(geom)
 
-    # if (len(ring_atoms) != 0):
-    #    cmx, cmy, cmz = getGMOfRing(geom, ring_atoms)
-    # else:
-    #    cmx, cmy, cmz = 0.0, 0.0, 0.0
-
     cmx, cmy, cmz = 0.0, 0.0, 0.0
+    zinc = BQ_Step
 
 # get normal to the current ring
     unit_normal_to_Ring = getUnitVector(getAverageNormaltoTheRing(geom, ring_atoms, [cmx, cmy, cmz]))
 
+
 # check its orientation with reference
     theta = getAngleBetweenVec(unit_normal_to_Ring, norm)
-    if (theta < 90): # if < 90, reverse the vector
-       unit_normal_to_Ring = list(map(lambda x: -x, unit_normal_to_Ring))
-
-# If the z coordinate of the ref normal is -tive, then zinc=-zinc
-    zinc = BQ_Step
-    if (unit_normal_to_Ring[2] < 0):
+    if (theta > 90): # if > 90, reverse the vector
         zinc = -zinc
 
     coord_format = "{0:.5f}"
@@ -624,6 +616,7 @@ def generateBQs_XY(geom, Conn):
             new_geom, new_points, new_normal = reorient(
                 geom, Conn, ring_atoms, points)
 
+# TODO: delete the sigma-only model detection part
             if (new_geom != []):
                 for i in range(0, len(ring_atoms)):
                     atm_idx = ring_atoms[i]
@@ -645,11 +638,13 @@ def generateBQs_XY(geom, Conn):
                         "\nSigma-Only Model detected. \nTherefore, the BQs will be generated on the opposite side of the s-only H-atoms.")
                 if (direction > 0):
                     direction_bq = 'NEGATIVE'
+# TODO: Until Here ^
 
                 cmx, cmy, cmz = getGMOfRing(new_geom, ring_atoms)
                 ref_ring = ring
                 xy_ref_ring_info.append(ring)
                 xy_ref_ring_info.append(sorted(ring_atoms))
+# TODO: the global reference direction vector should be compared with the following normal
                 normal_to_Ring = getUnitVector(getAverageNormaltoTheRing(
                     new_geom, ring_atoms, [cmx, cmy, cmz]))
                 normal_to_Ring[:] = [
@@ -996,7 +991,7 @@ def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
         count += 1
         # Another dummy atom is added from 1 angstrom distance from the CM of the ring in the user-specified direction perpendicular to the ring
         unit_normal_to_Ring = getUnitVector(
-            getAverageNormaltoTheRing(geom, ring_atoms, [cmx, cmy, cmz]))
+            getAverageNormaltoTheRing(sigma_geom, ring_atoms, [cmx, cmy, cmz]))
 
         # unit_normal_to_Ring . norm(referenceForDirection)
         # theta = cos-1(v1.v2) 
@@ -1238,8 +1233,6 @@ def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
                 words[3]), float(words[4]), int(words[5]), float(words[6])]
 
     sigma_geom = generateCartesianFromZmat(newZmat)
-
-    print("HERE", zmat_idx)
 
     # update referenceForDirection
     referenceForDirection = list(map(lambda x: zmat_idx[x], referenceForDirection))

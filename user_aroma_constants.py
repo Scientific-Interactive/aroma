@@ -90,12 +90,12 @@ OrcaSettings = {
 }
 
 # program to use - edit this with either GaussianSettings or OrcaSettings depending on your backend 
-externalProgram = OrcaSettings
+externalProgram = GaussianSettings
 ###########################################################################################################################################
 
 ###########################################################################################################################################
 # Defaults for NICS
-DEFAULT_BQ_STEP = 0.1 # in angstrom
+DEFAULT_BQ_STEP = 0.5 # in angstrom
 DEFAULT_BQ_RANGE = [0, 4]
 DEFAULT_INTEGRALNICS_RANGE = [2,5]
 # Default for distance from molecular plane in case of XY-Scan

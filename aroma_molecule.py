@@ -425,8 +425,8 @@ def generateZMatrix(geom, Conn):
    zmat = {}
    zmat_str = ""
 
-   orgidx_map_to_zmatidx = {}
    parent = {}
+   leftouts = [] # List of dangling atoms to be added in the end
    for i in range (1, nat+1): parent[i] = ""
 
    # zmat_idx is a map of orginal indices to those in z-matrix
@@ -444,6 +444,9 @@ def generateZMatrix(geom, Conn):
       flag_connections_over = 1
       for i in range (0, len(Conn[a])):
          if (not (Conn[a][i] in zmat)): 
+            if (len(Conn[Conn[a][i]]) < 2): 
+                leftouts.append(Conn[a][i])
+                continue
             flag_connections_over = 0
             b = Conn[a][i]
             idx += 1
@@ -499,7 +502,7 @@ def generateZMatrix(geom, Conn):
 
                distance = getDistance(geom[b][1:4], geom[a][1:4]) 
                angle = getAngleBetweenPoints(geom[b][1:4], geom[a][1:4], geom[c][1:4])
-               dihedral = getDihedralAngleBetween(geom[b][1:4], geom[a][1:4], geom[c][1:4], geom[d][1:4])
+               dihedral = -getDihedralAngleBetween(geom[b][1:4], geom[a][1:4], geom[c][1:4], geom[d][1:4])
 
                zmat_str += repr(geom[b][0]) + "  " + repr(zmat_idx[a]) + "   " + repr(distance) + "   " + repr(zmat_idx[c]) + "   " + repr(angle) + "   " + repr(zmat_idx[d]) + "   " + repr(dihedral) + "\n"
                break;
@@ -522,7 +525,9 @@ def generateZMatrix(geom, Conn):
                break;
 
 
+      a = ""
       if (not flag_connections_over): a = b 
+      elif (len(leftouts) > 0): a = ""
       else : a = parent[a]
 
       if (a == ""):
@@ -536,12 +541,13 @@ def generateZMatrix(geom, Conn):
                zmat[a] = [b, c, d]
                distance = getDistance(geom[b][1:4], geom[a][1:4]) 
                angle = getAngleBetweenPoints(geom[a][1:4], geom[b][1:4], geom[c][1:4])
-               dihedral = getDihedralAngleBetween(geom[a][1:4], geom[b][1:4], geom[c][1:4], geom[d][1:4])
+               dihedral = -getDihedralAngleBetween(geom[a][1:4], geom[b][1:4], geom[c][1:4], geom[d][1:4])
                zmat_str += repr(geom[a][0]) + "  " + repr(zmat_idx[b]) + "   " + repr(distance) + "   " + repr(zmat_idx[c]) + "   " + repr(angle) + "   " + repr(zmat_idx[d]) + "   " + repr(dihedral) + "\n"
                break;
 
       if (len(zmat) == nat): flag = 0
 
+   print(zmat_str)
    return zmat, zmat_str, zmat_idx
 
 #
