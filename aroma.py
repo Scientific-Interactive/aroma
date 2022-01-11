@@ -616,37 +616,23 @@ def generateBQs_XY(geom, Conn):
             new_geom, new_points, new_normal = reorient(
                 geom, Conn, ring_atoms, points)
 
-# TODO: delete the sigma-only model detection part
-            if (new_geom != []):
-                for i in range(0, len(ring_atoms)):
-                    atm_idx = ring_atoms[i]
-
-                    if (not sigma_model):
-                        for j in range(0, len(Conn[atm_idx])):
-                            if (new_geom[Conn[atm_idx][j]][0] != 1):
-                                continue
-                            else:
-                                if ((new_geom[Conn[atm_idx][j]][3]) > 0.5):
-                                    H_count += 1
-                                    direction += 1
-                                elif ((new_geom[Conn[atm_idx][j]][3]) < -0.5):
-                                    H_count += 1
-                                    direction -= 1
-                if (H_count > 2):
-                    sigma_model = 1
-                    print(
-                        "\nSigma-Only Model detected. \nTherefore, the BQs will be generated on the opposite side of the s-only H-atoms.")
-                if (direction > 0):
-                    direction_bq = 'NEGATIVE'
-# TODO: Until Here ^
-
                 cmx, cmy, cmz = getGMOfRing(new_geom, ring_atoms)
                 ref_ring = ring
                 xy_ref_ring_info.append(ring)
                 xy_ref_ring_info.append(sorted(ring_atoms))
-# TODO: the global reference direction vector should be compared with the following normal
-                normal_to_Ring = getUnitVector(getAverageNormaltoTheRing(
-                    new_geom, ring_atoms, [cmx, cmy, cmz]))
+
+# Calculate the CM of the ring, calculate the normal to the global reference ring
+                norm = getReferenceVecForDirection(new_geom)
+
+# the global reference direction vector should be compared with the following normal
+                normal_to_Ring = getUnitVector(getAverageNormaltoTheRing(new_geom, ring_atoms, [cmx, cmy, cmz]))
+
+# check its orientation with reference
+                theta = getAngleBetweenVec(normal_to_Ring, norm)
+                direction_bq = 'POSITIVE'
+                if (theta > 90): # if > 90, reverse the vector
+                   direction_bq = 'NEGATIVE'
+
                 normal_to_Ring[:] = [
                     vc*DEFAULT_XY_DISTANCE for vc in normal_to_Ring]
                 if (normal_to_Ring == [0.0, 0.0, 0.0]):
