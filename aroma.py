@@ -135,8 +135,8 @@ def check(armfile):
                 inponly_flag = 1
             if (runseq.count("OUTONLY") > 0):
                 outonly_flag = 1
-            if (runseq.count("FORCEORDER") > 0):
-                forceorder_flag = 1
+#            if (runseq.count("FORCEORDER") > 0):
+#                forceorder_flag = 1
             break
 
     if (opt_flag):
@@ -146,7 +146,7 @@ def check(armfile):
                 optfl_external = armlines[i].strip().split("=")[1]
                 break
 
-    # Check for input file for Geomtry
+    # Check for input file for Geometry
     if (not opt_external):
         for i in range(0, len(armlines)):
             if (armlines[i].upper().find("GEOMFILE") >= 0):
@@ -209,11 +209,20 @@ def check(armfile):
                 points[(p_count, 0)] = list(
                     map(float, re.split("[:|=]", armlines[i].strip())[1].split(",")))
                 p_count += 1
-               
- # Identify the ring in dict of CenterOf, more than 3 atoms and record the ring as reference for direction
+
+# Identify the ring in dict of CenterOf, more than 3 atoms and record the ring as reference for direction
     for p in range(1, len(CenterOf)+1):
         if (len(CenterOf[p]) > 3): # we simply take the first bunch of more than 3 atoms as reference
             referenceForDirection = CenterOf[p]
+            break
+
+    for i in range(0, len(armlines)):
+        if (armlines[i].upper().find("FORCEDIR") >= 0):
+            forceorder_flag = 1
+            referenceForDirection = list(
+                map(int, re.split("[:|=]", armlines[i].strip())[1].split(",")))
+            break
+               
 
     for i in range(0, len(armlines)):
         if (armlines[i].upper().find("BQSTEP") >= 0):
@@ -450,7 +459,7 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult, jobType):
         for ring in CenterOf:
             ring_atoms = CenterOf.get(ring)
 
-            # The Plane is always fixed to be XY and the molecule is oriented in such a way.
+#            # The Plane is always fixed to be XY and the molecule is oriented in such a way.
             new_geom, new_points, new_normal = reorient(geom, Conn, ring_atoms)
 
             if (new_geom != []):
@@ -548,14 +557,20 @@ def generateBQs_Points(points):
 
     return BQs_string
 
-def getReferenceVecForDirection(geom):
-    global referenceForDirection
+def getReferenceVecForDirection(geom, Conn):
+    global referenceForDirection, forceorder_flag
+
+    if not forceorder_flag:
+       ring_atoms_ordered = getOrderedRing(Conn, referenceForDirection)
+    else:
+       ring_atoms_ordered = referenceForDirection
+       print("ORDER", ring_atoms_ordered)
 
     if (len(referenceForDirection) == 0):
         return [0, 0, 1]
 
     rCM = getCMOfRing(geom, referenceForDirection)
-    norm = getAverageNormaltoTheRing(geom, referenceForDirection, rCM)
+    norm = getAverageNormaltoTheRing(geom, ring_atoms_ordered, rCM)
 
     return norm
 
@@ -566,9 +581,9 @@ def generateBQs_Z(geom, Conn, ring_atoms, sigma_direction, normal=[]):
     global referenceForDirection
 
 # Calculate the CM of the ring, calculate the normal to the global reference ring
-    norm = getReferenceVecForDirection(geom)
+    norm = getReferenceVecForDirection(geom, Conn)
 
-    cmx, cmy, cmz = 0.0, 0.0, 0.0
+    cmx, cmy, cmz = getCMOfRing(geom, ring_atoms)
     zinc = BQ_Step
 
 # get normal to the current ring
@@ -577,17 +592,32 @@ def generateBQs_Z(geom, Conn, ring_atoms, sigma_direction, normal=[]):
 
 # check its orientation with reference
     theta = getAngleBetweenVec(unit_normal_to_Ring, norm)
-    if (theta > 90): # if > 90, reverse the vector
+    if ( (theta > 90) and (theta < 270)): # if > 90, reverse the vector
         zinc = -zinc
 
-    coord_format = "{0:.5f}"
+#    coord_format = "{0:.5f}"
+#    BQs_string = ""
+#    zcoord = cmz + BQ_Range[0]
+#    for i in range(0, BQ_No):
+#        bqpt = [cmx, cmy, zcoord]
+#        BQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomLine(
+#            bqpt)
+#        zcoord += zinc
+
     BQs_string = ""
-    zcoord = cmz + BQ_Range[0]
-    for i in range(0, BQ_No):
-        bqpt = [cmx, cmy, zcoord]
+    a = [cmx, cmy, cmz] 
+    b = unit_normal_to_Ring 
+    vec_ab = getVector(a, b)
+    norm_vec_ab = vectorMagnitude(vec_ab)
+    n_vec_ab = getUnitVector(vec_ab)
+
+    for j in range(0, BQ_No):
+        bq_coord = [zinc*j*v for v in n_vec_ab]
+        bq_coord[:] = [a[v]+bq_coord[v] for v in range(0, 3)]
         BQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomLine(
-            bqpt)
-        zcoord += zinc
+                bq_coord)
+
+    print(BQs_string)
 
     return BQs_string
 
@@ -623,7 +653,7 @@ def generateBQs_XY(geom, Conn):
                 xy_ref_ring_info.append(sorted(ring_atoms))
 
 # Calculate the CM of the ring, calculate the normal to the global reference ring
-                norm = getReferenceVecForDirection(new_geom)
+                norm = getReferenceVecForDirection(new_geom, Conn)
 
 # the global reference direction vector should be compared with the following normal
                 normal_to_Ring = getUnitVector(getAverageNormaltoTheRing(new_geom, ring_atoms, [cmx, cmy, cmz]))
@@ -631,7 +661,7 @@ def generateBQs_XY(geom, Conn):
 # check its orientation with reference
                 theta = getAngleBetweenVec(normal_to_Ring, norm)
                 direction_bq = 'POSITIVE'
-                if (theta > 90): # if > 90, reverse the vector
+                if ((theta > 90) and (theta < 270)): # if > 90, reverse the vector
                    direction_bq = 'NEGATIVE'
 
                 normal_to_Ring[:] = [
@@ -982,9 +1012,9 @@ def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
 
         # unit_normal_to_Ring . norm(referenceForDirection)
         # theta = cos-1(v1.v2) 
-        norm = getReferenceVecForDirection(sigma_geom)
+        norm = getReferenceVecForDirection(sigma_geom, Conn)
         theta = getAngleBetweenVec(unit_normal_to_Ring, norm)
-        if (theta < 90): # if < 90, reverse the vector
+        if ((theta < 90) or (theta > 270)): # if < 90, reverse the vector
             unit_normal_to_Ring = list(map(lambda x: -x, unit_normal_to_Ring))
 
         if (ring_count <= indicator_for_fused_2):

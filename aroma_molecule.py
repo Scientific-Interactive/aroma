@@ -547,7 +547,6 @@ def generateZMatrix(geom, Conn):
 
       if (len(zmat) == nat): flag = 0
 
-   print(zmat_str)
    return zmat, zmat_str, zmat_idx
 
 #
