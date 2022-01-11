@@ -616,6 +616,7 @@ def generateBQs_XY(geom, Conn):
             new_geom, new_points, new_normal = reorient(
                 geom, Conn, ring_atoms, points)
 
+            if (new_geom != []):
                 cmx, cmy, cmz = getGMOfRing(new_geom, ring_atoms)
                 ref_ring = ring
                 xy_ref_ring_info.append(ring)
