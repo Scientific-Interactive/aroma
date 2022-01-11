@@ -114,7 +114,7 @@ def check(armfile):
 
     # Check for Validity of the RunType
     for i in range(0, len(armlines)):
-        if (armlines[i].upper().find("RUN") >= 0):
+        if (armlines[i].upper().find("AROMARUN") >= 0):
             runseq = re.split(
                 "[ |,]", armlines[i].upper().strip().split("=")[1])
             if (runseq.count("OPT") > 0):
@@ -344,6 +344,21 @@ def check(armfile):
                 sigma_mult = int(armlines[i].split("=")[1])
 
         if (integralnics_flag): BQ_Range = DEFAULT_INTEGRALNICS_RANGE
+
+        if (inponly_flag): 
+            f = open(armpath + flprfx + ".arm.org","w")
+            f.write(armlines)
+            f.close
+
+            f = open(armpath + flprfx + ".arm","w")
+            for i in range (0, len(armlines)):
+                if (armlines[i].upper().find("AROMARUN") >= 0):
+                    armlines[i] = re.sub("inponly", "outonly", armlines[i].lower())
+                    f.write(armlines[i]
+                else: f.write(armlines[i])
+            f.close()
+            print("This is INPUT-ONLY run. The original .arm file is saved as .arm.org and current .arm is modified for OUTPUT-ONLY run.\n"
+
 
 
 def generate_Opt_Input(geom, hashLine, title, charge, mult):
