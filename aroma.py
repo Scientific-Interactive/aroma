@@ -354,10 +354,10 @@ def check(armfile):
             for i in range (0, len(armlines)):
                 if (armlines[i].upper().find("AROMARUN") >= 0):
                     armlines[i] = re.sub("inponly", "outonly", armlines[i].lower())
-                    f.write(armlines[i]
+                    f.write(armlines[i])
                 else: f.write(armlines[i])
             f.close()
-            print("This is INPUT-ONLY run. The original .arm file is saved as .arm.org and current .arm is modified for OUTPUT-ONLY run.\n"
+            print("This is INPUT-ONLY run. The original .arm file is saved as .arm.org and current .arm is modified for OUTPUT-ONLY run.\n")
 
 
 
@@ -1778,8 +1778,11 @@ def plotData(flprfx):
       data["z"].append(row[8])
 
     # TODO: different plots for different run types
-    scatterPlot(data["#"], data["z"], "r", "NICSzz", flprfx + "-plot1.png")
+    scatterPlot(data["#"], data["z"])
+    # ... other calls to scatter plot 
 
+    # save the plot
+    savePlot("r", "NICSzz", flprfx + "-plot1.png")
 
 def aroma(armfile):
     # global flags

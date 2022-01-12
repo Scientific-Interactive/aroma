@@ -209,8 +209,11 @@ def nicsIntegralFit(xdata, ydata):
   return popt
 
 # scatter plot
-def scatterPlot(xdata, ydata, xLabel, yLabel, outputFile):
+def scatterPlot(xdata, ydata):
   plt.scatter(xdata, ydata) 
+
+# save the plot
+def savePlot(xLabel, yLabel, outputFile):
   plt.xlabel(xLabel)
   plt.ylabel(yLabel)
   plt.legend()
@@ -231,3 +234,4 @@ def sendEmail(toEmail, subject, content, smtpServer='localhost'):
     s.quit()
   except:
     print("[sendEmail] - unable to send email") 
+
