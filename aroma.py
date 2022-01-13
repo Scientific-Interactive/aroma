@@ -1788,6 +1788,21 @@ def plotData():
 
       return data
 
+    def readPicmoFile(lines):
+      data = {}
+
+      headers = lines[0].split()
+      headers = [headers[0], headers[-1]]
+      map(lambda x: initData(data, x), headers)
+
+      for lidx in range(1, len(lines[1:])):
+         row = map(lambda x: float(x), lines[lidx].split())
+
+         data["pi-MO#"].append(row[0])
+         data["-Sum"].append(row[-1])
+
+      return data
+
     # iterate over all job types
     for centerIdx in centerList:
        jobList = list(filter(lambda x: x["centerIdx"] == centerIdx, collatedFileSet))
@@ -1818,25 +1833,6 @@ def plotData():
                    pass
 
 
-#    def initData(data, x):
-#        data[x] = []
-#        return 
-#
-#    map(lambda x: initData(data, x), lines[0].split())
-#
-#    for lidx in range(1, len(lines[1:])):
-#      row = map(lambda x: float(x), lines[lidx].split())
-#      """ #       oop       in1        in2       inp       iso        x         y         z """
-#      data["#"].append(row[0])
-#      data["oop"].append(row[1])
-#      data["in1"].append(row[2])
-#      data["in2"].append(row[3])
-#      data["inp"].append(row[4])
-#      data["iso"].append(row[5])
-#      data["x"].append(row[6])
-#      data["y"].append(row[7])
-#      data["z"].append(row[8])
-#
 #    # TODO: different plots for different run types
 #    scatterPlot(data["#"], data["z"])
 #    # ... other calls to scatter plot 
