@@ -346,9 +346,7 @@ def check(armfile):
         if (integralnics_flag): BQ_Range = DEFAULT_INTEGRALNICS_RANGE
 
         if (inponly_flag): 
-            f = open(armpath + flprfx + ".arm.org","w")
-            f.write(armlines)
-            f.close
+            shutil.copyfile(armpath + flprfx + ".arm", armpath + flprfx + ".arm.org")
 
             f = open(armpath + flprfx + ".arm","w")
             for i in range (0, len(armlines)):
@@ -579,7 +577,6 @@ def getReferenceVecForDirection(geom, Conn):
        ring_atoms_ordered = getOrderedRing(Conn, referenceForDirection)
     else:
        ring_atoms_ordered = referenceForDirection
-       print("ORDER", ring_atoms_ordered)
 
     if (len(referenceForDirection) == 0):
         return [0, 0, 1]
@@ -631,8 +628,6 @@ def generateBQs_Z(geom, Conn, ring_atoms, sigma_direction, normal=[]):
         bq_coord[:] = [a[v]+bq_coord[v] for v in range(0, 3)]
         BQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomLine(
                 bq_coord)
-
-    print(BQs_string)
 
     return BQs_string
 
@@ -908,10 +903,9 @@ def run_Nics():
     if not pointonly_flag:
         for inpfl in inputFileSet:
             flname = inpfl["flprfx"]
-            print(flname)
             print("Job " + externalProgram["extCmd"] +
                   flname + " " + flname + " running ..")
-#            status = execCmd(externalProgram["constructCmd"](flname))
+            status = execCmd(externalProgram["constructCmd"](flname))
             if (not status):
                 print("Job Over.")
             else:
@@ -1765,26 +1759,22 @@ def plotData():
 #    print(collatedFileSet)
     centerList = list(set(list(map(lambda x: x["centerIdx"], collatedFileSet))))
 
-    def initData(data, x):
-        data[x] = []
-        return 
+    def localInitData(d, x):
+      d[x] = []
 
     def readArmDatFile(lines):
       data = {}
 
-      map(lambda x: initData(data, x), lines[0].split())
+      headers = lines[0].split()
+
+      list(map(lambda x: localInitData(data, x), headers))
+
 
       for lidx in range(1, len(lines[1:])):
-        row = map(lambda x: float(x), lines[lidx].split())
+        row = list(map(lambda x: float(x), lines[lidx].split()))
         """ #       oop       in1        in2       inp       iso        x         y         z """
         data["#"].append(row[0])
-#        data["oop"].append(row[1])
-#        data["in1"].append(row[2])
-#        data["in2"].append(row[3])
-#        data["inp"].append(row[4])
         data["iso"].append(row[5])
-#        data["x"].append(row[6])
-#        data["y"].append(row[7])
         data["z"].append(row[8])
 
       return data
@@ -1797,7 +1787,7 @@ def plotData():
       map(lambda x: initData(data, x), headers)
 
       for lidx in range(1, len(lines[1:])):
-         row = map(lambda x: float(x), lines[lidx].split())
+         row = list(map(lambda x: float(x), lines[lidx].split()))
 
          data["pi-MO#"].append(row[0])
          data["-Sum"].append(row[-1])
@@ -1807,14 +1797,14 @@ def plotData():
     # iterate over all job types
     for centerIdx in centerList:
        plotlist = []
+       legends = []
        jobList = list(filter(lambda x: x["centerIdx"] == centerIdx, collatedFileSet))
 
        if (sigma_flag):
-          3iso_main = []
-          3iso_sigma = []
+          iso_main = []
+          iso_sigma = []
 
        for j in jobList:
-           print(j["fileName"])
            flToPlot = j["fileName"]
    
            fl = open(flToPlot, "r")
@@ -1836,35 +1826,44 @@ def plotData():
                    picmoData = readPicmoFile(lines)
 
            if (not xy_flag and not pointonly_flag):
-               if (sigma_flag):
-                   plotlist.append(armData["z"]) 
+               plotlist.append(armData["z"]) 
+               if (j["jobType"] == "main"): legends.append("NICS-ZZ")
+               elif (j["jobType"] == "sigma"): legends.append("NICS-sigma-ZZ")
 
-               if (j["jobType"] == "main"): 3iso_main.append(armData["iso"])
-               elif (j["jobType"] == "sigma"): 3iso_sigma.append(armData[["iso"])
+               if (sigma_flag):
+                 if (j["jobType"] == "main"): iso_main = armData["iso"]
+                 elif (j["jobType"] == "sigma"): iso_sigma = armData["iso"]
                    
                if (ncs_flag):
                    plotlist.append(plines["-Sum"])
+                   legends.append("PI-CMO")
 
            if (xy_flag):
+               plotlist.append(armData["z"]) 
+               if (j["jobType"] == "main"): legends.append("NICS-ZZ")
+               elif (j["jobType"] == "sigma"): legends.append("NICS-sigma-ZZ")
+               
                if (sigma_flag):
-                   plotlist.append(armData["z"]) 
-
-               if (j["jobType"] == "main"): 3iso_main.append(armData["z"])
-               elif (j["jobType"] == "sigma"): 3iso_sigma.append(armData["z"])
+                  if (j["jobType"] == "main"): iso_main = armData["z"]
+                  elif (j["jobType"] == "sigma"): iso_sigma = armData["z"]
                    
                if (ncs_flag):
                    plotlist.append(plines["-Sum"])
+                   legends.append("PI-CMO")
 
-       if (sigma_flag):
-           3Diso = []
-           for i in range (0, len(3iso_main)):
-               3Diso.append(3iso_main[i] - 3iso_sigma[i])
-           plotlist.append(3Diso)
+       if sigma_flag: 
+           Diso = []
+           for i in range (0, len(iso_main)):
+               Diso.append(3*(iso_main[i] - iso_sigma[i]))
+           plotlist.append(Diso)
+           if (not xy_flag): legends.append("3Diso")
+           else: legends.append("D-NICS-ZZ")
 
-        for ydata in plotlist:
-          scatterPlot(armData["#"], ydata)
 
-        savePlot("r", "NICSindex", flprfx + "-plot" + centerIdx +".png")
+       for i in range (0, len(plotlist)):
+          scatterPlot(armData["#"], plotlist[i], legends[i])
+
+       savePlot("r", "NICSindex", externalProgram["outdir"] + flprfx + "-plot" + centerIdx +".png")
 
 #    # TODO: different plots for different run types
 #    scatterPlot(data["#"], data["z"])
@@ -1906,7 +1905,7 @@ def aroma(armfile):
        plotData()
 
        # send email notification
-#       sendEmail(emailSettings.to_user, "[AROMA]" + armfile, "Dear User, \n\nAROMA job [" + armfile + "] seems over. \n\n- AROMABOT" , smtpServer=emailSettings.smtp_host) 
+       sendEmail(emailSettings["to_user"], "[AROMA]" + armfile, "Dear User, \n\nAROMA job [" + armfile + "] seems over. \n\n- AROMABOT" , smtpServer=emailSettings["smtp_host"]) 
 
     # all over
     print("\n--------------------------------------------------------------------")

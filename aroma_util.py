@@ -209,8 +209,8 @@ def nicsIntegralFit(xdata, ydata):
   return popt
 
 # scatter plot
-def scatterPlot(xdata, ydata):
-  plt.scatter(xdata, ydata) 
+def scatterPlot(xdata, ydata, legend):
+  plt.scatter(xdata, ydata, label=legend) 
 
 # save the plot
 def savePlot(xLabel, yLabel, outputFile):
