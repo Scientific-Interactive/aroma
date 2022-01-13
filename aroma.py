@@ -911,7 +911,7 @@ def run_Nics():
             print(flname)
             print("Job " + externalProgram["extCmd"] +
                   flname + " " + flname + " running ..")
-            status = execCmd(externalProgram["constructCmd"](flname))
+#            status = execCmd(externalProgram["constructCmd"](flname))
             if (not status):
                 print("Job Over.")
             else:
@@ -1778,13 +1778,14 @@ def plotData():
         row = map(lambda x: float(x), lines[lidx].split())
         """ #       oop       in1        in2       inp       iso        x         y         z """
         data["#"].append(row[0])
-        data["oop"].append(row[1])
-        data["in1"].append(row[2])
-        data["in2"].append(row[3])
-        data["inp"].append(row[4])
+#        data["oop"].append(row[1])
+#        data["in1"].append(row[2])
+#        data["in2"].append(row[3])
+#        data["inp"].append(row[4])
         data["iso"].append(row[5])
-        data["x"].append(row[6])
-        data["y"].append(row[7])
+#        data["x"].append(row[6])
+#        data["y"].append(row[7])
+        data["z"].append(row[8])
 
       return data
 
@@ -1805,8 +1806,13 @@ def plotData():
 
     # iterate over all job types
     for centerIdx in centerList:
+       plotlist = []
        jobList = list(filter(lambda x: x["centerIdx"] == centerIdx, collatedFileSet))
-#       print(centerIdx, jobList)
+
+       if (sigma_flag):
+          3iso_main = []
+          3iso_sigma = []
+
        for j in jobList:
            print(j["fileName"])
            flToPlot = j["fileName"]
@@ -1817,20 +1823,41 @@ def plotData():
 
            armDatData = readArmDatFile(lines)
 
-#to do: read and store first column as xdata, and iso and zz as ydatas
+           if (ncs_flag):
+               if (j["jobType"] == "main"):
+                   picmofl = j["fileName"].replace(".armdat",".picmo")
+
+           picfl = open(picmofl, "r")
+           plines = picfl.readlines()
+           picfl.close()
+
+           picmoData = readPicmoFile(lines)
 
            if (not xy_flag and not pointonly_flag):
                if (sigma_flag):
-                   pass
+                   plotlist.append(armData[2]) 
+
+               if (j["jobType"] == "main"): 3iso_main.append(armData[1])
+               elif (j["jobType"] == "sigma"): 3iso_sigma.append(armData[1])
+                   
                if (ncs_flag):
-                   #to do: open and read .picmo file
-                   pass
+                   plotlist.append(plines[1])
+
            if (xy_flag):
                if (sigma_flag):
-                   pass
+                   plotlist.append(armData[2]) 
+
+               if (j["jobType"] == "main"): 3iso_main.append(armData[2])
+               elif (j["jobType"] == "sigma"): 3iso_sigma.append(armData[2])
+                   
                if (ncs_flag):
-                   #to do: open and read .picmo file
-                   pass
+                   plotlist.append(plines[1])
+
+       if (sigma_flag):
+           3Diso = []
+           for i in range (0, len(3iso_main)):
+               3Diso.append(3iso_main[i] - 3iso_sigma[i])
+           plotlist.append(3Diso)
 
 
 #    # TODO: different plots for different run types
