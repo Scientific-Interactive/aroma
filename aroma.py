@@ -1765,6 +1765,28 @@ def plotData():
 #    print(collatedFileSet)
     centerList = list(set(list(map(lambda x: x["centerIdx"], collatedFileSet))))
 
+    def initData(data, x):
+        data[x] = []
+        return 
+
+    def readArmDatFile(lines):
+      data = {}
+
+      map(lambda x: initData(data, x), lines[0].split())
+
+      for lidx in range(1, len(lines[1:])):
+        row = map(lambda x: float(x), lines[lidx].split())
+        """ #       oop       in1        in2       inp       iso        x         y         z """
+        data["#"].append(row[0])
+        data["oop"].append(row[1])
+        data["in1"].append(row[2])
+        data["in2"].append(row[3])
+        data["inp"].append(row[4])
+        data["iso"].append(row[5])
+        data["x"].append(row[6])
+        data["y"].append(row[7])
+
+      return data
 
     # iterate over all job types
     for centerIdx in centerList:
@@ -1777,6 +1799,8 @@ def plotData():
            fl = open(flToPlot, "r")
            lines = fl.readlines()
            fl.close()
+
+           armDatData = readArmDatFile(lines)
 
 #to do: read and store first column as xdata, and iso and zz as ydatas
 
