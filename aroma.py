@@ -1394,7 +1394,8 @@ def writeCollatedFiles(jobType, fileExt="armdat"):
 
       final_file = open(externalProgram["outdir"] + baseprfx + "." + fileExt, "w")
 
-      collatedFileSet.append({"fileName": final_file, "flprfx": baseprfx, "jobType": jobType})
+#      collatedFileSet.append({"fileName": final_file, "flprfx": baseprfx, "jobType": jobType})
+      collatedFileSet.append({"fileName": externalProgram["outdir"] + baseprfx + "." + fileExt, "flprfx": baseprfx, "jobType": jobType, "centerIdx": centerIdx})
 
       for inpFil in centerFileSet:
         lines = readFile(externalProgram["outdir"] + inpFil["flprfx"] + "." + fileExt)
@@ -1750,39 +1751,74 @@ def writeOutputHeader():
         outfl.write("\nFor the Original Molecule:\n")
         outfl.close()
 
-def plotData(flprfx):
-    flToPlot = flprfx + "-center1.armdat"
-    print("Plotting data for: " + flToPlot)
+def plotData():
+    # global flags
+    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag
+    # global molecule-related
+    global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
+    # global technical
+    global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
+    # global inputFileSet
+    global inputFileSet, collatedFileSet
 
-    fl = open(flToPlot, "r")
-    lines = fl.readlines()
-    fl.close()
 
-    def initData(data, x):
-        data[x] = []
-        return 
+#    print(collatedFileSet)
+    centerList = list(set(list(map(lambda x: x["centerIdx"], collatedFileSet))))
 
-    map(lambda x: initData(data, x), lines[0].split())
 
-    for lidx in range(1, len(lines[1:])):
-      row = map(lambda x: float(x), lines[lidx].split())
-      """ #       oop       in1        in2       inp       iso        x         y         z """
-      data["#"].append(row[0])
-      data["oop"].append(row[1])
-      data["in1"].append(row[2])
-      data["in2"].append(row[3])
-      data["inp"].append(row[4])
-      data["iso"].append(row[5])
-      data["x"].append(row[6])
-      data["y"].append(row[7])
-      data["z"].append(row[8])
+    # iterate over all job types
+    for centerIdx in centerList:
+       jobList = list(filter(lambda x: x["centerIdx"] == centerIdx, collatedFileSet))
+#       print(centerIdx, jobList)
+       for j in jobList:
+           print(j["fileName"])
+           flToPlot = j["fileName"]
+   
+           fl = open(flToPlot, "r")
+           lines = fl.readlines()
+           fl.close()
 
-    # TODO: different plots for different run types
-    scatterPlot(data["#"], data["z"])
-    # ... other calls to scatter plot 
+#to do: read and store first column as xdata, and iso and zz as ydatas
 
-    # save the plot
-    savePlot("r", "NICSzz", flprfx + "-plot1.png")
+           if (not xy_flag and not pointonly_flag):
+               if (sigma_flag):
+                   pass
+               if (ncs_flag):
+                   #to do: open and read .picmo file
+                   pass
+           if (xy_flag):
+               if (sigma_flag):
+                   pass
+               if (ncs_flag):
+                   #to do: open and read .picmo file
+                   pass
+
+
+#    def initData(data, x):
+#        data[x] = []
+#        return 
+#
+#    map(lambda x: initData(data, x), lines[0].split())
+#
+#    for lidx in range(1, len(lines[1:])):
+#      row = map(lambda x: float(x), lines[lidx].split())
+#      """ #       oop       in1        in2       inp       iso        x         y         z """
+#      data["#"].append(row[0])
+#      data["oop"].append(row[1])
+#      data["in1"].append(row[2])
+#      data["in2"].append(row[3])
+#      data["inp"].append(row[4])
+#      data["iso"].append(row[5])
+#      data["x"].append(row[6])
+#      data["y"].append(row[7])
+#      data["z"].append(row[8])
+#
+#    # TODO: different plots for different run types
+#    scatterPlot(data["#"], data["z"])
+#    # ... other calls to scatter plot 
+#
+#    # save the plot
+#    savePlot("r", "NICSzz", flprfx + "-plot1.png")
 
 def aroma(armfile):
     # global flags
@@ -1812,17 +1848,17 @@ def aroma(armfile):
     # run all the jobs - parent molecule and sigma model
     runJobs()
 
+    if not inponly_flag:
+       # plot the data
+       plotData()
+
+       # send email notification
+#       sendEmail(emailSettings.to_user, "[AROMA]" + armfile, "Dear User, \n\nAROMA job [" + armfile + "] seems over. \n\n- AROMABOT" , smtpServer=emailSettings.smtp_host) 
+
     # all over
     print("\n--------------------------------------------------------------------")
     print("                        ** Aroma Run Over. **")
     print("--------------------------------------------------------------------\n")
-
-    if not inponly_flag:
-       # plot the data
-       plotData(flprfx)
-
-       # send email notification
-       sendEmail(emailSettings.to_user, "[AROMA]" + armfile, "Dear User, \n\nAROMA job [" + armfile + "] seems over. \n\n- AROMABOT" , smtpServer=emailSettings.smtp_host) 
 
 if __name__ == "__main__":
     aroma(sys.argv[1])
