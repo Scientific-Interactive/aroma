@@ -1821,37 +1821,39 @@ def plotData():
            lines = fl.readlines()
            fl.close()
 
-           armDatData = readArmDatFile(lines)
+           armData = readArmDatFile(lines)
+
+           picmoData = {}
 
            if (ncs_flag):
                if (j["jobType"] == "main"):
                    picmofl = j["fileName"].replace(".armdat",".picmo")
 
-           picfl = open(picmofl, "r")
-           plines = picfl.readlines()
-           picfl.close()
+                   picfl = open(picmofl, "r")
+                   plines = picfl.readlines()
+                   picfl.close()
 
-           picmoData = readPicmoFile(lines)
+                   picmoData = readPicmoFile(lines)
 
            if (not xy_flag and not pointonly_flag):
                if (sigma_flag):
-                   plotlist.append(armData[2]) 
+                   plotlist.append(armData["z"]) 
 
-               if (j["jobType"] == "main"): 3iso_main.append(armData[1])
-               elif (j["jobType"] == "sigma"): 3iso_sigma.append(armData[1])
+               if (j["jobType"] == "main"): 3iso_main.append(armData["iso"])
+               elif (j["jobType"] == "sigma"): 3iso_sigma.append(armData[["iso"])
                    
                if (ncs_flag):
-                   plotlist.append(plines[1])
+                   plotlist.append(plines["-Sum"])
 
            if (xy_flag):
                if (sigma_flag):
-                   plotlist.append(armData[2]) 
+                   plotlist.append(armData["z"]) 
 
-               if (j["jobType"] == "main"): 3iso_main.append(armData[2])
-               elif (j["jobType"] == "sigma"): 3iso_sigma.append(armData[2])
+               if (j["jobType"] == "main"): 3iso_main.append(armData["z"])
+               elif (j["jobType"] == "sigma"): 3iso_sigma.append(armData["z"])
                    
                if (ncs_flag):
-                   plotlist.append(plines[1])
+                   plotlist.append(plines["-Sum"])
 
        if (sigma_flag):
            3Diso = []
@@ -1859,6 +1861,10 @@ def plotData():
                3Diso.append(3iso_main[i] - 3iso_sigma[i])
            plotlist.append(3Diso)
 
+        for ydata in plotlist:
+          scatterPlot(armData["#"], ydata)
+
+        savePlot("r", "NICSindex", flprfx + "-plot" + centerIdx +".png")
 
 #    # TODO: different plots for different run types
 #    scatterPlot(data["#"], data["z"])
