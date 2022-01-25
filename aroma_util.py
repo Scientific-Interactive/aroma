@@ -237,17 +237,13 @@ def sendEmail(toEmail, subject, content, smtpServer='localhost'):
     print("[sendEmail] - unable to send email") 
 
 # zip file
-def zipTheFiles(zipFileName, fileFilter):
-  fileList = glob.glob(fileFilter)
-
+def zipTheFiles(zipFileName, fileList):
   zipFile = zipfile.ZipFile(zipFileName, "w")
   list(map(lambda x: zipFile.write(x), fileList))
   zipFile.close()
 
 # remove files
-def removeAllFiles(fileFiter):
-  fileList = glob.glob(fileFilter)
-
+def removeAllFiles(fileList):
   for fl in fileList:
       try: 
           os.remove(fl)

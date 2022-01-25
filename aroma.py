@@ -1921,17 +1921,18 @@ def aroma(armfile):
        sendEmail(emailSettings["to_user"], "[AROMA]" + armfile, "Dear User, \n\nAROMA job [" + armfile + "] seems over. \n\n- AROMABOT" , smtpServer=emailSettings["smtp_host"]) 
 
        fileFilterInp = inpdir + org_flprfx + "*center*set*"
-       zipFileNameInp = inpdir + org_flprfx + "-inp-archive.zip"
        fileFilterOut = outdir + org_flprfx + "*center*set*"
-       zipFileNameOut = outdir + org_flprfx + "-out-archive.zip"
+       zipFileName = outdir + org_flprfx + "-archive.zip"
+
+       fileListInp = glob.glob(fileFilterInp)
+       fileListOut = glob.glob(fileFilterOut)
+       fileList = list(set(fileListInp + fileListOut))
 
        # zip the intermediate files
-       zipTheFiles(zipFileNameInp, fileFilterInp)
-       zipTheFiles(zipFileNameOut, fileFilterOut)
+       zipTheFiles(zipFileNameInp, fileList)
 
        # and then remove them
-       removeAllFiles(fileFilterInp)
-       removeAllFiles(fileFilterOut)
+       removeAllFiles(fileList)
 
     # all over
     print("\n--------------------------------------------------------------------")
