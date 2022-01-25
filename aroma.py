@@ -1911,6 +1911,15 @@ def aroma(armfile):
        # send email notification
        sendEmail(emailSettings["to_user"], "[AROMA]" + armfile, "Dear User, \n\nAROMA job [" + armfile + "] seems over. \n\n- AROMABOT" , smtpServer=emailSettings["smtp_host"]) 
 
+       fileFilter = flprfx + "*center*set*"
+       zipFile = flprfx + "-archive.zip"
+
+       # zip the intermediate files
+       zipTheFiles(zipFileName, fileFilter)
+
+       # and then remove them
+       removeAllFiles(fileFilter)
+
     # all over
     print("\n--------------------------------------------------------------------")
     print("                        ** Aroma Run Over. **")

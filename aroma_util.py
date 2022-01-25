@@ -11,6 +11,7 @@ import math
 import glob
 import string
 import scipy 
+import zipfile
 
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
@@ -234,4 +235,22 @@ def sendEmail(toEmail, subject, content, smtpServer='localhost'):
     s.quit()
   except:
     print("[sendEmail] - unable to send email") 
+
+# zip file
+def zipTheFiles(zipFileName, fileFilter):
+  fileList = glob.glob(fileFilter)
+
+  zipFile = zipfile.ZipFile(zipFileName, "w")
+  list(map(lambda x: zipFile.write(x), fileList))
+  zipFile.close()
+
+# remove files
+def removeAllFiles(fileFiter):
+  fileList = glob.glob(fileFilter)
+
+  for fl in fileList:
+      try: 
+          os.remove(fl)
+      except:
+          print("Error removing file", fl)
 
