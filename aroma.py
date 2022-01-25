@@ -1805,6 +1805,8 @@ def plotData():
        jobList = list(filter(lambda x: x["centerIdx"] == centerIdx, collatedFileSet))
 
        if (sigma_flag):
+          z_main = []
+          z_sigma = []
           iso_main = []
           iso_sigma = []
 
@@ -1830,38 +1832,45 @@ def plotData():
                    picmoData = readPicmoFile(lines)
 
            if (not xy_flag and not pointonly_flag):
-               plotlist.append(armData["z"]) 
-               if (j["jobType"] == "main"): legends.append("NICS-ZZ")
-               elif (j["jobType"] == "sigma"): legends.append("NICS-sigma-ZZ")
+               if (j["jobType"] == "main"): 
+                   plotlist.append(armData["z"]) 
+                   legends.append("NICS-ZZ")
+                   z_main = armData["z"]
 
                if (sigma_flag):
                  if (j["jobType"] == "main"): iso_main = armData["iso"]
-                 elif (j["jobType"] == "sigma"): iso_sigma = armData["iso"]
+                 elif (j["jobType"] == "sigma"): 
+                     z_sigma = armData["z"]
+                     iso_sigma = armData["iso"]
                    
                if (ncs_flag):
                    plotlist.append(plines["-Sum"])
                    legends.append("PI-CMO")
 
            if (xy_flag):
-               plotlist.append(armData["z"]) 
-               if (j["jobType"] == "main"): legends.append("NICS-ZZ")
-               elif (j["jobType"] == "sigma"): legends.append("NICS-sigma-ZZ")
+               if (j["jobType"] == "main"): 
+                   plotlist.append(armData["z"]) 
+                   legends.append("NICS-ZZ")
+                   z_main = armData["z"]
+               elif (j["jobType"] == "sigma"): z_sigma = armData["z"] 
                
-               if (sigma_flag):
-                  if (j["jobType"] == "main"): iso_main = armData["z"]
-                  elif (j["jobType"] == "sigma"): iso_sigma = armData["z"]
-                   
                if (ncs_flag):
                    plotlist.append(plines["-Sum"])
                    legends.append("PI-CMO")
 
        if sigma_flag: 
            Diso = []
+           Dzz = []
            for i in range (0, len(iso_main)):
-               Diso.append(3*(iso_main[i] - iso_sigma[i]))
-           plotlist.append(Diso)
-           if (not xy_flag): legends.append("3Diso")
-           else: legends.append("D-NICS-ZZ")
+               Dzza.append(z_main[i] - z_sigma[i])
+               if (not xy_flag): 
+                   Diso.append(3*(iso_main[i] - iso_sigma[i]))
+           
+           plotlist.append(Dzz)
+           legends.append("D-NICS-ZZ")
+           if (not xy_flag): 
+               plotlist.append(Diso)
+               legends.append("3Diso")
 
 
        for i in range (0, len(plotlist)):
