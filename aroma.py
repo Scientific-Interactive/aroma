@@ -1298,6 +1298,10 @@ def grepData():
       centerList.sort()
 
       dist = 0.0
+
+      if (xy_flag and xy_extend != 0.0):
+          dist = -xy_extend
+
       idx = 0
 
       # iterate over each center for the job type
