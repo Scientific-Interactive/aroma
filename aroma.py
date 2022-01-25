@@ -1774,7 +1774,7 @@ def plotData():
       list(map(lambda x: localInitData(data, x), headers))
 
 
-      for lidx in range(1, len(lines[1:])):
+      for lidx in range(1, len(lines[1:])+1):
         row = list(map(lambda x: float(x), lines[lidx].split()))
         """ #       oop       in1        in2       inp       iso        x         y         z """
         data["#"].append(row[0])
@@ -1790,7 +1790,7 @@ def plotData():
       headers = [headers[0], headers[-1]]
       map(lambda x: initData(data, x), headers)
 
-      for lidx in range(1, len(lines[1:])):
+      for lidx in range(1, len(lines[1:]))+1:
          row = list(map(lambda x: float(x), lines[lidx].split()))
 
          data["pi-MO#"].append(row[0])
@@ -1858,11 +1858,11 @@ def plotData():
                    plotlist.append(plines["-Sum"])
                    legends.append("PI-CMO")
 
-       if sigma_flag: 
+       if (sigma_flag): 
            Diso = []
            Dzz = []
-           for i in range (0, len(iso_main)):
-               Dzza.append(z_main[i] - z_sigma[i])
+           for i in range (0, len(z_main)):
+               Dzz.append(z_main[i] - z_sigma[i])
                if (not xy_flag): 
                    Diso.append(3*(iso_main[i] - iso_sigma[i]))
            
@@ -1889,7 +1889,7 @@ def aroma(armfile):
     # global flags
     global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag
     # global molecule-related
-    global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
+    global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals, org_flprfx
     # global technical
     global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
 
@@ -1902,6 +1902,7 @@ def aroma(armfile):
 
     # set the file prefix
     flprfx = armfile[armfile.rindex("/")+1:len(armfile)]
+    org_flprfx = flprfx
 
     # read aroma input file and set necessary flags and params
     check(armfile)
@@ -1920,16 +1921,16 @@ def aroma(armfile):
        # send email notification
        sendEmail(emailSettings["to_user"], "[AROMA]" + armfile, "Dear User, \n\nAROMA job [" + armfile + "] seems over. \n\n- AROMABOT" , smtpServer=emailSettings["smtp_host"]) 
 
-       fileFilterInp = inpdir + org_flprfx + "*center*set*"
-       fileFilterOut = outdir + org_flprfx + "*center*set*"
-       zipFileName = outdir + org_flprfx + "-archive.zip"
+       fileFilterInp = externalProgram["inpdir"] + org_flprfx + "*center*set*"
+       fileFilterOut = externalProgram["outdir"] + org_flprfx + "*center*set*"
+       zipFileName = externalProgram["outdir"] + org_flprfx + "-archive.zip"
 
        fileListInp = glob.glob(fileFilterInp)
        fileListOut = glob.glob(fileFilterOut)
        fileList = list(set(fileListInp + fileListOut))
 
        # zip the intermediate files
-       zipTheFiles(zipFileNameInp, fileList)
+       zipTheFiles(zipFileName, fileList)
 
        # and then remove them
        removeAllFiles(fileList)
