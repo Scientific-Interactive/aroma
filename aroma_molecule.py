@@ -524,8 +524,7 @@ def generateZMatrix(geom, Conn):
                zmat_str += repr(geom[b][0]) + "  " + repr(zmat_idx[a]) + "   " + repr(distance) + "\n" 
                break;
 
-
-      a = ""
+#      a = ""
       if (not flag_connections_over): a = b 
       elif (len(leftouts) > 0): a = ""
       else : a = parent[a]

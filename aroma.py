@@ -343,7 +343,7 @@ def check(armfile):
                 s_mult_flag = 1
                 sigma_mult = int(armlines[i].split("=")[1])
 
-        if (integralnics_flag): BQ_Range = DEFAULT_INTEGRALNICS_RANGE
+        if (integralnics_flag): BQ_Range = DEFAULT_INTEGRALNICS_RANGE; print("HERE", BQ_Range)
 
         if (inponly_flag): 
             shutil.copyfile(armpath + flprfx + ".arm", armpath + flprfx + ".arm.org")
@@ -618,7 +618,8 @@ def generateBQs_Z(geom, Conn, ring_atoms, sigma_direction, normal=[]):
 
     BQs_string = ""
     a = [cmx, cmy, cmz] 
-    b = unit_normal_to_Ring 
+    b = unit_normal_to_Ring
+    print("HERE3", a, b, zinc, BQ_Range)
     vec_ab = getVector(a, b)
     norm_vec_ab = vectorMagnitude(vec_ab)
     n_vec_ab = getUnitVector(vec_ab)
