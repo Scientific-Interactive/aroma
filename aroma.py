@@ -343,7 +343,7 @@ def check(armfile):
                 s_mult_flag = 1
                 sigma_mult = int(armlines[i].split("=")[1])
 
-        if (integralnics_flag): BQ_Range = DEFAULT_INTEGRALNICS_RANGE; print("HERE", BQ_Range)
+        if (integralnics_flag): BQ_Range = DEFAULT_INTEGRALNICS_RANGE
 
         if (inponly_flag): 
             shutil.copyfile(armpath + flprfx + ".arm", armpath + flprfx + ".arm.org")
@@ -604,8 +604,10 @@ def generateBQs_Z(geom, Conn, ring_atoms, sigma_direction, normal=[]):
 
 # check its orientation with reference
     theta = getAngleBetweenVec(unit_normal_to_Ring, norm)
+    dtemp = 1
     if ( (theta > 90) and (theta < 270)): # if > 90, reverse the vector
         zinc = -zinc
+        dtemp = -1
 
 #    coord_format = "{0:.5f}"
 #    BQs_string = ""
@@ -619,11 +621,12 @@ def generateBQs_Z(geom, Conn, ring_atoms, sigma_direction, normal=[]):
     BQs_string = ""
     a = [cmx, cmy, cmz] 
     b = unit_normal_to_Ring
-    print("HERE3", a, b, zinc, BQ_Range)
     vec_ab = getVector(a, b)
     norm_vec_ab = vectorMagnitude(vec_ab)
     n_vec_ab = getUnitVector(vec_ab)
 
+# To initialize the first BQ at the starting point of BQ_Range
+    a[2] = cmz + BQ_Range[0]*dtemp 
     for j in range(0, BQ_No):
         bq_coord = [zinc*j*v for v in n_vec_ab]
         bq_coord[:] = [a[v]+bq_coord[v] for v in range(0, 3)]
