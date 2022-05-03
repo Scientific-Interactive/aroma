@@ -626,10 +626,11 @@ def generateBQs_Z(geom, Conn, ring_atoms, sigma_direction, normal=[]):
     n_vec_ab = getUnitVector(vec_ab)
 
 # To initialize the first BQ at the starting point of BQ_Range
-    a[2] = cmz + BQ_Range[0]*dtemp 
+    c = [BQ_Range[0]*v*dtemp for v in n_vec_ab]
+    c[:] = [a[v]+c[v] for v in range(0, 3)]
     for j in range(0, BQ_No):
         bq_coord = [zinc*j*v for v in n_vec_ab]
-        bq_coord[:] = [a[v]+bq_coord[v] for v in range(0, 3)]
+        bq_coord[:] = [c[v]+bq_coord[v] for v in range(0, 3)]
         BQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomLine(
                 bq_coord)
 
