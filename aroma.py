@@ -131,6 +131,8 @@ def check(armfile):
             if (runseq.count("INTEGRALNICS") > 0):
                 integralnics_flag = 1
                 sigma_flag = 1
+                BQ_Range = DEFAULT_INTEGRALNICS_RANGE
+
             if (runseq.count("INPONLY") > 0):
                 inponly_flag = 1
             if (runseq.count("OUTONLY") > 0):
@@ -342,8 +344,6 @@ def check(armfile):
             if (armlines[i].upper().find("SONLY MULT") >= 0):
                 s_mult_flag = 1
                 sigma_mult = int(armlines[i].split("=")[1])
-
-        if (integralnics_flag): BQ_Range = DEFAULT_INTEGRALNICS_RANGE
 
         if (inponly_flag): 
             shutil.copyfile(armpath + flprfx + ".arm", armpath + flprfx + ".arm.org")
