@@ -1795,7 +1795,7 @@ def plotData():
       headers = [headers[0], headers[-1]]
       map(lambda x: initData(data, x), headers)
 
-      for lidx in range(1, len(lines[1:]))+1:
+      for lidx in range(1, len(lines[1:])+1):
          row = list(map(lambda x: float(x), lines[lidx].split()))
 
          data["pi-MO#"].append(row[0])
