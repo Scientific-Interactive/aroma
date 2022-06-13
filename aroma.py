@@ -1506,7 +1506,7 @@ def Execute():
 
                   nat = inpFil["nat"]
 
-
+   
                   dist = grepPiCMO(nat, piMOs, nocc, inpFil["nBq"], BQ_Range,
                              BQ_Step, outfl, externalProgram["outExt"], dist)
 
@@ -1793,7 +1793,7 @@ def plotData():
 
       headers = lines[0].split()
       headers = [headers[0], headers[-1]]
-      map(lambda x: initData(data, x), headers)
+      list(map(lambda x: localInitData(data, x), headers))
 
       for lidx in range(1, len(lines[1:])+1):
          row = list(map(lambda x: float(x), lines[lidx].split()))
@@ -1805,9 +1805,12 @@ def plotData():
 
     # iterate over all job types
     for centerIdx in centerList:
+        jobList = list(filter(lambda x: x["centerIdx"] == centerIdx and (x["fileName"].upper().find(".PICMO") < 0), collatedFileSet))
+
+    for centerIdx in centerList:
        plotlist = []
        legends = []
-       jobList = list(filter(lambda x: x["centerIdx"] == centerIdx, collatedFileSet))
+       jobList = list(filter(lambda x: x["centerIdx"] == centerIdx and (x["fileName"].upper().find(".PICMO") < 0), collatedFileSet))
 
        if (sigma_flag):
           z_main = []
@@ -1826,7 +1829,7 @@ def plotData():
 
            picmoData = {}
 
-           if (ncs_flag):
+           if (picmo_flag):
                if (j["jobType"] == "main"):
                    picmofl = j["fileName"].replace(".armdat",".picmo")
 
@@ -1834,7 +1837,7 @@ def plotData():
                    plines = picfl.readlines()
                    picfl.close()
 
-                   picmoData = readPicmoFile(lines)
+                   picmoData = readPicmoFile(plines)
 
            if (not xy_flag and not pointonly_flag):
                if (j["jobType"] == "main"): 
@@ -1848,8 +1851,9 @@ def plotData():
                      z_sigma = armData["z"]
                      iso_sigma = armData["iso"]
                    
-               if (ncs_flag):
-                   plotlist.append(plines["-Sum"])
+               if (picmo_flag):
+                 if (j["jobType"] == "main"): 
+                   plotlist.append(picmoData["-Sum"])
                    legends.append("PI-CMO")
 
            if (xy_flag):
@@ -1859,8 +1863,9 @@ def plotData():
                    z_main = armData["z"]
                elif (j["jobType"] == "sigma"): z_sigma = armData["z"] 
                
-               if (ncs_flag):
-                   plotlist.append(plines["-Sum"])
+               if (picmo_flag):
+                 if (j["jobType"] == "main"): 
+                   plotlist.append(picmoData["-Sum"])
                    legends.append("PI-CMO")
 
        if (sigma_flag): 
