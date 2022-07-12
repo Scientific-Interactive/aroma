@@ -221,7 +221,7 @@ def savePlot(xLabel, yLabel, outputFile):
   plt.savefig(outputFile)
 
 # send email if SMTP is configured
-def sendEmail(toEmail, subject, content, smtpServer='localhost'):
+def sendEmail(toEmail, subject, content, timeOut=10, smtpServer='localhost'):
   try:  
     msg = EmailMessage()
     msg.set_content(content)
@@ -230,16 +230,16 @@ def sendEmail(toEmail, subject, content, smtpServer='localhost'):
     # From assumed to be what ever is set by system
  
     # Send the message via our own SMTP server.
-    s = smtplib.SMTP(smtpServer)
+    s = smtplib.SMTP(smtpServer, timeout=timeOut) # default timeout = 10 seconds
     s.send_message(msg)
     s.quit()
   except:
     print("[sendEmail] - unable to send email") 
 
 # zip file
-def zipTheFiles(zipFileName, fileList):
+def zipTheFiles(zipFileName, fileList, fileListSansPrefix):
   zipFile = zipfile.ZipFile(zipFileName, "w")
-  list(map(lambda x: zipFile.write(x), fileList))
+  list(map(lambda a,b: zipFile.write(a, arcname=b), fileList))
   zipFile.close()
 
 # remove files

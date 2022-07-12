@@ -1938,9 +1938,10 @@ def aroma(armfile):
        fileListInp = glob.glob(fileFilterInp)
        fileListOut = glob.glob(fileFilterOut)
        fileList = list(set(fileListInp + fileListOut))
+       fileListSansPrefix = list(map(lambda x: x.replace(externalProgram["inpdir"], "").replece(externalProgram["outdir"], ""), fileList))
 
        # zip the intermediate files
-       zipTheFiles(zipFileName, fileList)
+       zipTheFiles(zipFileName, fileList, fileListSansPrefix)
 
        # and then remove them
        removeAllFiles(fileList)
