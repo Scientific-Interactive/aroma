@@ -239,7 +239,7 @@ def sendEmail(toEmail, subject, content, timeOut=10, smtpServer='localhost'):
 # zip file
 def zipTheFiles(zipFileName, fileList, fileListSansPrefix):
   zipFile = zipfile.ZipFile(zipFileName, "w")
-  list(map(lambda a,b: zipFile.write(a, arcname=b), fileList))
+  list(map(lambda a,b: zipFile.write(a, arcname=b), fileList, fileListSansPrefix))
   zipFile.close()
 
 # remove files
