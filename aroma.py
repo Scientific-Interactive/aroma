@@ -472,7 +472,7 @@ def genNicsInputs(geom, Conn, hashLine, title, charge, mult, jobType):
         for ring in CenterOf:
             ring_atoms = CenterOf.get(ring)
 
-#            # The Plane is always fixed to be XY and the molecule is oriented in such a way.
+            # The Plane is always fixed to be XY and the molecule is oriented in such a way.
             new_geom, new_points, new_normal = reorient(geom, Conn, ring_atoms)
 
             if (new_geom != []):
@@ -539,6 +539,11 @@ def addBreakPoints(BQs_string):
 
     bqs = BQs_string.strip().split("\n")
 
+    if (nAtoms >= externalProgram["maxAtomsInInputFile"]):
+        #TODO: abort
+        print("[ABORT] - maxAtomsInInputFile", externalProgram["maxAtomsInInputFile"] , ' is less than or equal to ', nAtoms)
+        sys.exit(10)
+
     atmCount = nAtoms
 
     newBQs_string = ""
@@ -547,8 +552,7 @@ def addBreakPoints(BQs_string):
         newBQs_string += bq + "\n"
         atmCount += 1
         if (atmCount % externalProgram["maxAtomsInInputFile"] == 0):
-            newBQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomSetBreak(
-            ) + "\n"
+            newBQs_string += externalProgram["writerFunctCall"]["geomInput"].genGhostAtomSetBreak() + "\n"
             atmCount = nAtoms
 
     return newBQs_string
