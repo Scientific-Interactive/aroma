@@ -130,7 +130,6 @@ def check(armfile):
                 pointonly_flag = 1
             if (runseq.count("INTEGRALNICS") > 0):
                 integralnics_flag = 1
-                sigma_flag = 1
                 BQ_Range = DEFAULT_INTEGRALNICS_RANGE
 
             if (runseq.count("INPONLY") > 0):
@@ -551,6 +550,7 @@ def addBreakPoints(BQs_string):
             ) + "\n"
             atmCount = nAtoms
 
+    print(newBQs_string)
     return newBQs_string
 
 
@@ -1375,7 +1375,7 @@ def grepData():
             f_out.close()
 
     # write collated set of files
-    if ((len(inputFileSet) > 1)):
+    if ((len(inputFileSet) > 0)):
         writeCollatedFiles("main")
         writeCollatedFiles("sigma")
 
@@ -1543,8 +1543,17 @@ def callAnalyse(flprfx, CenterOf, all_aromatic_rings, analyse_dist, outfl):
         outfl.write("\n\nFor Center " + repr(ring))
         if analyse_flag:
             analyse(m_fl, s_fl, analyse_dist, outfl, ncs_flag, p_fl)
-        elif integralnics_flag:
-            integralnics_analyse(m_fl, s_fl, BQ_Range[0], outfl)
+        elif (integralnics_flag and (not sigma_flag) and (not ncs_flag)):
+            s_fl = ""; p_fl = ""
+            integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], outfl)
+        elif (integralnics_flag and (not sigma_flag) and ncs_flag):
+            s_fl = ""
+            integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], outfl)
+        elif (integralnics_flag and sigma_flag and (not ncs_flag)):
+            p_fl = ""
+            integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], outfl)
+        elif (integralnics_flag and sigma_flag and ncs_flag):
+            integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], outfl)
 
     n_count = len(CenterOf)
     if (len(normals) > 0):
@@ -1555,9 +1564,18 @@ def callAnalyse(flprfx, CenterOf, all_aromatic_rings, analyse_dist, outfl):
             p_fl = flprfx + "-center" + repr(ring) + ".picmo"
             outfl.write("\n\nFor Center " + repr(n_count))
             if analyse_flag:
-                analyse(m_fl, s_fl, analyse_dist, outfl, pfl)
-            elif integralnics_flag:
-                integralnics_analyse(m_fl, s_fl, BQ_Range[0], outfl)
+                analyse(m_fl, s_fl, analyse_dist, outfl, ncs_flag, p_fl)
+            elif (integralnics_flag and (not sigma_flag) and (not ncs_flag)):
+                s_fl = ""; p_fl = ""
+                integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], outfl)
+            elif (integralnics_flag and (not sigma_flag) and ncs_flag):
+                s_fl = ""
+                integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], outfl)
+            elif (integralnics_flag and sigma_flag and (not ncs_flag)):
+                p_fl = ""
+                integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], outfl)
+            elif (integralnics_flag and sigma_flag and ncs_flag):
+                integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], outfl)
 
     if (area_flag):
         area = {}
@@ -1603,6 +1621,7 @@ def runJobs():
 
     org_flprfx = flprfx
     org_CenterOf = CenterOf
+    ncs_flag_org = ncs_flag
 
     if (not outonly_flag):
 
@@ -1701,10 +1720,11 @@ def runJobs():
         if (opt_flag):
             removeFiles(externalProgram["inpdir"] + flprfx + "-opt* ")
 
+    ncs_flag = ncs_flag_org
     numpy_flag = checkNumPy()
     if not inponly_flag:
         if (integralnics_flag or analyse_flag):
-            if (sigma_flag and numpy_flag and not xy_flag and not pointonly_flag):
+            if (numpy_flag and not xy_flag and not pointonly_flag):
                 outfl = open(outfilename, "a")
                 callAnalyse(org_flprfx, org_CenterOf,
                             all_aromatic_rings, analyse_dist, outfl)
@@ -1938,7 +1958,7 @@ def aroma(armfile):
        fileListInp = glob.glob(fileFilterInp)
        fileListOut = glob.glob(fileFilterOut)
        fileList = list(set(fileListInp + fileListOut))
-       fileListSansPrefix = list(map(lambda x: x.replace(externalProgram["inpdir"], "").replece(externalProgram["outdir"], ""), fileList))
+       fileListSansPrefix = list(map(lambda x: x.replace(externalProgram["inpdir"], "").replace(externalProgram["outdir"], ""), fileList))
 
        # zip the intermediate files
        zipTheFiles(zipFileName, fileList, fileListSansPrefix)
