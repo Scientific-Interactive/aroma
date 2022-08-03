@@ -90,8 +90,13 @@ def identifyPiMOs(outfl):
       for j in range (0, nbasis):
          eligible_for_ring = icnt_atmicno[j] in Max_Conn
          if (eligible_for_ring):
-            if (abs(orb[i][j]) > 5e-5):
-                if (any ((Idx_Bas[j].upper().find(S) >= 0) for S in ["1S","2S","3S","PX","PY"])):
+            if (abs(orb[i][j]) > 5e-4):
+                if (any ((Idx_Bas[j].upper().find(S) >= 0) for S in ["1S","2S","3S"])):
+                   FLAG = 0
+                   break
+            if (abs(orb[i][j]) > 5e-3):
+                if (any ((Idx_Bas[j].upper().find(S) >= 0) for S in ["PX","PY"])):
+                   print("P BASIS funciton number ",j)
                    FLAG = 0
                    break
 
@@ -121,6 +126,9 @@ def grepPiCMO(nat, piMOs, nocc, nghost, BQ_Range, BQ_Step, outfl, outExt, distId
             break;
 
       data_string = '      '
+      cmo_init = {}
+      for c in range (0, len(piMOs)): 
+          cmo_init[piMOs[c]] = 0.0
       prvsmo = 0
       sumval = 0.0
       data_string = "   " + fpformat.fix(dist,2)
@@ -131,11 +139,15 @@ def grepPiCMO(nat, piMOs, nocc, nghost, BQ_Range, BQ_Step, outfl, outExt, distId
             words = olines[j+5+k].split()
             for l in range (prvsmo, len(piMOs)):
                if (int(float(words[0])) == int(piMOs[l])):
-                  data_string += "  " + words[9]
-                  sumval += float(words[9])
+                  cmo_init[piMOs[l]] = float(words[9])
+#                  data_string += "  " + words[9]
+#                  sumval += float(words[9])
                   prvsmo = l+1
                   break
             continue
+      for c in range (0, len(piMOs)):
+          data_string += "  " + fpformat.fix(cmo_init[piMOs[c]],2)
+          sumval += cmo_init[piMOs[c]] 
       dist += BQ_Step
 
       prvs = j+5+k  

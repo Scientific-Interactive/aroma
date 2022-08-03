@@ -295,6 +295,7 @@ def check(armfile):
                 area_flag = 1
     if integralnics_flag:
         analyse_flag = 0
+    if (not sigma_flag): analyse_flag = 0
 
     for i in range(0, len(armlines)):
         if (armlines[i].upper().find("CLEAR") >= 0):
@@ -550,7 +551,6 @@ def addBreakPoints(BQs_string):
             ) + "\n"
             atmCount = nAtoms
 
-    print(newBQs_string)
     return newBQs_string
 
 
@@ -1541,7 +1541,7 @@ def callAnalyse(flprfx, CenterOf, all_aromatic_rings, analyse_dist, outfl):
         p_fl = flprfx + "-center" + repr(ring) + ".picmo"
 
         outfl.write("\n\nFor Center " + repr(ring))
-        if analyse_flag:
+        if (analyse_flag and not integralnics_flag):
             analyse(m_fl, s_fl, analyse_dist, outfl, ncs_flag, p_fl)
         elif (integralnics_flag and (not sigma_flag) and (not ncs_flag)):
             s_fl = ""; p_fl = ""
@@ -1563,7 +1563,7 @@ def callAnalyse(flprfx, CenterOf, all_aromatic_rings, analyse_dist, outfl):
             s_fl = flprfx + "-sigma-center" + repr(n_count) + ".armdat"
             p_fl = flprfx + "-center" + repr(ring) + ".picmo"
             outfl.write("\n\nFor Center " + repr(n_count))
-            if analyse_flag:
+            if (analyse_flag and not integralnics_flag):
                 analyse(m_fl, s_fl, analyse_dist, outfl, ncs_flag, p_fl)
             elif (integralnics_flag and (not sigma_flag) and (not ncs_flag)):
                 s_fl = ""; p_fl = ""
