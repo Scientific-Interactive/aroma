@@ -40,7 +40,7 @@ import aroma_util
 
 def init():
     # global flags
-    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag, forceorder_flag, picmo_flag
+    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag, forceorder_flag, picmo_flag, pimos_flag
     # global molecule-related
     global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals, exocyclic, referenceForDirection
     # global technical
@@ -90,6 +90,7 @@ def init():
     clear_flag = 0
     forceorder_flag = 0
     picmo_flag = 0
+    pimos_flag = 0
 
     inputFileSet = []
     collatedFileSet = []
@@ -100,9 +101,9 @@ def init():
 def check(armfile):
 
     # global flags
-    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag, forceorder_flag, picmo_flag
+    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag, forceorder_flag, picmo_flag, pimos_flag
     # global molecule-related
-    global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals, referenceForDirection
+    global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals, referenceForDirection, arm_piMOs
     # global technical
     global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
 
@@ -356,6 +357,14 @@ def check(armfile):
                 else: f.write(armlines[i])
             f.close()
             print("This is INPUT-ONLY run. The original .arm file is saved as .arm.org and current .arm is modified for OUTPUT-ONLY run.\n")
+
+
+    for i in range(0, len(armlines)):
+        if (armlines[i].upper().find("PIMOS") >= 0):
+            pimos_flag = 1
+            arm_piMOs = list(map(int, re.split("[:|=]", armlines[i].strip())[1].split(",")))
+#            arm_piMOs = list(int(armlines[i].split("=")[1].split(",")))
+            break
 
 
 
@@ -1466,9 +1475,9 @@ def generateAllInputs(geom, title, charge, mult, Conn, jobType):
 def Execute():
 
     # global flags
-    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag, picmo_flag
+    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag, picmo_flag, pimos_flag
     # global molecule-related
-    global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals
+    global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals, arm_piMOs
     # global technical
     global runtype, hashLine_nics, hashLine_opt, hashLine_ncs, hashLine_nbo, BQ_Step, BQ_Range, BQ_No, xy_BQ_dist, sigma_charge, sigma_mult, analyse_dist, clear_flag, xy_extend
     # global geom length (number of atoms)
@@ -1488,6 +1497,9 @@ def Execute():
             # pi-MOs are same in all the output files, so just identify them from the first file.
             piMOs, nocc = identifyPiMOs(
                 externalProgram["outdir"] + inputFileSet[0]["flprfx"] + externalProgram["outExt"])
+
+            if (pimos_flag):
+                piMOs = arm_piMOs
 
             # iterate over all job types, which are not sigma
             centerList = list(set(list(map(lambda x: x["centerIdx"], list(filter(lambda x: x["jobType"] != "sigma", inputFileSet))))))
@@ -1558,7 +1570,7 @@ def callAnalyse(flprfx, CenterOf, all_aromatic_rings, analyse_dist, outfl):
             integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], outfl)
         elif (integralnics_flag and sigma_flag and ncs_flag):
             integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], outfl)
-        elif (not integralnics_flag and not sigma_flag and ncs_flag):
+        elif (ncs_flag and (not integralnics_flag) and (not sigma_flag)):
             integralnics_analyse(m_fl, "", p_fl, BQ_Range[0], outfl)
 
     n_count = len(CenterOf)
@@ -1583,7 +1595,7 @@ def callAnalyse(flprfx, CenterOf, all_aromatic_rings, analyse_dist, outfl):
             elif (integralnics_flag and sigma_flag and ncs_flag):
                 integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], outfl)
 
-    if (area_flag):
+    if (area_flag and sigma_flag):
         area = {}
         tot_area = 0.0
         outfl.write(
@@ -1729,7 +1741,7 @@ def runJobs():
     ncs_flag = ncs_flag_org
     numpy_flag = checkNumPy()
     if not inponly_flag:
-        if (integralnics_flag or analyse_flag):
+        if (integralnics_flag or analyse_flag or ncs_flag):
             if (numpy_flag and not xy_flag and not pointonly_flag):
                 outfl = open(outfilename, "a")
                 callAnalyse(org_flprfx, org_CenterOf,

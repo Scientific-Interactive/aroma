@@ -96,7 +96,6 @@ def identifyPiMOs(outfl):
                    break
             if (abs(orb[i][j]) > 5e-3):
                 if (any ((Idx_Bas[j].upper().find(S) >= 0) for S in ["PX","PY"])):
-                   print("P BASIS funciton number ",j)
                    FLAG = 0
                    break
 
