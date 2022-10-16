@@ -78,7 +78,37 @@ def grepPiCMO(piMOs, outfl, outExt):
    f.close()
 
 
-def main(Prfx):
+def writeCollatedFiles(inputFileSet):
+
+    jobType = "main"
+    fileExt = "picmo"
+
+    # get all files in the "main" run
+    mainFiles = list(filter(lambda x: x["jobType"] == jobType and x["setIdx"] != "-1", inputFileSet))
+
+    # get list of all centers
+    centerList = list(set(list(map(lambda x: x["centerIdx"], mainFiles))))
+
+    for centerIdx in centerList:
+      idx = 0
+      centerFileSet = list(filter(lambda x: x["centerIdx"] == centerIdx and x["jobType"] == jobType, mainFiles))
+
+      baseprfx = centerFileSet[0]["baseprfx"] + "-center" + centerIdx
+
+      final_file = open(externalProgram["outdir"] + baseprfx + "." + fileExt, "w")
+
+#      collatedFileSet.append({"fileName": final_file, "flprfx": baseprfx, "jobType": jobType})
+#      collatedFileSet.append({"fileName": externalProgram["outdir"] + baseprfx + "." + fileExt, "flprfx": baseprfx, "jobType": jobType, "centerIdx": centerIdx})
+
+      for inpFil in centerFileSet:
+        lines = readFile(externalProgram["outdir"] + inpFil["flprfx"] + "." + fileExt)
+        for i in range(idx, len(lines)):
+            final_file.write(lines[i])
+        idx = 1
+
+      final_file.close()
+
+def main():
 
    piMOs = []
    if (len(sys.argv) > 2):
@@ -86,8 +116,26 @@ def main(Prfx):
          piMOs.append(int(sys.argv[i]))
    else: print("Error: MOs are not specified .. Aborting .. "); sys.exit(10)
 
-   outfl = sys.argv[1]
-   grepPiCMO(piMOs, outfl, externalProgram["outExt"])
+   flprfx  = sys.argv[1]
+
+   outf = open(externalProgram["outdir"] + flprfx + "-inputFileSet.json", "r") # this file name needs to change, based on input
+   inputFileSet = json.loads(outf.read())
+   outf.close()
+
+   # get all files in the "main" run
+   mainFiles = list(filter(lambda x: x["jobType"] == jobType and x["setIdx"] != "-1", inputFileSet))
+
+   # get list of all centers
+   centerList = list(set(list(map(lambda x: x["centerIdx"], mainFiles))))
+
+   for centerIdx in centerList:
+      idx = 0
+      centerFileSet = list(filter(lambda x: x["centerIdx"] == centerIdx and x["jobType"] == jobType, mainFiles))
+
+      for inpFil in centerFileSet:
+        grepPiCMO(piMOs, externalProgram["outdir"] + inpFil["flprfx"], externalProgram["outExt"])
+
+   writeCollatedFiles(inputFileSet)
 
 if __name__ == "__main__":
-   main (sys.argv[1:len(sys.argv)])
+   main()
