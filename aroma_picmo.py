@@ -8,6 +8,7 @@
 
 import os
 import sys
+import json
 import string
 import fpformat
 
@@ -123,6 +124,7 @@ def main():
    outf.close()
 
    # get all files in the "main" run
+   jobType = "main"
    mainFiles = list(filter(lambda x: x["jobType"] == jobType and x["setIdx"] != "-1", inputFileSet))
 
    # get list of all centers
