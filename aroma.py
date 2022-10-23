@@ -1571,7 +1571,7 @@ def callAnalyse(flprfx, CenterOf, all_aromatic_rings, analyse_dist, outfl):
         elif (integralnics_flag and sigma_flag and ncs_flag):
             integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], outfl)
         elif (ncs_flag and (not integralnics_flag) and (not sigma_flag)):
-            integralnics_analyse(m_fl, "", p_fl, BQ_Range[0], outfl)
+            analyse_ncs(p_fl, outfl, BQ_Range[0])
 
     n_count = len(CenterOf)
     if (len(normals) > 0):

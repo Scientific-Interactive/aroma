@@ -189,6 +189,40 @@ def integralnics_analyse(mfile, sfile, pfile, dist_start = 2.0, outfl = sys.stdo
       outfl.write("\nThe mean Integral-NICS value is " + repr(round(nics,3)) + " with error " + repr(round(err,3)))
       outfl.write("\n--------------------------------------------------------------------\n")
 
+def analyse_ncs(pfile, outfl=sys.stdout, dist_start = DEFAULT_DISTANCE_FOR_ANALYSIS):
+
+   numpy_flag = checkNumPy()
+   if (not numpy_flag): sys.exit(10)
+
+   if (len(sys.argv) > 3): dist_start = float(sys.argv[3]) 
+   
+   plines = []
+   p_dict = []
+   plines = readAndCheck(pfile)
+   p_dict = processData(plines) 
+
+   for i in range (0, len(m_dict)):
+      if (float(m_dict[i][0]) >= float(dist_start)):
+          dist_start = i
+          break
+
+   if (dist_start == DEFAULT_DISTANCE_FOR_ANALYSIS):
+      outfl.write("\n\nWarning: Analysis for sigma-only model is performed for BQs beyond " + repr(DEFAULT_DISTANCE_FOR_ANALYSIS) + " angstrom.\n") 
+      outfl.write("There are no BQs beyond that for this job. Therefore, Aroma can not perform analysis.\n\n")
+      return
+
+   dist = []; p_inp = []
+   for i in range (dist_start, len(p_dict)):
+       dist.append(p_dict[i][0])
+       p_inp.append(p_dict[i][len(p_dict[i])-1])  # take the sum column
+  
+   p_pinp = numpy.poly1d(numpy.polyfit(dist, p_inp, 3))
+
+   outfl.write("\n\nPicmo polynomial fits are:\n")
+   outfl.write("\n" + str(p_pinp) + "\n")
+   outfl.write("\nThe NICS value using CMO analysis is " + repr(round(p_pinp(1),3)) )
+
+   outfl.write("\n--------------------------------------------------------------------\n")
 
 if __name__ == "__main__":
    analyse(sys.argv[1], sys.argv[2])
