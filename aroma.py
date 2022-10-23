@@ -40,7 +40,7 @@ import aroma_util
 
 def init():
     # global flags
-    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag, forceorder_flag, picmo_flag, pimos_flag
+    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag, forceorder_flag, picmo_flag, pimos_flag, param3_flag
     # global molecule-related
     global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals, exocyclic, referenceForDirection
     # global technical
@@ -56,6 +56,7 @@ def init():
     xy_flag = 0
     pointonly_flag = 0
     integralnics_flag = 0
+    param3_flag = 0
     analyse_flag = 1
     area_flag = 0
     inponly_flag = 0
@@ -101,7 +102,7 @@ def init():
 def check(armfile):
 
     # global flags
-    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag, forceorder_flag, picmo_flag, pimos_flag
+    global opt_flag, ncs_flag, sigma_flag, xy_flag, pointonly_flag, integralnics_flag, analyse_flag, area_flag, s_charge_flag, s_mult_flag, opt_external, optfl_external, inponly_flag, outonly_flag, forceorder_flag, picmo_flag, pimos_flag, param3_flag
     # global molecule-related
     global armpath, CenterOf, geomflext, geomfl, flprfx, outfilename, sigma_direction, all_aromatic_rings, n_xy_center, xy_ref_ring_info, BQGuide, points, normals, referenceForDirection, arm_piMOs
     # global technical
@@ -132,6 +133,9 @@ def check(armfile):
             if (runseq.count("INTEGRALNICS") > 0):
                 integralnics_flag = 1
                 BQ_Range = DEFAULT_INTEGRALNICS_RANGE
+
+            if (runseq.count("3PARAMFIT") > 0):
+                if integralnics_flag: param3_flag = 1
 
             if (runseq.count("INPONLY") > 0):
                 inponly_flag = 1
@@ -1549,7 +1553,7 @@ def Execute():
 def callAnalyse(flprfx, CenterOf, all_aromatic_rings, analyse_dist, outfl):
 
     #   conn_mat, Conn = genConnectivityMatrix(geom)
-    global analyse_flag, integralnics_flag, ncs_flag
+    global analyse_flag, integralnics_flag, ncs_flag, param3_flag
 
     for ring in CenterOf:
         m_fl = flprfx + "-center" + repr(ring) + ".armdat"
@@ -1561,15 +1565,15 @@ def callAnalyse(flprfx, CenterOf, all_aromatic_rings, analyse_dist, outfl):
             analyse(m_fl, s_fl, analyse_dist, outfl, ncs_flag, p_fl)
         elif (integralnics_flag and (not sigma_flag) and (not ncs_flag)):
             s_fl = ""; p_fl = ""
-            integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], outfl)
+            integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], param3_flag, outfl)
         elif (integralnics_flag and (not sigma_flag) and ncs_flag):
             s_fl = ""
-            integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], outfl)
+            integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], param3_flag, outfl)
         elif (integralnics_flag and sigma_flag and (not ncs_flag)):
             p_fl = ""
-            integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], outfl)
+            integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], param3_flag, outfl)
         elif (integralnics_flag and sigma_flag and ncs_flag):
-            integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], outfl)
+            integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], param3_flag, outfl)
         elif (ncs_flag and (not integralnics_flag) and (not sigma_flag)):
             analyse_ncs(p_fl, outfl, BQ_Range[0])
 
@@ -1585,15 +1589,15 @@ def callAnalyse(flprfx, CenterOf, all_aromatic_rings, analyse_dist, outfl):
                 analyse(m_fl, s_fl, analyse_dist, outfl, ncs_flag, p_fl)
             elif (integralnics_flag and (not sigma_flag) and (not ncs_flag)):
                 s_fl = ""; p_fl = ""
-                integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], outfl)
+                integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], param3_flag, outfl)
             elif (integralnics_flag and (not sigma_flag) and ncs_flag):
                 s_fl = ""
-                integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], outfl)
+                integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], param3_flag, outfl)
             elif (integralnics_flag and sigma_flag and (not ncs_flag)):
                 p_fl = ""
-                integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], outfl)
+                integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], param3_flag, outfl)
             elif (integralnics_flag and sigma_flag and ncs_flag):
-                integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], outfl)
+                integralnics_analyse(m_fl, s_fl, p_fl, BQ_Range[0], param3_flag, outfl)
 
     if (area_flag and sigma_flag):
         area = {}

@@ -109,28 +109,23 @@ def analyse(mfile, sfile, dist_start = DEFAULT_DISTANCE_FOR_ANALYSIS, outfl = sy
 
    outfl.write("\n--------------------------------------------------------------------\n")
 
-def integralnics_analyse(mfile, sfile, pfile, dist_start = 2.0, outfl = sys.stdout):
+def integralnics_analyse(mfile, sfile, pfile, dist_start = 2.0, param3_flag = 0, outfl = sys.stdout):
 
 
-   def fitbcr(dist, dat, name):
+   def fitbcr(dist, dat, name, param3_flag):
 
-#      p_3iso = nicsIntegralFit(dist, dat)
-      p_zz = nicsIntegralFit(dist, dat)
+      if (not param3_flag):
+         p_zz = nicsIntegralFit(dist, dat)
+         outfl.write("Parameters of the AB^r curve fitting for " + name + " are :\n")
+         outfl.write("\n A = " + str(p_zz[0]) + "     B = " + str(p_zz[1]) + "\n")
+      else:
+         p_zz = nicsIntegralFit_abc(dist, dat)
+         outfl.write("Parameters of the AB^r + C curve fitting for " + name + " are :\n")
+         outfl.write("\n A = " + str(p_zz[0]) + "     B = " + str(p_zz[1]) + "    C = " + str(p_zz[2]) + "\n")
 
-#      nicsint_val_3iso = ((p_3iso[0]*(p_3iso[1]**100))/math.log(p_3iso[1])) - (p_3iso[0]/math.log(p_3iso[1]))
-      nicsint_val_zz = ((p_zz[0]*(p_zz[1]**100))/math.log(p_zz[1])) - (p_zz[0]/math.log(p_zz[1]))
+      nicsint_val_zz = ((p_zz[0]*(p_zz[1]**100))/math.log(p_zz[1])) - (p_zz[0]/math.log(p_zz[1])) + p_zz[2]
 
-#      nics = (nicsint_val_3iso + nicsint_val_zz)/2
-#      err = abs(nicsint_val_3iso - nics)
-
-#      outfl.write("\n--------------------------------------------------------------------\n")
-      outfl.write("Parameters of the AB^r curve fitting for " + name + " are :\n")
-      outfl.write("\n A = " + str(p_zz[0]) + "     B = " + str(p_zz[1]) + "\n")
       outfl.write("Integral NICS " + name + " = " + str(nicsint_val_zz) + "\n\n\n")
-#      outfl.write("\n A = " + str(p_3iso[0]) + "     b = " + str(p_3iso[1]) + "\n")
-#      outfl.write("Integral NICS 3Diso = " + str(nicsint_val_3iso) + "\n")
-#      outfl.write("\nThe mean Integral-NICS value is " + repr(round(nics,3)) + " with error " + repr(round(err,3)))
-#      outfl.write("\n--------------------------------------------------------------------\n")
       return p_zz, nicsint_val_zz
 
    numpy_flag = checkNumPy()
@@ -158,14 +153,14 @@ def integralnics_analyse(mfile, sfile, pfile, dist_start = 2.0, outfl = sys.stdo
        dist.append(m_dict[i][0])
        m_zz.append(m_dict[i][4])
 
-   mp_zz, nicsint_val_zz = fitbcr(dist, m_zz, "NICS-ZZ")
+   mp_zz, nicsint_val_zz = fitbcr(dist, m_zz, "NICS-ZZ", param3_flag)
 
    if (pfile != ""):
       c_zz = []
       last = len(p_dict[1]) - 1
       for i in range (dist_start, len(p_dict)):
           c_zz.append(p_dict[i][last])
-      p_cmo, nicsint_val_cmo = fitbcr(dist, c_zz, "CMO-pi")
+      p_cmo, nicsint_val_cmo = fitbcr(dist, c_zz, "CMO-pi", param3_flag)
 
 
    if (sfile != ""):
@@ -181,8 +176,8 @@ def integralnics_analyse(mfile, sfile, pfile, dist_start = 2.0, outfl = sys.stdo
               print("Warning: For some points chosen for fitting the Doop and 3Diso data, the del-inp values exceeds 5.0")
               break
 
-      p_3iso, nicsint_val_3iso = fitbcr(dist, del_3iso, "3Diso")
-      p_dzz, nicsint_val_dzz = fitbcr(dist, del_zz, "DZZ")
+      p_3iso, nicsint_val_3iso = fitbcr(dist, del_3iso, "3Diso", param3_flag)
+      p_dzz, nicsint_val_dzz = fitbcr(dist, del_zz, "DZZ", param3_flag)
 
       nics = (nicsint_val_3iso + nicsint_val_zz)/2
       err = abs(nicsint_val_3iso - nics)
@@ -199,10 +194,10 @@ def analyse_ncs(pfile, outfl=sys.stdout, dist_start = DEFAULT_DISTANCE_FOR_ANALY
    plines = []
    p_dict = []
    plines = readAndCheck(pfile)
-   p_dict = processData(plines) 
+   p_dict = processPData(plines) 
 
-   for i in range (0, len(m_dict)):
-      if (float(m_dict[i][0]) >= float(dist_start)):
+   for i in range (0, len(p_dict)):
+      if (float(p_dict[i][0]) >= float(dist_start)):
           dist_start = i
           break
 

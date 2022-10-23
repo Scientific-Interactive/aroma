@@ -209,6 +209,16 @@ def nicsIntegralFit(xdata, ydata):
 
   return popt
 
+# nics integral fit with 3 parameters
+def nicsIntegralFit_abc(xdata, ydata):
+
+  def func(x, a, b, c):
+    return a*(b**x) + c
+
+  popt, pcov = curve_fit(func, xdata, ydata)
+
+  return popt
+
 # scatter plot
 def scatterPlot(xdata, ydata, legend):
   plt.scatter(xdata, ydata, label=legend) 
@@ -239,9 +249,10 @@ def sendEmail(toEmail, subject, content, timeOut=10, smtpServer='localhost'):
 
 def sendMailCmd(toEmail, subject, content):
   try:
-    cmd = 'echo "' + content + '" | mail -s "' + submit + '" ' + toEmail
+    cmd = 'echo "' + content + '" | mail -s "' + subject + '" ' + toEmail
     os.system(cmd)
-  except:
+  except Exception as e:
+    print(e)
     print("[sendEmailCmd] - unable to send email") 
 
 # zip file
