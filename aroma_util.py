@@ -231,10 +231,18 @@ def sendEmail(toEmail, subject, content, timeOut=10, smtpServer='localhost'):
  
     # Send the message via our own SMTP server.
     s = smtplib.SMTP(smtpServer, timeout=timeOut) # default timeout = 10 seconds
+    s.set_debuglevel(1)
     s.send_message(msg)
     s.quit()
   except:
     print("[sendEmail] - unable to send email") 
+
+def sendMailCmd(toEmail, subject, content):
+  try:
+    cmd = 'echo "' + content '" | mail -s "' + submit + '" ' + toEmail
+    os.system(cmd)
+  except:
+    print("[sendEmailCmd] - unable to send email") 
 
 # zip file
 def zipTheFiles(zipFileName, fileList, fileListSansPrefix):
