@@ -239,7 +239,7 @@ def sendEmail(toEmail, subject, content, timeOut=10, smtpServer='localhost'):
 
 def sendMailCmd(toEmail, subject, content):
   try:
-    cmd = 'echo "' + content '" | mail -s "' + submit + '" ' + toEmail
+    cmd = 'echo "' + content + '" | mail -s "' + submit + '" ' + toEmail
     os.system(cmd)
   except:
     print("[sendEmailCmd] - unable to send email") 
