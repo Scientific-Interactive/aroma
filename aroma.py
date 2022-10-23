@@ -1967,7 +1967,7 @@ def aroma(armfile):
        plotData()
 
        # send email notification
-       sendMailCmd(emailSettings["to_user"], "[AROMA]" + armfile, "Dear User, \n\nAROMA job [" + armfile + "] seems over. \n\n- AROMABOT" , smtpServer=emailSettings["smtp_host"]) 
+       sendMailCmd(emailSettings["to_user"], "[AROMA]" + armfile, "Dear User, \n\nAROMA job [" + armfile + "] seems over. \n\n- AROMABOT") 
 
        fileFilterInp = externalProgram["inpdir"] + org_flprfx + "*center*set*"
        fileFilterOut = externalProgram["outdir"] + org_flprfx + "*center*set*"
