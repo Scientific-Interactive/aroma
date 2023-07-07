@@ -181,7 +181,7 @@ def integralnics_analyse(mfile, sfile, pfile, dist_start = 2.0, outfl = sys.stdo
       if (sfile != ""):
          outfl.write(("A(delta-zz) = " + str(round(p_dzz_ab[0],4)) + "\tB(delta-zz) = " + str(round(p_dzz_ab[1],4)) + "\tIntegral-NICS(delta-zz) = " + str(round(nicsint_dzz_ab,4)) + "\n").expandtabs(24))
          outfl.write(("A(3Diso) = " + str(round(p_3iso_ab[0],4)) + "\tB(3Diso) = " + str(round(p_3iso_ab[1],4)) + "\tIntegral-NICS(3Diso) = " + str(round(nicsint_3iso_ab,4)) + "\n").expandtabs(24))
-         sonly_mean = meanOf([nicsint_dzz_ab + nicsint_3iso_ab])
+         sonly_mean = meanOf([nicsint_dzz_ab, nicsint_3iso_ab])
          outfl.write("\n                Sigma-only Integral-NICS(pi, zz) = " + str(round(sonly_mean,4)) + " \u00B1 " + str(round((sonly_mean - nicsint_dzz_ab),4)) + "\n")
 
       outfl.write("\nNICS(r)=A*B^r +C; NICS(1)=A*B+C	NICS(1.7)=A*B^1.7 +C\n\n")
@@ -191,8 +191,8 @@ def integralnics_analyse(mfile, sfile, pfile, dist_start = 2.0, outfl = sys.stdo
       if (sfile != ""):
          outfl.write(("A(delta-zz) = " + str(round(p_dzz_abc[0],4)) + "\tB(delta-zz) = " + str(round(p_dzz_abc[1],4)) + "\tC(delta-zz) = " + str(round(p_dzz_abc[2],4)) + "\tNICS(1) = " + str(round(nicsint_dzz_abc1,4)) + "\tNICS(1.7) = " + str(round(nicsint_dzz_abc17,4)) + "\n").expandtabs(24))
          outfl.write(("A(3Diso) = " + str(round(p_3iso_abc[0],4)) + "\tB(3Diso) = " + str(round(p_3iso_abc[1],4)) + "\tC(3Diso) = " + str(round(p_3iso_abc[2],4)) + "\tNICS(1) = " + str(round(nicsint_3iso_abc1,4)) + "\tNICS(1.7) = " + str(round(nicsint_3iso_abc17,4)) + "\n").expandtabs(24))
-         sonly_mean1 = meanOf([nicsint_dzz_abc1 + nicsint_3iso_abc1])
-         sonly_mean17 = meanOf([nicsint_dzz_abc17 + nicsint_3iso_abc17])
+         sonly_mean1 = meanOf([nicsint_dzz_abc1, nicsint_3iso_abc1])
+         sonly_mean17 = meanOf([nicsint_dzz_abc17, nicsint_3iso_abc17])
          outfl.write("\n                Sigma-only Sigma-only NICS(1) = " + str(round(sonly_mean1,4)) + " \u00B1 " + str(round((sonly_mean1 - nicsint_dzz_abc1),4)) + "\n")
          outfl.write("\n                Sigma-only Sigma-only NICS(1.7) = " + str(round(sonly_mean17,4)) + " \u00B1 " + str(round((sonly_mean17 - nicsint_dzz_abc17),4)) + "\n")
       outfl.write("\n--------------------------------------------------------------------\n")
