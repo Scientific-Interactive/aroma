@@ -49,7 +49,7 @@ class Application(tk.Frame):
     def arrangeStaticLabels(self):
 
 #       Aroma Logo
-        self.aroma_img = ImageTk.PhotoImage(   (Image.open("aroma_logo.png")).resize((450,125) ,Image.ANTIALIAS) )
+        self.aroma_img = ImageTk.PhotoImage(   (Image.open("aroma_logo.png")).resize((450,125) ,Image.LANCZOS) )
         self.aroma_logo = tk.Label(self, image=self.aroma_img, bg=self.colour)
         self.aroma_logo.image = self.aroma_img
         self.aroma_logo.grid(column=0, row=0, columnspan=3, sticky='NEWS', pady=20 )
@@ -61,13 +61,13 @@ class Application(tk.Frame):
         self.statuslabel.grid(column=0,row=5, padx=10, pady=10, sticky="ew")
 
 #       Technion Logo
-        self.tech_img = ImageTk.PhotoImage(   (Image.open("tech_logo.png")).resize((130,100),Image.ANTIALIAS) )
+        self.tech_img = ImageTk.PhotoImage(   (Image.open("tech_logo.png")).resize((130,100),Image.LANCZOS) )
         self.tech_logo = tk.Label(self, image=self.tech_img, bg=self.colour)
         self.tech_logo.image = self.tech_img
         self.tech_logo.grid(column=0, row=6, sticky="news", padx=10, pady=20)
 
 #       Chemistry Logo
-        self.chem_img = ImageTk.PhotoImage(   (Image.open("chem_logo.png")).resize((250,100),Image.ANTIALIAS) )
+        self.chem_img = ImageTk.PhotoImage(   (Image.open("chem_logo.png")).resize((250,100),Image.LANCZOS) )
         self.chem_logo = tk.Label(self, image=self.chem_img, bg=self.colour)
         self.chem_logo.image = self.chem_img
         self.chem_logo.grid(column=2, row=6, sticky="news", padx=10, pady=20)
