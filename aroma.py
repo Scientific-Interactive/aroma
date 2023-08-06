@@ -1530,20 +1530,6 @@ def Execute():
             # write collated files for picmo
             writeCollatedFiles("main", "picmo")
 
-        if (xy_flag):
-            outfl = open(outfilename, "a")
-            outfl.write(
-                "\n\nThe Centers for Rings/Bonds from the .arm file corresponds to following BQs\n")
-            outfl.write("Ring  Distance    X       Y       Z\n")
-            for i in range(1, len(BQGuide)+1):
-                if i == 1:
-                    dist = 0.0
-                else:
-                    dist += round(getDistance(BQGuide[i]
-                                  [1], BQGuide[i-1][1]), 3)
-                outfl.write("  " + repr(i) + "     " + fpformat.fix(dist, 1) + "   " + fpformat.fix(
-                    BQGuide[i][1][0], 3) + "   " + fpformat.fix(BQGuide[i][1][1], 3) + "   " + fpformat.fix(BQGuide[i][1][2], 3) + "\n")
-            outfl.close()
 
 
 def callAnalyse(flprfx, CenterOf, all_aromatic_rings, analyse_dist, outfl):
@@ -1649,6 +1635,22 @@ def runJobs():
         jsonInputSetFile = externalProgram["outdir"] + flprfx + "-inputFileSet.json"
         jsonXYDistFile   = externalProgram["outdir"] + flprfx + "-xyBQDist.json"
 
+        if inponly_flag and xy_flag:
+            outfl = open(outfilename, "a")
+            outfl.write(
+                "\n\nThe Centers for Rings/Bonds from the .arm file corresponds to following BQs\n")
+            outfl.write("Ring  Distance    X       Y       Z\n")
+            for i in range(1, len(BQGuide)+1):
+                if i == 1:
+                    dist = 0.0
+                else:
+                    dist += round(getDistance(BQGuide[i]
+                                  [1], BQGuide[i-1][1]), 3)
+                outfl.write("  " + repr(i) + "     " + fpformat.fix(dist, 1) + "   " + fpformat.fix(
+                    BQGuide[i][1][0], 3) + "   " + fpformat.fix(BQGuide[i][1][1], 3) + "   " + fpformat.fix(BQGuide[i][1][2], 3) + "\n")
+            outfl.close()
+
+
         if (sigma_flag):
             if (opt_flag or opt_external):
                 theParser = externalProgram["readerFunctCall"]["output"](
@@ -1691,6 +1693,17 @@ def runJobs():
                 outfl.write(
                     "\n--------------------------------------------------------------------\n")
                 outfl.write("\nFor the Sigma Model:\n")
+                outfl.write(
+                    "\n\nThe Centers for Rings/Bonds from the .arm file corresponds to following BQs\n")
+                outfl.write("Ring  Distance    X       Y       Z\n")
+                for i in range(1, len(BQGuide)+1):
+                    if i == 1:
+                       dist = 0.0
+                    else:
+                       dist += round(getDistance(BQGuide[i]
+                                  [1], BQGuide[i-1][1]), 3)
+                    outfl.write("  " + repr(i) + "     " + fpformat.fix(dist, 1) + "   " + fpformat.fix(
+                        BQGuide[i][1][0], 3) + "   " + fpformat.fix(BQGuide[i][1][1], 3) + "   " + fpformat.fix(BQGuide[i][1][2], 3) + "\n")
                 outfl.close()
 
             if (s_charge_flag):

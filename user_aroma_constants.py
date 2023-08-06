@@ -25,7 +25,7 @@ Max_Conn = {5:4, 6:4, 7:4, 8:3, 13:4, 14:4, 15:5, 16:3, 17:1, 22:6}
 # Geometry Related Constants
 COORDINATE_EQUALITY_TOLERENCE = 0.001 # in angstrom
 COVALENT_BOND_TOLERENCE = 0.4 # in angstrom
-TORSION_ANGLE_TOLERANCE = 15 # in degrees, ideal value 5
+TORSION_ANGLE_TOLERANCE = 60 # in degrees, ideal value 5
 ###########################################################################################################################################
 
 
@@ -42,7 +42,8 @@ GaussianSettings = {
   "inpExt": ".in",
   "outExt": ".out",
 
-  "extCmd": "/user/local/g09/g09 ",
+#  "extCmd": "/user/local/g09/g09 ",
+  "extCmd": "C://Users/user/Documents/2.0Aroma/G09W/G09W/g09 ",
   "chkCmd": "/usr/local/g09/formchk ",
 
   "extensions": { 'input': ['com','gjf','inp','in'], 'output': ['log', 'out'], 'checkpoint': ['chk'] }, # list of possibile extensions for Gaussian Files
@@ -51,9 +52,9 @@ GaussianSettings = {
   "maxAtomsInInputFile": 50,
 
   # Aroma defaults for Gaussian run
-  "defaultOptimizationKeyline": "%nproc=1\n%mem=1024MB\n# HF/STO-3G OPT \n",
-  "defaultNicsKeyline": "%nproc=1\n%mem=1024MB\n# HF/STO-3G NMR=GIAO INTEGRAL=(GRID=ULTRAFINE) CPHF=(GRID=FINE)\n",
-  "defaultNcsKeyline": "%nproc=1\n%mem=1024MB\n# HF/STO-3G NMR=GIAO IOP(10/46=1) POP(NBOREAD, FULL) INTEGRAL=(GRID=ULTRAFINE) CPHF=(GRID=FINE)\n",
+  "defaultOptimizationKeyline": "%nproc=1\n%mem=1024MB\n# HF/3-21G OPT \n",
+  "defaultNicsKeyline": "%nproc=1\n%mem=1024MB\n# HF/3-21G NMR=GIAO INTEGRAL=(GRID=ULTRAFINE) CPHF=(GRID=FINE)\n",
+  "defaultNcsKeyline": "%nproc=1\n%mem=1024MB\n# HF/3-21G NMR=GIAO IOP(10/46=1) POP(NBO6READ, FULL) INTEGRAL=(GRID=ULTRAFINE) CPHF=(GRID=FINE)\n",
   "defaultNboKeyline": "$NBO NCS=0.1 <I MO XYZ> $END\n",
 
   # define construction of command to run Gaussian Files
@@ -109,8 +110,8 @@ DEFAULT_DISTANCE_FOR_ANALYSIS = 1.1
 ###########################################################################################################################################
 # Defaults for Aroma Generated Sigma-Only Model
 # All the angles are in degrees and lengths in angstrom
-FIXED_SIGMA_ANGLE = '95.0' 
-FIXED_SIGMA_DIHEDRAL_ANGLE = '0.0' 
+FIXED_SIGMA_ANGLE = '105.0' 
+FIXED_SIGMA_DIHEDRAL_ANGLE = '20.0' 
 # Dictionary of Atom-H bond length
 # Key: Value :: Atomic Number : Bond Length
 ATM_H_BL = {5:'1.19', 6:'1.00', 7:'1.00', 8:'0.96', 13:'1.55', 14:'1.47',15:'1.35', 16:'1.31', 22:'1.60'}
