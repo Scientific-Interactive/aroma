@@ -110,8 +110,8 @@ DEFAULT_DISTANCE_FOR_ANALYSIS = 1.1
 ###########################################################################################################################################
 # Defaults for Aroma Generated Sigma-Only Model
 # All the angles are in degrees and lengths in angstrom
-FIXED_SIGMA_ANGLE = '105.0' 
-FIXED_SIGMA_DIHEDRAL_ANGLE = '20.0' 
+FIXED_SIGMA_ANGLE = '95.0' 
+FIXED_SIGMA_DIHEDRAL_ANGLE = '0.0' 
 # Dictionary of Atom-H bond length
 # Key: Value :: Atomic Number : Bond Length
 ATM_H_BL = {5:'1.19', 6:'1.00', 7:'1.00', 8:'0.96', 13:'1.55', 14:'1.47',15:'1.35', 16:'1.31', 22:'1.60'}
