@@ -12,8 +12,10 @@ import json
 import string
 import fpformat
 
-import aroma_constants
+import aroma_user_constants
+aroma_user_constants.loadUserConstants(sys.argv[0])
 from aroma_constants import *
+import aroma_constants
 
 import aroma_util
 from aroma_util import *
