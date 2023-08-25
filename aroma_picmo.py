@@ -114,32 +114,40 @@ def writeCollatedFiles(inputFileSet):
 def main():
 
    piMOs = []
-   if (len(sys.argv) > 2):
-      for i in range (2, len(sys.argv)):
+   if (len(sys.argv) > 3):
+      for i in range (3, len(sys.argv)):
          piMOs.append(int(sys.argv[i]))
-   else: print("Error: MOs are not specified .. Aborting .. "); sys.exit(10)
+   else: print("Error: Usage is RUNTYPE filename MOs .. One of the inputs is missing, hence aborting .. "); sys.exit(10)
 
-   flprfx  = sys.argv[1]
+   runtype = sys.argv[1].upper()
+   if (runtype == "GAUSSIAN" or runtype == "AROMA"): pass
+   else: print("Error: The Runtype can either GAUSSIAN or AROMA. Aborting due to incorrect Runtype .. "); sys.exit(10)
 
-   outf = open(externalProgram["outdir"] + flprfx + "-inputFileSet.json", "r") # this file name needs to change, based on input
-   inputFileSet = json.loads(outf.read())
-   outf.close()
+   if (runtype == "AROMA"):
+      flprfx  = sys.argv[2]
+      outf = open(externalProgram["outdir"] + flprfx + "-inputFileSet.json", "r") # this file name needs to change, based on input
+      inputFileSet = json.loads(outf.read())
+      outf.close()
 
-   # get all files in the "main" run
-   jobType = "main"
-   mainFiles = list(filter(lambda x: x["jobType"] == jobType and x["setIdx"] != "-1", inputFileSet))
+      # get all files in the "main" run
+      jobType = "main"
+      mainFiles = list(filter(lambda x: x["jobType"] == jobType and x["setIdx"] != "-1", inputFileSet))
 
-   # get list of all centers
-   centerList = list(set(list(map(lambda x: x["centerIdx"], mainFiles))))
+      # get list of all centers
+      centerList = list(set(list(map(lambda x: x["centerIdx"], mainFiles))))
 
-   for centerIdx in centerList:
-      idx = 0
-      centerFileSet = list(filter(lambda x: x["centerIdx"] == centerIdx and x["jobType"] == jobType, mainFiles))
+      for centerIdx in centerList:
+         idx = 0
+         centerFileSet = list(filter(lambda x: x["centerIdx"] == centerIdx and x["jobType"] == jobType, mainFiles))
 
-      for inpFil in centerFileSet:
-        grepPiCMO(piMOs, externalProgram["outdir"] + inpFil["flprfx"], externalProgram["outExt"])
+         for inpFil in centerFileSet:
+           grepPiCMO(piMOs, externalProgram["outdir"] + inpFil["flprfx"], externalProgram["outExt"])
 
-   writeCollatedFiles(inputFileSet)
+      writeCollatedFiles(inputFileSet)
+
+   elif (runtype == "GAUSSIAN"):
+      flnm = sys.argv[2]
+      grepPiCMO(piMOs, externalProgram["outdir"] + flnm, "")
 
 if __name__ == "__main__":
    main()
