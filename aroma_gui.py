@@ -73,7 +73,7 @@ class Application(tk.Frame):
         self.chem_logo.grid(column=2, row=6, sticky="news", padx=10, pady=20)
 
 #       Credits
-        self.credit = tk.Label(self, text="Citation:\n1. Aroma, Anuja P. Rahalkar and Amnon Stanger\n2. A. Stanger, J. Org. Chem. 2010, 71, 883-893\n3. A. Stanger, J. Org. Chem. 2010, 75, 2281-2288\n4.R. Gershoni-Poranne, A. Stanger, Chem. Eur. J. 2014, 20, 5673-5688", bg="white", justify="center", font=("papyrus", 10))
+        self.credit = tk.Label(self, text="Citation:\n1) Aroma, Anuja P. Rahalkar and Amnon Stanger\n2) A. Stanger, J. Org. Chem. 2010, 71, 883-893\n3) A. Stanger, J. Org. Chem. 2010, 75, 2281-2288\n4) R. Gershoni-Poranne, A. Stanger, Chem. Eur. J. 2014, 20, 5673-5688", bg="white", justify="left", font=("papyrus", 10))
         self.credit.grid(column=1, row=6, padx=10, pady=10, sticky="ew")
 
     def getTheArmFile(self):
