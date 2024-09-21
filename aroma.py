@@ -608,7 +608,7 @@ def generateBQs_Z(geom, Conn, ring_atoms, sigma_direction, normal=[]):
 # Calculate the CM of the ring, calculate the normal to the global reference ring
     norm = getReferenceVecForDirection(geom, Conn)
 
-    cmx, cmy, cmz = getCMOfRing(geom, ring_atoms)
+    cmx, cmy, cmz = getGMOfRing(geom, ring_atoms)
     zinc = BQ_Step
 
 # get normal to the current ring
