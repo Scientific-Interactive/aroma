@@ -135,6 +135,18 @@ def check(armfile):
 
             if (runseq.count("INPONLY") > 0):
                 inponly_flag = 1
+        
+                shutil.copyfile(armpath + flprfx + ".arm", armpath + flprfx + ".arm.org")
+
+                f = open(armpath + flprfx + ".arm","w")
+                for i in range (0, len(armlines)):
+                    if (armlines[i].upper().find("AROMARUN") >= 0):
+                        armlines[i] = re.sub("inponly", "outonly", armlines[i].lower())
+                        f.write(armlines[i])
+                    else: f.write(armlines[i])
+                f.close()
+                print("This is INPUT-ONLY run. The original .arm file is saved as .arm.org and current .arm is modified for OUTPUT-ONLY run.\n")
+
             if (runseq.count("OUTONLY") > 0):
                 outonly_flag = 1
 #            if (runseq.count("FORCEORDER") > 0):
@@ -345,18 +357,6 @@ def check(armfile):
             if (armlines[i].upper().find("SONLY MULT") >= 0):
                 s_mult_flag = 1
                 sigma_mult = int(armlines[i].split("=")[1])
-
-        if (inponly_flag): 
-            shutil.copyfile(armpath + flprfx + ".arm", armpath + flprfx + ".arm.org")
-
-            f = open(armpath + flprfx + ".arm","w")
-            for i in range (0, len(armlines)):
-                if (armlines[i].upper().find("AROMARUN") >= 0):
-                    armlines[i] = re.sub("inponly", "outonly", armlines[i].lower())
-                    f.write(armlines[i])
-                else: f.write(armlines[i])
-            f.close()
-            print("This is INPUT-ONLY run. The original .arm file is saved as .arm.org and current .arm is modified for OUTPUT-ONLY run.\n")
 
 
     for i in range(0, len(armlines)):
@@ -1607,6 +1607,7 @@ def runJobs():
     # input file set
     global inputFileSet
 
+    print("HERE2", externalProgram)
     if (not opt_external):  # if asked not asked for optimization, read the geometry from the input geom file
         for extension in externalProgram["extensions"]:
             if (externalProgram["extensions"][extension].count(geomflext) == 1):
@@ -1961,6 +1962,7 @@ def aroma(armfile):
     # init global flags
     init()
 
+    print("HERE", externalProgram)
     # set the file prefix
     flprfx = armfile[armfile.rindex("/")+1:len(armfile)]
     org_flprfx = flprfx
