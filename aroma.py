@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # Author : Anuja
 # 30.01.2013
-# Last Updated : 02.01.2021
+# Last Updated : 22.09.2024
 
 # Main Driver scipt for automation of NICS-Scan in Z and XY Directions, Sigma-Only Model and CMO-NICS
 
@@ -1221,6 +1221,7 @@ def genSigmaModel(flprfx, geom, Conn, title, charge, mult):
             "  " + FIXED_SIGMA_ANGLE + "  " + \
             repr(zmat_idx[ring_dummy_tuples[r][1]]) + \
             "  " + FIXED_SIGMA_DIHEDRAL_ANGLE + "\n"
+        flag_H[mapec[r]] = 1
 
 # ADD: Z-MATRIX ELEMENTS FOR NORMALS
     for norm in normals:
@@ -1607,7 +1608,6 @@ def runJobs():
     # input file set
     global inputFileSet
 
-    print("HERE2", externalProgram)
     if (not opt_external):  # if asked not asked for optimization, read the geometry from the input geom file
         for extension in externalProgram["extensions"]:
             if (externalProgram["extensions"][extension].count(geomflext) == 1):
@@ -1962,7 +1962,6 @@ def aroma(armfile):
     # init global flags
     init()
 
-    print("HERE", externalProgram)
     # set the file prefix
     flprfx = armfile[armfile.rindex("/")+1:len(armfile)]
     org_flprfx = flprfx

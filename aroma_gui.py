@@ -1,8 +1,6 @@
 #! /usr/bin/env python
-# Author : Anuja
 # Last Updated : 02.11.2014
-# Python 3 upgrade: V. Ganesh
-# Updated: 19.10.2020
+# Updated: 23.09.2024
 #
 
 import aroma
@@ -39,7 +37,7 @@ class Application(tk.Frame):
         self.arrangeStaticLabels()
         self.getTheArmFile()
         self.RunAroma()
-        self.RunAromaSu()
+#        self.RunAromaSu()
         self.outputText()
         self.status()
         self.clear()
@@ -107,9 +105,9 @@ class Application(tk.Frame):
         self.RunMButton['state']='normal'
         self.statusText.set("Job Over: " + self.fl)
 
-    def RunAromaSu(self):
-        self.RunMButton = tk.Button(self, text='Run Multiple', command=self.threadRunM)
-        self.RunMButton.grid(column=1,row=2)
+#    def RunAromaSu(self):
+#        self.RunMButton = tk.Button(self, text='Run Multiple', command=self.threadRunM)
+#        self.RunMButton.grid(column=1,row=2)
 
     def threadRunM(self):
         suaromathread = threading.Thread(target=self.RunS, args=())

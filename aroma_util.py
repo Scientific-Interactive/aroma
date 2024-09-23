@@ -1,7 +1,6 @@
 #! /usr/bin/env python
-# Author : Anuja
 # @ 10.02.2013
-# Last Updated : 20.02.2014
+# Last Updated : 23.09.2024
 
 # Utility Functions for Package Aroma 
 
@@ -197,7 +196,7 @@ def removeFiles(fls):
 
 # aroma version
 def aromaVersion():
-   return "v2.0.16012021"
+   return "v2.0.23092024"
 
 # nics integral fit
 def nicsIntegralFit(xdata, ydata):
