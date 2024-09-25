@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # Author : Anuja
 # 30.01.2013
-# Last Updated : 22.09.2024
+# Last Updated : 23.09.2024
 
 # Main Driver scipt for automation of NICS-Scan in Z and XY Directions, Sigma-Only Model and CMO-NICS
 
@@ -1507,7 +1507,8 @@ def Execute():
             centerList.sort()
 
             idx = 0
-            dist = 0.0
+            if (xy_extend != 0.0): dist = -xy_extend
+            else: dist = 0.0
 
             # iterate over each center for the job type
             for centerIdx in centerList:
@@ -1636,7 +1637,8 @@ def runJobs():
         jsonInputSetFile = externalProgram["outdir"] + flprfx + "-inputFileSet.json"
         jsonXYDistFile   = externalProgram["outdir"] + flprfx + "-xyBQDist.json"
 
-        if inponly_flag and xy_flag:
+#        if inponly_flag and xy_flag:
+        if xy_flag:
             outfl = open(outfilename, "a")
             outfl.write(
                 "\n\nThe Centers for Rings/Bonds from the .arm file corresponds to following BQs\n")

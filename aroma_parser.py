@@ -325,7 +325,7 @@ class OrcaInputFileParser(FileParser):
 
       idx = 0      
       for line in glines:
-         if (line.lower().find("*xyz") >= 0): break
+         if (line.lower().replace(" ", "").find("*xyz") >= 0): break
          idx += 1
       adx = 1
       words = glines[idx].split()

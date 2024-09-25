@@ -35,27 +35,27 @@ TORSION_ANGLE_TOLERANCE = 60 # in degrees, ideal value 5
 
 # Constants, Paths for setting Gaussian Runs
 GaussianSettings = {
-  "inpdir": "tests/",
-  "outdir": "tests/",
+  "inpdir": "/home/user/input/",
+  "outdir": "/home/user/output/",
   "chkdir": "chk/",
 
-  "inpExt": ".in",
+  "inpExt": ".com",
   "outExt": ".out",
 
-#  "extCmd": "/user/local/g09/g09 ",
-  "extCmd": "C://Users/user/Documents/2.0Aroma/G09W/G09W/g09 ",
-  "chkCmd": "/usr/local/g09/formchk ",
+  "extCmd": "/home/user/bin/g09run ",
+#  "extCmd": "C://Users/user/Documents/2.0Aroma/G09W/G09W/g09 ",
+  "chkCmd": "/home/user/g09/formchk ",
 
   "extensions": { 'input': ['com','gjf','inp','in'], 'output': ['log', 'out'], 'checkpoint': ['chk'] }, # list of possibile extensions for Gaussian Files
 
   # maximum number of atoms and ghost atoms/Bqs that your system can handle
-  "maxAtomsInInputFile": 50,
+  "maxAtomsInInputFile": 500,
 
   # Aroma defaults for Gaussian run
   "defaultOptimizationKeyline": "%nproc=1\n%mem=1024MB\n# HF/3-21G OPT \n",
-  "defaultNicsKeyline": "%nproc=1\n%mem=1024MB\n# HF/3-21G NMR=GIAO INTEGRAL=(GRID=ULTRAFINE) CPHF=(GRID=FINE)\n",
-  "defaultNcsKeyline": "%nproc=1\n%mem=1024MB\n# HF/3-21G NMR=GIAO IOP(10/46=1) POP(NBO6READ, FULL) INTEGRAL=(GRID=ULTRAFINE) CPHF=(GRID=FINE)\n",
-  "defaultNboKeyline": "$NBO NCS=0.1 <I MO XYZ> $END\n",
+  "defaultNicsKeyline": "# B3LYP/6-311+G* 6D NMR=GIAO INTEGRAL=(GRID=ULTRAFINE) CPHF=(GRID=FINE)\n",
+  "defaultNcsKeyline": "# B3LYP/6-311+G* 6D NMR=GIAO IOP(10/46=1) POP(NBO6READ, FULL) INTEGRAL=(GRID=ULTRAFINE) CPHF=(GRID=FINE)\n",
+  "defaultNboKeyline": "$NBO NCS=0.1,I,MO,XYZ $END\n",
 
   # define construction of command to run Gaussian Files
   "constructCmd": lambda flprfx: GaussianSettings["extCmd"] + GaussianSettings["inpdir"] + flprfx + GaussianSettings["inpExt"] + " " + GaussianSettings["outdir"] + flprfx + GaussianSettings["outExt"],
@@ -96,7 +96,7 @@ externalProgram = GaussianSettings
 
 ###########################################################################################################################################
 # Defaults for NICS
-DEFAULT_BQ_STEP = 0.5 # in angstrom
+DEFAULT_BQ_STEP = 0.2 # in angstrom
 DEFAULT_BQ_RANGE = [0, 4]
 DEFAULT_INTEGRALNICS_RANGE = [2,5]
 # Default for distance from molecular plane in case of XY-Scan
