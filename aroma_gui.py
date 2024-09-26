@@ -85,7 +85,6 @@ class Application(tk.Frame):
         self.inpfl.delete(0, tk.END)
         self.inpfl.insert(0, self.armfl)
         self.RunSButton['state']='normal'
-        self.RunMButton['state']='normal'
 
     def RunAroma(self):
         self.RunSButton = tk.Button(self, text='Run Single', command=self.threadRunS)
@@ -98,11 +97,11 @@ class Application(tk.Frame):
     def RunS(self):
         self.fl = tk.Entry.get(self.inpfl)
         self.RunSButton['state']='disabled'
-        self.RunMButton['state']='disabled'
+#        self.RunMButton['state']='disabled'
         self.statusText.set("Currently Running: " + self.fl)
         aroma.aroma(self.fl[0:len(self.fl)-4])
         self.RunSButton['state']='normal'
-        self.RunMButton['state']='normal'
+#        self.RunMButton['state']='normal'
         self.statusText.set("Job Over: " + self.fl)
 
 #    def RunAromaSu(self):

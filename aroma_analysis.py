@@ -122,15 +122,12 @@ def integralnics_analyse(mfile, sfile, pfile, dist_start = 2.0, outfl = sys.stdo
           nicsint_val_zz_abc1 = (p_zz_abc[0]*p_zz_abc[1]) + p_zz_abc[2]
           nicsint_val_zz_abc17 = (p_zz_abc[0]*(p_zz_abc[1]**(1.7))) + p_zz_abc[2]
           return p_zz_abc, nicsint_val_zz_abc1, nicsint_val_zz_abc17, "Success", ""
-      except OptimizeWarning as o:
-#          outfl.write(repr(o) + "\nHence, following values might not be accurate")
+      except scipy.optimize.OptimizeWarning as o:
           return p_zz_abc, nicsint_val_zz_abc1, nicsint_val_zz_abc17, "Success", "Parameter values might not be accurate as: " + repr(o)
       except RuntimeError as r:
-#          outfl.write(repr(r) + "\nHence, skipping this fit")
-          return 0.0, 0.0, 0.0, "Failure", "The parameters are set to zeros as: " + repr(r)
+          return 0.0, 0.0, 0.0, "Failure", "The curve fitting was not successful. " + repr(r)
       except ValueError as v:
-#          outfl.write(repr(v) + "\nHence, skipping this fit")
-          return 0.0, 0.0, 0.0, "Failure", "The parameters are set to zeros as: " + repr(v)
+          return 0.0, 0.0, 0.0, "Failure", "The curve fitting was not successful. " + repr(v)
 
 
    def fitbcr(dist, dat, name):
@@ -139,15 +136,12 @@ def integralnics_analyse(mfile, sfile, pfile, dist_start = 2.0, outfl = sys.stdo
           p_zz_ab = nicsIntegralFit(dist, dat)
           nicsint_val_zz_ab = ((p_zz_ab[0]*(p_zz_ab[1]**100))/math.log(p_zz_ab[1])) - (p_zz_ab[0]/math.log(p_zz_ab[1]))
           return p_zz_ab, nicsint_val_zz_ab, "Success", "" 
-      except OptimizeWarning as o:
-#          outfl.write(repr(o) + "\nHence, following values might not be accurate")
+      except scipy.optimize.OptimizeWarning as o:
           return p_zz_ab, nicsint_val_zz_ab, "Success", "The parameter values might not be accurate as: " + repr(o)
       except RuntimeError as r:
-#          outfl.write(repr(r) + "\nHence, skipping this fit")
-          return 0.0, 0.0, "Failure", "The parameters are set to zero as: " + repr(r)
+          return 0.0, 0.0, "Failure", "The curve fitting was not successful. " + repr(r)
       except ValueError as v:
-#          outfl.write(repr(v) + "\nHence, skipping this fit")
-          return 0.0, 0.0, "Failure", "The parameters are set to zero as: " + repr(v)
+          return 0.0, 0.0, "Failure", "The curve fitting was not successful. " + repr(v)
 
 
    numpy_flag = checkNumPy()
@@ -229,7 +223,6 @@ def integralnics_analyse(mfile, sfile, pfile, dist_start = 2.0, outfl = sys.stdo
              outfl.write("For delta-ZZ: " + nicsint_dzz_ab_err + "\n")
 
          if (nicsint_3iso_ab_status == "Success"):
-             if (nicsint_3iso_ab_err != ""): outfl.write("\n" + nicsint_3iso_ab_err + "\n")
              outfl.write(("A(3Diso) = " + str(round(p_3iso_ab[0],4)) + "\tB(3Diso) = " + str(round(p_3iso_ab[1],4)) + "\tIntegral-NICS(3Diso) = " + str(round(nicsint_3iso_ab,4)) + "\n").expandtabs(24))
          else:
              outfl.write("For 3Diso: " + nicsint_3iso_ab_err + "\n")
