@@ -147,7 +147,7 @@ def main():
    elif (runtype == "GAUSSIAN"):
       flnm = sys.argv[2]
       grepPiCMO(piMOs, externalProgram["outdir"] + flnm, "")
-      print("The data saved in file: ", flnm + ".picmo"
+      print("The data saved in file: ", flnm + ".picmo")
 
 if __name__ == "__main__":
    main()
