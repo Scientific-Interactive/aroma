@@ -2,8 +2,8 @@ rm -fr dist build aroma-win aroma-win.zip
 
 # windows build
 pyinstaller --windowed --onefile --name Aroma_GUI --hidden-import='PIL._tkinter_finder' --hidden-import='scipy.spatial.transform._rotation_groups' --hidden-import=_tkinter aroma_gui.py
-pyinstaller --windowed --onefile --name Aroma aroma.py
-pyinstaller --windowed --onefile --name Aroma_picmo aroma_picmo.py
+pyinstaller --onefile --hidden-import='scipy.spatial.transform._rotation_groups' --name Aroma aroma.py
+pyinstaller --onefile --hidden-import='scipy.spatial.transform._rotation_groups' --name Aroma_picmo aroma_picmo.py
 cd dist
 mkdir aroma-win
 mv Aroma_GUI.exe aroma-win/
