@@ -276,7 +276,7 @@ class OrcaOutputFileParser(FileParser):
       i = 0
 
       for i in range(len(outlines)):
-         if (outlines[i].find("CHEMICAL SHIFTS") >= 0): break
+         if (outlines[i].find("CHEMICAL SHIFTS") >= 0 or outlines[i].find("CHEMICAL SHIELDINGS") >= 0): break
 
 
       i += 4
