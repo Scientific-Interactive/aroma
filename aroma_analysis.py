@@ -107,7 +107,7 @@ def analyse(mfile, sfile, dist_start = DEFAULT_DISTANCE_FOR_ANALYSIS, outfl = sy
    if (ncs_flag):
       outfl.write("\n\nPicmo polynomial fits are:\n")
       outfl.write("\n" + str(p_pinp) + "\n")
-      outfl.write("\nThe NICS value using CMO analysis is " + repr(round(p_pinp(1),3)) )
+      outfl.write("\nThe NICS value using CMO analysis is " + str(round(p_pinp(1),3)) )
 
    outfl.write("\n--------------------------------------------------------------------\n")
 
@@ -299,7 +299,7 @@ def analyse_ncs(pfile, outfl=sys.stdout, dist_start = DEFAULT_DISTANCE_FOR_ANALY
 
    outfl.write("\n\nPicmo polynomial fits are:\n")
    outfl.write("\n" + str(p_pinp) + "\n")
-   outfl.write("\nThe NICS value using CMO analysis is " + repr(round(p_pinp(1),3)) )
+   outfl.write("\nThe NICS value using CMO analysis is " + str(round(p_pinp(1),3)) )
 
    outfl.write("\n--------------------------------------------------------------------\n")
 

@@ -74,7 +74,7 @@ def grepPiCMO(piMOs, outfl, outExt):
             continue
 
       prvs = j+5+k
-      f.write(data_string + "  " + repr(-round(sumval,2)) + "\n")
+      f.write(data_string + "  " + str(-round(sumval,2)) + "\n")
 
    f.write("\n")
    f.close()
