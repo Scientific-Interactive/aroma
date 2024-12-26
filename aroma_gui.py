@@ -4,7 +4,6 @@
 #
 
 import aroma
-import aroma_su
 
 import aroma_util
 
@@ -37,7 +36,6 @@ class Application(tk.Frame):
         self.arrangeStaticLabels()
         self.getTheArmFile()
         self.RunAroma()
-#        self.RunAromaSu()
         self.outputText()
         self.status()
         self.clear()
@@ -97,30 +95,16 @@ class Application(tk.Frame):
     def RunS(self):
         self.fl = tk.Entry.get(self.inpfl)
         self.RunSButton['state']='disabled'
-#        self.RunMButton['state']='disabled'
         self.statusText.set("Currently Running: " + self.fl)
         aroma.aroma(self.fl[0:len(self.fl)-4])
         self.RunSButton['state']='normal'
-#        self.RunMButton['state']='normal'
         self.statusText.set("Job Over: " + self.fl)
 
-#    def RunAromaSu(self):
-#        self.RunMButton = tk.Button(self, text='Run Multiple', command=self.threadRunM)
-#        self.RunMButton.grid(column=1,row=2)
 
     def threadRunM(self):
         suaromathread = threading.Thread(target=self.RunS, args=())
         suaromathread.start()
 
-    def RunM(self):
-        self.fl = tk.Entry.get(self.inpfl)
-        self.RunSButton['state']='disabled'
-        self.RunMButton['state']='disabled'
-        self.statusText.set("Currently Running: " + self.fl)
-        aroma_su.main(self.fl[0:len(self.fl)-4])
-        self.RunSButton['state']='normal'
-        self.RunMButton['state']='normal'
-        self.statusText.set("Job Over: " + self.fl)
 
     def outputText(self):
         self.optext = ScrolledText.ScrolledText(self, height=12, width=100 )
