@@ -10,7 +10,6 @@ import sys
 import time
 import string
 import struct
-import fpformat
 
 import aroma_constants
 from aroma_constants import *
@@ -130,7 +129,7 @@ def grepPiCMO(nat, piMOs, nocc, nghost, BQ_Range, BQ_Step, outfl, outExt, distId
           cmo_init[piMOs[c]] = 0.0
       prvsmo = 0
       sumval = 0.0
-      data_string = "   " + fpformat.fix(dist,2)
+      data_string = "   " + fpformatFix(dist,2)
       for k in range (0, nocc):
          if (olines[j+5+k+1].find("Total") >= 0):
             break
@@ -145,7 +144,7 @@ def grepPiCMO(nat, piMOs, nocc, nghost, BQ_Range, BQ_Step, outfl, outExt, distId
                   break
             continue
       for c in range (0, len(piMOs)):
-          data_string += "  " + fpformat.fix(cmo_init[piMOs[c]],2)
+          data_string += "  " + fpformatFix(cmo_init[piMOs[c]],2)
           sumval += cmo_init[piMOs[c]] 
       dist += BQ_Step
 

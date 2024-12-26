@@ -5,7 +5,6 @@
 #
 
 import time
-import fpformat
 
 import aroma
 import aroma_molecule
@@ -100,7 +99,7 @@ class Harness:
       print("="*50)
       print("Running Test: " + testClass.getName())
       testTime = testClass.runAndGetTime()
-      print("\t Time to run test: " +  fpformat.fix(testTime, 4))
+      print("\t Time to run test: " +  fpformatFix(testTime, 4))
       print("\t Result: \t" + testClass.getResult())
       print("\t Expected: \t" + testClass.getExpectedResult())
       print("\t Test passed: \t" + repr(testClass.testPassed()))
@@ -114,7 +113,7 @@ class Harness:
    def summary(self):
       print("Total Number of Tests: " + repr(self.numberOfTests))
       print("Total Number of Tests Passed: " + repr(self.numberOfTestsPassed)) 
-      print("Total Time: " + fpformat.fix(self.totalTime, 4))
+      print("Total Time: " + fpformatFix(self.totalTime, 4))
 
 if __name__=="__main__":
    harness = Harness()

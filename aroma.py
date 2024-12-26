@@ -12,7 +12,6 @@ import glob
 import json
 import shutil
 import string
-import fpformat
 
 from aroma_constants import *
 import aroma_constants
@@ -1377,8 +1376,8 @@ def grepData():
                 # In-plane chemical shift is average of the two in-plane shifts
                 inp = 0.5*(inp1+inp2)
 
-                BQ_data_string += fpformat.fix(dist, 2) + "   " + fpformat.fix(oup, 4) + "   " + fpformat.fix(inp1, 4) + "   " + fpformat.fix(inp2, 4) + "   " + fpformat.fix(
-                    inp, 4) + "   " + fpformat.fix(iso, 4) + "   " + fpformat.fix(xx, 4) + "   " + fpformat.fix(yy, 4) + "   " + fpformat.fix(zz, 4) + "\n"
+                BQ_data_string += fpformatFix(dist, 2) + "   " + fpformatFix(oup, 4) + "   " + fpformatFix(inp1, 4) + "   " + fpformatFix(inp2, 4) + "   " + fpformatFix(
+                    inp, 4) + "   " + fpformatFix(iso, 4) + "   " + fpformatFix(xx, 4) + "   " + fpformatFix(yy, 4) + "   " + fpformatFix(zz, 4) + "\n"
                 f_out.write(BQ_data_string)
 
                 if (not xy_flag):
@@ -1649,8 +1648,8 @@ def runJobs():
                 else:
                     dist += round(getDistance(BQGuide[i]
                                   [1], BQGuide[i-1][1]), 3)
-                outfl.write("  " + repr(i) + "     " + fpformat.fix(dist, 1) + "   " + fpformat.fix(
-                    BQGuide[i][1][0], 3) + "   " + fpformat.fix(BQGuide[i][1][1], 3) + "   " + fpformat.fix(BQGuide[i][1][2], 3) + "\n")
+                outfl.write("  " + repr(i) + "     " + fpformatFix(dist, 1) + "   " + fpformatFix(
+                    BQGuide[i][1][0], 3) + "   " + fpformatFix(BQGuide[i][1][1], 3) + "   " + fpformatFix(BQGuide[i][1][2], 3) + "\n")
             outfl.close()
 
 
@@ -1705,8 +1704,8 @@ def runJobs():
                     else:
                        dist += round(getDistance(BQGuide[i]
                                   [1], BQGuide[i-1][1]), 3)
-                    outfl.write("  " + repr(i) + "     " + fpformat.fix(dist, 1) + "   " + fpformat.fix(
-                        BQGuide[i][1][0], 3) + "   " + fpformat.fix(BQGuide[i][1][1], 3) + "   " + fpformat.fix(BQGuide[i][1][2], 3) + "\n")
+                    outfl.write("  " + repr(i) + "     " + fpformatFix(dist, 1) + "   " + fpformatFix(
+                        BQGuide[i][1][0], 3) + "   " + fpformatFix(BQGuide[i][1][1], 3) + "   " + fpformatFix(BQGuide[i][1][2], 3) + "\n")
                 outfl.close()
 
             if (s_charge_flag):
@@ -1776,8 +1775,8 @@ def runJobs():
             for i in range(1, lineno):
                 awords = list(map(float, armdatlines[i].split()))
                 sawords = list(map(float, sarmdatlines[i].split()))
-                armlog.write(fpformat.fix(awords[0], 2) + "   " + fpformat.fix(awords[8], 4) + "   " + fpformat.fix(
-                             sawords[8], 4) + "   " + fpformat.fix(awords[8]-sawords[8], 4) + "\n")
+                armlog.write(fpformatFix(awords[0], 2) + "   " + fpformatFix(awords[8], 4) + "   " + fpformatFix(
+                             sawords[8], 4) + "   " + fpformatFix(awords[8]-sawords[8], 4) + "\n")
             armlog.close()
 
 

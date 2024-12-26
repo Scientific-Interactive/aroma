@@ -35,14 +35,15 @@ TORSION_ANGLE_TOLERANCE = 60 # in degrees, ideal value 5
 
 # Constants, Paths for setting Gaussian Runs
 GaussianSettings = {
-  "inpdir": "/home/user/input/",
-  "outdir": "/home/user/output/",
+  "inpdir": "tests/",
+  "outdir": "tests/",
   "chkdir": "chk/",
 
-  "inpExt": ".com",
-  "outExt": ".out",
+  "inpExt": ".in",
+  "outExt": ".log",
 
-  "extCmd": "/home/user/bin/g09run ",
+#  "extCmd": "/home/user/bin/g09run ",
+  "extCmd":  "C://Users/user/Documents/2.0Aroma/G09W/G09W/g09 ",
 #  "extCmd": "C://Users/user/Documents/2.0Aroma/G09W/G09W/g09 ",
   "chkCmd": "/home/user/g09/formchk ",
 
@@ -92,6 +93,7 @@ OrcaSettings = {
 
 # program to use - edit this with either GaussianSettings or OrcaSettings depending on your backend 
 externalProgram = GaussianSettings
+#externalProgram = OrcaSettings
 ###########################################################################################################################################
 
 ###########################################################################################################################################

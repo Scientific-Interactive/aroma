@@ -1,9 +1,0 @@
-geomfile=/home/anuja/input/pyrrole.in
-run=nicsscan, scan
-center:1,2,3,4,5
-keylines
-nics_template
-# b3lyp/6-31+G* nmr=giao IOP(10/46=1) POP(NBOREAD, FULL)
-end keyline
-bqstep=0.2
-bqrange=-2,2

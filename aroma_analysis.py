@@ -9,7 +9,6 @@ import os
 import sys
 import math
 import string
-import fpformat
 import numpy
 import scipy
 

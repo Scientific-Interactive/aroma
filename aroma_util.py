@@ -268,3 +268,5 @@ def removeAllFiles(fileList):
       except:
           print("Error removing file", fl)
 
+def fpformatFix(x, digits):
+    return ('%.' + repr(digits) + 'f') % x
