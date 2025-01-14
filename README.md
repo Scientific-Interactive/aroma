@@ -1,9 +1,17 @@
 # Introduction
-The aroma package.
+Aroma is a utility package for evaluating aromatic properties via NICS
+methods, preferably by NICS,zz. It is designed as a “Plug-In” utility for the
+computational chemistry packages; Gaussian 09, Gaussian 16, Orca 5 and
+Orca 6. NBO 6 and NBO 7 are also supported for the purpose of CMO-NICS
+calculations (using the NCS procedure). 
 
-This is built in collaboration and active guidance of Prof Dr. A. Stanger at Technion https://chemistry.technion.ac.il/team/%d7%90%d7%9e%d7%a0%d7%95%d7%9f-%d7%a9%d7%98%d7%a0%d7%92%d7%a8/ by Scientific Interactive. 
-(c) Techionon 
+
+This package built in collaboration and active guidance of [Prof Dr. Amnon Stanger](https://chemistry.technion.ac.il/team/%d7%90%d7%9e%d7%a0%d7%95%d7%9f-%d7%a9%d7%98%d7%a0%d7%92%d7%a8/) at Technion and Scientific Interactive team. 
+
+(c) Technion 
+
 (c) Scientific Interactive
+
 
 # Building 
 
