@@ -1,6 +1,6 @@
 # Introduction
 Aroma is a utility package for evaluating aromatic properties via NICS
-methods, preferably by NICS,zz. It is designed as a “Plug-In” utility for the
+methods, preferably by NICS-pi,zz. It is designed as a “Plug-In” utility for the
 computational chemistry packages; Gaussian 09, Gaussian 16, Orca 5 and
 Orca 6. NBO 6 and NBO 7 are also supported for the purpose of CMO-NICS
 calculations (using the NCS procedure). 
