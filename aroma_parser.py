@@ -279,16 +279,15 @@ class OrcaOutputFileParser(FileParser):
          if (outlines[i].find("CHEMICAL SHIFTS") >= 0 or outlines[i].find("CHEMICAL SHIELDINGS") >= 0): break
 
 
-      i += 4
-      bl = 27
+#      i += 4
+      i += 11
+#      bl = 27
+      bl = 32
       st = i + bl*nat
       ed = st + nBQ*bl
 
-      # print("CHEMICAL SHIFTS", "line", i, "st", st, "ed", ed, "nat", nat, "nBQ", nBQ)
-
       idx=0
       for j in range(st, ed, bl):
-        # print("==START== idx,j,bl ", idx, j, bl)
         xx = yy = zz = e1 = e2 = e3 = iso = 0.0
         for k in range(j, j+bl):
           pline = outlines[k].strip() 
